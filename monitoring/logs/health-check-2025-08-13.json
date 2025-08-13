@@ -1,0 +1,32 @@
+[
+  {
+    "timestamp": "2025-08-13T18:03:10.620Z",
+    "type": "health-check",
+    "data": [
+      {
+        "target": "Railway Production",
+        "url": "https://gclaude-enterprise.railway.app",
+        "status": "down",
+        "responseTime": null,
+        "error": "Request failed with status code 404",
+        "timestamp": "2025-08-13T18:03:08.232Z"
+      },
+      {
+        "target": "Render Production",
+        "url": "https://gclaude-enterprise.onrender.com",
+        "status": "down",
+        "responseTime": null,
+        "error": "Request failed with status code 404",
+        "timestamp": "2025-08-13T18:03:10.145Z"
+      },
+      {
+        "target": "Local Development",
+        "url": "http://localhost:3007",
+        "status": "up",
+        "responseTime": 4,
+        "statusCode": 200,
+        "timestamp": "2025-08-13T18:03:10.620Z"
+      }
+    ]
+  }
+]

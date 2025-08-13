@@ -1,11 +1,18 @@
-
 services:
   - type: web
     name: gclaude-enterprise-system
     env: node
+    plan: free
     buildCommand: npm install
     startCommand: node enterprise-server.js
     healthCheckPath: /api/health
+    autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
+      - key: JWT_SECRET
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false

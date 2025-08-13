@@ -1,0 +1,81 @@
+{
+  "title": "🌐 跨瀏覽器相容性測試報告",
+  "timestamp": "2025-08-13T17:36:56.262Z",
+  "summary": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0,
+    "passRate": "100.0%"
+  },
+  "testResults": [
+    {
+      "testName": "Chrome 首頁載入",
+      "success": true,
+      "message": "登入表單正常載入",
+      "timestamp": "2025-08-13T17:36:40.037Z"
+    },
+    {
+      "testName": "Chrome 管理員登入",
+      "success": true,
+      "message": "登入成功",
+      "timestamp": "2025-08-13T17:36:43.294Z"
+    },
+    {
+      "testName": "Chrome Desktop響應式",
+      "success": true,
+      "message": "視窗尺寸 1920x1080 正常顯示",
+      "timestamp": "2025-08-13T17:36:44.495Z"
+    },
+    {
+      "testName": "Chrome Tablet響應式",
+      "success": true,
+      "message": "視窗尺寸 768x1024 正常顯示",
+      "timestamp": "2025-08-13T17:36:45.615Z"
+    },
+    {
+      "testName": "Chrome Mobile響應式",
+      "success": true,
+      "message": "視窗尺寸 375x667 正常顯示",
+      "timestamp": "2025-08-13T17:36:46.721Z"
+    },
+    {
+      "testName": "Edge 首頁載入",
+      "success": true,
+      "message": "登入表單正常載入",
+      "timestamp": "2025-08-13T17:36:49.481Z"
+    },
+    {
+      "testName": "Edge 管理員登入",
+      "success": true,
+      "message": "登入成功",
+      "timestamp": "2025-08-13T17:36:52.727Z"
+    },
+    {
+      "testName": "Edge Desktop響應式",
+      "success": true,
+      "message": "視窗尺寸 1920x1080 正常顯示",
+      "timestamp": "2025-08-13T17:36:53.912Z"
+    },
+    {
+      "testName": "Edge Tablet響應式",
+      "success": true,
+      "message": "視窗尺寸 768x1024 正常顯示",
+      "timestamp": "2025-08-13T17:36:55.010Z"
+    },
+    {
+      "testName": "Edge Mobile響應式",
+      "success": true,
+      "message": "視窗尺寸 375x667 正常顯示",
+      "timestamp": "2025-08-13T17:36:56.086Z"
+    }
+  ],
+  "compatibility": {
+    "chrome": true,
+    "edge": true
+  },
+  "responsiveDesign": {
+    "desktop": true,
+    "tablet": true,
+    "mobile": true
+  }
+}

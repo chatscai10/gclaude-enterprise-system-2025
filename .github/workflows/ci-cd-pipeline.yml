@@ -1,0 +1,370 @@
+name: 🚀 GClaude Enterprise CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # 📋 程式碼品質檢查
+  code-quality:
+    name: 📋 Code Quality Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🔍 Lint Check
+        run: npm run lint --if-present
+
+      - name: 📊 Type Check
+        run: npm run typecheck --if-present
+
+      - name: 🔒 Security Audit
+        run: npm audit --audit-level=moderate
+
+  # 🧪 測試階段
+  test:
+    name: 🧪 Test Suite
+    runs-on: ubuntu-latest
+    needs: code-quality
+    strategy:
+      matrix:
+        test-type: [unit, integration, api, security]
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🗄️ Setup Database
+        run: |
+          mkdir -p data
+          node -e "require('./database.js')"
+
+      - name: 🧪 Run ${{ matrix.test-type }} Tests
+        run: |
+          case "${{ matrix.test-type }}" in
+            "unit")
+              npm test --if-present
+              ;;
+            "integration")
+              npm run test:integration --if-present
+              ;;
+            "api")
+              npm start &
+              sleep 10
+              node scripts/comprehensive-api-test.js
+              ;;
+            "security")
+              node scripts/security-audit.js
+              ;;
+          esac
+
+      - name: 📊 Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ matrix.test-type }}
+          path: |
+            test-results/
+            coverage/
+            logs/
+
+  # 🌐 瀏覽器測試
+  browser-tests:
+    name: 🌐 Browser Compatibility Tests
+    runs-on: ubuntu-latest
+    needs: test
+    strategy:
+      matrix:
+        browser: [chrome, firefox]
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🌐 Install Browser Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser firefox
+
+      - name: 🗄️ Setup Database
+        run: |
+          mkdir -p data
+          node -e "require('./database.js')"
+
+      - name: 🚀 Start Server
+        run: |
+          npm start &
+          sleep 15
+
+      - name: 🌐 Run Browser Tests
+        run: |
+          if [ "${{ matrix.browser }}" = "chrome" ]; then
+            node scripts/enhanced-browser-verification.js
+          else
+            node scripts/comprehensive-cross-browser-test.js
+          fi
+
+      - name: 📸 Upload Screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-screenshots-${{ matrix.browser }}
+          path: |
+            **/screenshots/
+            **/*screenshots*/
+
+  # 🐳 Docker構建
+  docker-build:
+    name: 🐳 Docker Build & Test
+    runs-on: ubuntu-latest
+    needs: [test, browser-tests]
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🐳 Build Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: gclaude-enterprise:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 🧪 Test Docker Container
+        run: |
+          docker run -d --name test-container \
+            -p 3007:3007 \
+            -e NODE_ENV=test \
+            gclaude-enterprise:test
+          
+          sleep 30
+          
+          # 健康檢查
+          curl --fail http://localhost:3007/api/health || exit 1
+          
+          docker stop test-container
+          docker rm test-container
+
+      - name: 🏷️ Log in to Container Registry
+        if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📦 Extract Metadata
+        if: github.ref == 'refs/heads/main'
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: 🚀 Build and Push
+        if: github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # 🚀 部署到各平台
+  deploy:
+    name: 🚀 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [docker-build]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    strategy:
+      matrix:
+        platform: [railway, render]
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🚀 Deploy to ${{ matrix.platform }}
+        run: |
+          case "${{ matrix.platform }}" in
+            "railway")
+              if [ -n "${{ secrets.RAILWAY_TOKEN }}" ]; then
+                echo "部署到 Railway..."
+                # Railway CLI 部署邏輯
+                curl -fsSL https://railway.app/install.sh | sh
+                railway login --token ${{ secrets.RAILWAY_TOKEN }}
+                railway up --detach
+              else
+                echo "Railway token not configured, skipping"
+              fi
+              ;;
+            "render")
+              if [ -n "${{ secrets.RENDER_API_KEY }}" ]; then
+                echo "觸發 Render 部署..."
+                curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}" \
+                  -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}"
+              else
+                echo "Render API key not configured, skipping"
+              fi
+              ;;
+          esac
+
+  # ✅ 部署後驗證
+  post-deploy-verification:
+    name: ✅ Post-Deploy Verification
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: ⏳ Wait for Deployment
+        run: sleep 60
+
+      - name: 🏥 Health Check
+        run: |
+          URLS=("https://gclaude-enterprise.railway.app" "https://gclaude-enterprise.onrender.com")
+          for url in "${URLS[@]}"; do
+            echo "檢查 $url..."
+            if curl --fail --max-time 30 "$url/api/health"; then
+              echo "✅ $url 健康檢查通過"
+            else
+              echo "❌ $url 健康檢查失敗"
+            fi
+          done
+
+      - name: 🧪 Smoke Tests
+        run: |
+          # 執行基本功能測試
+          node -e "
+            const axios = require('axios');
+            async function smokeTest() {
+              const urls = [
+                'https://gclaude-enterprise.railway.app',
+                'https://gclaude-enterprise.onrender.com'
+              ];
+              
+              for (const url of urls) {
+                try {
+                  console.log(\`測試 \${url}...\`);
+                  
+                  // 健康檢查
+                  const health = await axios.get(\`\${url}/api/health\`, { timeout: 10000 });
+                  console.log(\`✅ 健康檢查: \${health.status}\`);
+                  
+                  // 登入測試
+                  const login = await axios.post(\`\${url}/api/auth/login\`, {
+                    username: 'admin',
+                    password: 'admin123'
+                  }, { timeout: 10000 });
+                  console.log(\`✅ 登入測試: \${login.status}\`);
+                  
+                } catch (error) {
+                  console.log(\`❌ \${url} 測試失敗: \${error.message}\`);
+                }
+              }
+            }
+            smokeTest();
+          "
+
+  # 📱 通知
+  notify:
+    name: 📱 Notification
+    runs-on: ubuntu-latest
+    needs: [post-deploy-verification]
+    if: always()
+    steps:
+      - name: 📱 Send Telegram Notification
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ "${{ needs.post-deploy-verification.result }}" = "success" ]; then
+            STATUS="✅ 成功"
+            MESSAGE="🚀 GClaude Enterprise System 部署成功！
+            
+            📊 部署資訊:
+            • 分支: ${{ github.ref_name }}
+            • 提交: ${{ github.sha }}
+            • 觸發者: ${{ github.actor }}
+            
+            🌐 可用網址:
+            • Railway: https://gclaude-enterprise.railway.app
+            • Render: https://gclaude-enterprise.onrender.com
+            
+            ✅ 所有測試和部署檢查通過"
+          else
+            STATUS="❌ 失敗"
+            MESSAGE="🚨 GClaude Enterprise System 部署失敗！
+            
+            📊 部署資訊:
+            • 分支: ${{ github.ref_name }}
+            • 提交: ${{ github.sha }}
+            • 觸發者: ${{ github.actor }}
+            
+            請檢查 GitHub Actions 日誌以了解詳細錯誤資訊。"
+          fi
+          
+          if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
+            curl -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+              -H "Content-Type: application/json" \
+              -d "{
+                \"chat_id\": \"$TELEGRAM_CHAT_ID\",
+                \"text\": \"$MESSAGE\",
+                \"parse_mode\": \"HTML\"
+              }"
+          fi

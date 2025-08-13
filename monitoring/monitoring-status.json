@@ -1,0 +1,29 @@
+{
+  "startTime": "2025-08-13T18:03:07.941Z",
+  "targets": [
+    {
+      "name": "Railway Production",
+      "url": "https://gclaude-enterprise.railway.app",
+      "status": "unknown",
+      "lastCheck": null
+    },
+    {
+      "name": "Render Production",
+      "url": "https://gclaude-enterprise.onrender.com",
+      "status": "unknown",
+      "lastCheck": null
+    },
+    {
+      "name": "Local Development",
+      "url": "http://localhost:3007",
+      "status": "unknown",
+      "lastCheck": null
+    }
+  ],
+  "alerts": [],
+  "metrics": {
+    "uptime": 0,
+    "totalChecks": 0,
+    "failedChecks": 0
+  }
+}
