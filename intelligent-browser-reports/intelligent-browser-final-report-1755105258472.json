@@ -1,0 +1,1039 @@
+{
+  "timestamp": "2025-08-13T17:14:18.470Z",
+  "testingSummary": {
+    "totalTestCategories": 3,
+    "completedCategories": 3,
+    "totalTests": 40,
+    "passedTests": 28,
+    "failedTests": 12,
+    "totalScreenshots": 13,
+    "totalErrors": 8,
+    "overallSuccessRate": 70
+  },
+  "detailedResults": {
+    "basic_verification": {
+      "startTime": 1755104858203,
+      "tests": [
+        {
+          "name": "首頁載入測試",
+          "startTime": 1755104858344,
+          "status": "passed",
+          "steps": [
+            "導航到首頁",
+            "頁面標題: 登入 - GClaude 企業管理系統",
+            "登入表單存在: true"
+          ],
+          "screenshots": [],
+          "errors": [],
+          "duration": 2407
+        },
+        {
+          "name": "API 健康檢查",
+          "startTime": 1755104860751,
+          "status": "passed",
+          "steps": [
+            "API 狀態: healthy",
+            "服務版本: 2.0.0",
+            "運行時間: 3408秒"
+          ],
+          "screenshots": [],
+          "errors": [],
+          "duration": 2104
+        },
+        {
+          "name": "用戶登入測試: admin",
+          "startTime": 1755104862855,
+          "status": "passed",
+          "steps": [
+            "表單填寫完成",
+            "提交登入表單",
+            "登入後 URL: http://localhost:3007/admin",
+            "登入成功"
+          ],
+          "screenshots": [],
+          "errors": [],
+          "duration": 4394
+        },
+        {
+          "name": "用戶登入測試: manager",
+          "startTime": 1755104867256,
+          "status": "passed",
+          "steps": [
+            "表單填寫完成",
+            "提交登入表單",
+            "登入後 URL: http://localhost:3007/dashboard?role=manager",
+            "登入成功"
+          ],
+          "screenshots": [],
+          "errors": [],
+          "duration": 3695
+        },
+        {
+          "name": "用戶登入測試: employee",
+          "startTime": 1755104870960,
+          "status": "passed",
+          "steps": [
+            "表單填寫完成",
+            "提交登入表單",
+            "登入後 URL: http://localhost:3007/dashboard?role=employee",
+            "登入成功"
+          ],
+          "screenshots": [],
+          "errors": [],
+          "duration": 3756
+        },
+        {
+          "name": "用戶登入測試: intern",
+          "startTime": 1755104874722,
+          "status": "passed",
+          "steps": [
+            "表單填寫完成",
+            "提交登入表單",
+            "登入後 URL: http://localhost:3007/dashboard?role=intern",
+            "登入成功"
+          ],
+          "screenshots": [],
+          "errors": [],
+          "duration": 4393
+        },
+        {
+          "name": "響應式設計測試",
+          "startTime": 1755104879121,
+          "status": "passed",
+          "steps": [
+            "Desktop 視圖測試完成",
+            "Tablet 視圖測試完成",
+            "Mobile 視圖測試完成"
+          ],
+          "screenshots": [],
+          "errors": [],
+          "duration": 3901
+        }
+      ],
+      "screenshots": [
+        {
+          "name": "homepage",
+          "description": "首頁載入完成",
+          "filename": "homepage-1755104860359.png",
+          "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\homepage-1755104860359.png",
+          "timestamp": 1755104860359
+        },
+        {
+          "name": "health-check",
+          "description": "API 健康檢查結果",
+          "filename": "health-check-1755104862769.png",
+          "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\health-check-1755104862769.png",
+          "timestamp": 1755104862769
+        },
+        {
+          "name": "login-form-filled-admin",
+          "description": "登入表單已填寫",
+          "filename": "login-form-filled-admin-1755104864026.png",
+          "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\login-form-filled-admin-1755104864026.png",
+          "timestamp": 1755104864026
+        },
+        {
+          "name": "login-result-admin",
+          "description": "登入結果",
+          "filename": "login-result-admin-1755104867035.png",
+          "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\login-result-admin-1755104867035.png",
+          "timestamp": 1755104867035
+        },
+        {
+          "name": "login-form-filled-manager",
+          "description": "登入表單已填寫",
+          "filename": "login-form-filled-manager-1755104867922.png",
+          "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\login-form-filled-manager-1755104867922.png",
+          "timestamp": 1755104867922
+        },
+        {
+          "name": "login-result-manager",
+          "description": "登入結果",
+          "filename": "login-result-manager-1755104870770.png",
+          "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\login-result-manager-1755104870770.png",
+          "timestamp": 1755104870770
+        },
+        {
+          "name": "login-form-filled-employee",
+          "description": "登入表單已填寫",
+          "filename": "login-form-filled-employee-1755104871941.png",
+          "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\login-form-filled-employee-1755104871941.png",
+          "timestamp": 1755104871941
+        },
+        {
+          "name": "login-result-employee",
+          "description": "登入結果",
+          "filename": "login-result-employee-1755104874526.png",
+          "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\login-result-employee-1755104874526.png",
+          "timestamp": 1755104874526
+        },
+        {
+          "name": "login-form-filled-intern",
+          "description": "登入表單已填寫",
+          "filename": "login-form-filled-intern-1755104875958.png",
+          "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\login-form-filled-intern-1755104875958.png",
+          "timestamp": 1755104875958
+        },
+        {
+          "name": "login-result-intern",
+          "description": "登入結果",
+          "filename": "login-result-intern-1755104878932.png",
+          "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\login-result-intern-1755104878932.png",
+          "timestamp": 1755104878932
+        },
+        {
+          "name": "responsive-Desktop",
+          "description": "Desktop 視圖",
+          "filename": "responsive-Desktop-1755104879753.png",
+          "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\responsive-Desktop-1755104879753.png",
+          "timestamp": 1755104879753
+        },
+        {
+          "name": "responsive-Tablet",
+          "description": "Tablet 視圖",
+          "filename": "responsive-Tablet-1755104880975.png",
+          "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\responsive-Tablet-1755104880975.png",
+          "timestamp": 1755104880975
+        },
+        {
+          "name": "responsive-Mobile",
+          "description": "Mobile 視圖",
+          "filename": "responsive-Mobile-1755104882954.png",
+          "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\responsive-Mobile-1755104882954.png",
+          "timestamp": 1755104882954
+        }
+      ],
+      "errors": [
+        {
+          "type": "http_error",
+          "status": 404,
+          "url": "http://localhost:3007/api/auth/verify",
+          "timestamp": 1755104867270
+        },
+        {
+          "type": "console_error",
+          "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "timestamp": 1755104867270
+        },
+        {
+          "type": "http_error",
+          "status": 404,
+          "url": "http://localhost:3007/api/auth/verify",
+          "timestamp": 1755104870971
+        },
+        {
+          "type": "console_error",
+          "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "timestamp": 1755104870971
+        },
+        {
+          "type": "http_error",
+          "status": 404,
+          "url": "http://localhost:3007/api/auth/verify",
+          "timestamp": 1755104874734
+        },
+        {
+          "type": "console_error",
+          "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "timestamp": 1755104874734
+        },
+        {
+          "type": "http_error",
+          "status": 404,
+          "url": "http://localhost:3007/api/auth/verify",
+          "timestamp": 1755104879134
+        },
+        {
+          "type": "console_error",
+          "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "timestamp": 1755104879134
+        }
+      ],
+      "summary": {
+        "totalTests": 7,
+        "passedTests": 7,
+        "failedTests": 0,
+        "totalDuration": 24819,
+        "averageTestDuration": 3545.5714285714284,
+        "totalScreenshots": 13,
+        "totalErrors": 8,
+        "timestamp": "2025-08-13T17:08:03.022Z"
+      }
+    },
+    "deep_verification": null,
+    "complete_function": {
+      "startTime": 1755105015710,
+      "apiTests": [
+        {
+          "name": "系統健康檢查",
+          "url": "/api/health",
+          "status": "passed",
+          "expectedStatus": 200,
+          "actualStatus": 200,
+          "responseData": {
+            "status": "healthy",
+            "service": "GClaude Enterprise Management System",
+            "version": "2.0.0",
+            "timestamp": "2025-08-13T17:10:16.019Z",
+            "uptime": 3563,
+            "environment": "development",
+            "features": {
+              "authentication": true,
+              "employeeManagement": true,
+              "attendanceSystem": true,
+              "revenueTracking": true,
+              "inventoryManagement": true,
+              "schedulingSystem": true,
+              "promotionVoting": true,
+              "maintenanceRequests": true,
+              "telegramIntegration": true,
+              "browserVerification": true,
+              "realTimeNotifications": true,
+              "databaseConnection": true
+            },
+            "database": {
+              "connected": true,
+              "type": "SQLite",
+              "location": "./data/enterprise.db"
+            }
+          },
+          "timestamp": "2025-08-13T17:10:16.021Z"
+        },
+        {
+          "name": "用戶登入API",
+          "url": "/api/auth/login",
+          "status": "passed",
+          "expectedStatus": 200,
+          "actualStatus": 200,
+          "responseData": {
+            "success": true,
+            "message": "登入成功",
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXVpZCI6IjMxMTdjNWVhLTA2MmEtNDliNi05YWNlLTY1ODc3MzY3ODdlMCIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTUxMDUwMTYsImV4cCI6MTc1NTE5MTQxNn0.cHbLsxQV3_d783XTLv9DI2msFiBbIV8VQKf527XuJaM",
+            "user": {
+              "id": 1,
+              "uuid": "3117c5ea-062a-49b6-9ace-6587736787e0",
+              "username": "admin",
+              "name": "系統管理員",
+              "role": "admin",
+              "email": "admin@gclaude.com",
+              "phone": "02-12345678"
+            }
+          },
+          "timestamp": "2025-08-13T17:10:16.173Z"
+        },
+        {
+          "name": "獲取用戶資料",
+          "url": "/api/auth/profile",
+          "status": "passed",
+          "expectedStatus": 200,
+          "actualStatus": 200,
+          "responseData": {
+            "success": true,
+            "data": {
+              "id": 1,
+              "uuid": "3117c5ea-062a-49b6-9ace-6587736787e0",
+              "username": "admin",
+              "name": "系統管理員",
+              "role": "admin",
+              "email": "admin@gclaude.com",
+              "phone": "02-12345678",
+              "birth_date": "1980-01-01",
+              "gender": "男",
+              "address": "台北市信義區松智路1號",
+              "hire_date": "2020-01-01",
+              "department_id": 1
+            }
+          },
+          "timestamp": "2025-08-13T17:10:16.176Z"
+        },
+        {
+          "name": "員工統計API",
+          "url": "/api/employees/stats/overview",
+          "status": "passed",
+          "expectedStatus": 200,
+          "actualStatus": 200,
+          "responseData": {
+            "success": true,
+            "data": {
+              "total": 5,
+              "active": 5,
+              "recentHires": 1,
+              "averageSalary": 51600,
+              "byDepartment": {
+                "技術部": 1,
+                "服務部": 2,
+                "營運部": 1,
+                "管理部": 1
+              },
+              "byPosition": {
+                "系統管理員": 1,
+                "員工": 2,
+                "實習生": 1,
+                "店長": 1
+              }
+            }
+          },
+          "timestamp": "2025-08-13T17:10:16.180Z"
+        },
+        {
+          "name": "儀表板統計",
+          "url": "/api/dashboard/stats",
+          "status": "passed",
+          "expectedStatus": 200,
+          "actualStatus": 200,
+          "responseData": {
+            "success": true,
+            "data": {
+              "employees": 5,
+              "todayAttendance": 2,
+              "monthlyRevenue": 378012,
+              "lowStockProducts": 0,
+              "pendingMaintenance": 4,
+              "systemHealth": 100,
+              "lastUpdated": "2025-08-13T17:10:16.182Z"
+            }
+          },
+          "timestamp": "2025-08-13T17:10:16.182Z"
+        },
+        {
+          "name": "最近活動記錄",
+          "url": "/api/dashboard/recent-activities",
+          "status": "passed",
+          "expectedStatus": 200,
+          "actualStatus": 200,
+          "responseData": {
+            "success": true,
+            "data": [
+              {
+                "id": 52,
+                "action": "user_login",
+                "user_name": "系統管理員",
+                "user_role": "admin",
+                "target_type": null,
+                "created_at": "2025-08-13 17:10:16",
+                "icon": "bi-person-check",
+                "description": "系統管理員 登入系統"
+              },
+              {
+                "id": 51,
+                "action": "user_login",
+                "user_name": "李實習生",
+                "user_role": "intern",
+                "target_type": null,
+                "created_at": "2025-08-13 17:09:24",
+                "icon": "bi-person-check",
+                "description": "李實習生 登入系統"
+              },
+              {
+                "id": 50,
+                "action": "user_login",
+                "user_name": "張員工",
+                "user_role": "employee",
+                "target_type": null,
+                "created_at": "2025-08-13 17:09:17",
+                "icon": "bi-person-check",
+                "description": "張員工 登入系統"
+              },
+              {
+                "id": 49,
+                "action": "user_login",
+                "user_name": "王店長",
+                "user_role": "manager",
+                "target_type": null,
+                "created_at": "2025-08-13 17:09:09",
+                "icon": "bi-person-check",
+                "description": "王店長 登入系統"
+              },
+              {
+                "id": 48,
+                "action": "user_login",
+                "user_name": "系統管理員",
+                "user_role": "admin",
+                "target_type": null,
+                "created_at": "2025-08-13 17:08:57",
+                "icon": "bi-person-check",
+                "description": "系統管理員 登入系統"
+              },
+              {
+                "id": 47,
+                "action": "user_login",
+                "user_name": "系統管理員",
+                "user_role": "admin",
+                "target_type": null,
+                "created_at": "2025-08-13 17:08:30",
+                "icon": "bi-person-check",
+                "description": "系統管理員 登入系統"
+              },
+              {
+                "id": 46,
+                "action": "user_login",
+                "user_name": "李實習生",
+                "user_role": "intern",
+                "target_type": null,
+                "created_at": "2025-08-13 17:07:56",
+                "icon": "bi-person-check",
+                "description": "李實習生 登入系統"
+              },
+              {
+                "id": 45,
+                "action": "user_login",
+                "user_name": "張員工",
+                "user_role": "employee",
+                "target_type": null,
+                "created_at": "2025-08-13 17:07:52",
+                "icon": "bi-person-check",
+                "description": "張員工 登入系統"
+              },
+              {
+                "id": 44,
+                "action": "user_login",
+                "user_name": "王店長",
+                "user_role": "manager",
+                "target_type": null,
+                "created_at": "2025-08-13 17:07:48",
+                "icon": "bi-person-check",
+                "description": "王店長 登入系統"
+              },
+              {
+                "id": 43,
+                "action": "user_login",
+                "user_name": "系統管理員",
+                "user_role": "admin",
+                "target_type": null,
+                "created_at": "2025-08-13 17:07:44",
+                "icon": "bi-person-check",
+                "description": "系統管理員 登入系統"
+              }
+            ]
+          },
+          "timestamp": "2025-08-13T17:10:16.184Z"
+        },
+        {
+          "name": "商品列表API",
+          "url": "/api/products",
+          "status": "passed",
+          "expectedStatus": 200,
+          "actualStatus": 200,
+          "responseData": {
+            "success": true,
+            "data": [
+              {
+                "id": 5,
+                "uuid": "7b9f74e7-6fa2-4769-9428-9d40093b8673",
+                "code": "P005",
+                "name": "原子筆",
+                "category": "辦公用品",
+                "description": null,
+                "unit": "個",
+                "current_stock": 120,
+                "min_stock": 25,
+                "max_stock": 1000,
+                "unit_cost": 8.5,
+                "selling_price": 15,
+                "supplier": "辦公用品供應商",
+                "is_active": 1,
+                "created_at": "2025-08-13 15:35:58",
+                "updated_at": "2025-08-13 15:35:58"
+              },
+              {
+                "id": 2,
+                "uuid": "8c22af87-a5c4-49a3-8cf4-d6ee596bf68b",
+                "code": "P002",
+                "name": "垃圾袋",
+                "category": "清潔用品",
+                "description": null,
+                "unit": "個",
+                "current_stock": 80,
+                "min_stock": 15,
+                "max_stock": 1000,
+                "unit_cost": 45,
+                "selling_price": 65,
+                "supplier": "清潔用品供應商",
+                "is_active": 1,
+                "created_at": "2025-08-13 15:35:58",
+                "updated_at": "2025-08-13 15:35:58"
+              },
+              {
+                "id": 3,
+                "uuid": "6eace7bb-b341-43df-b0fe-e81225ca8440",
+                "code": "P003",
+                "name": "洗手液",
+                "category": "個人護理",
+                "description": null,
+                "unit": "個",
+                "current_stock": 45,
+                "min_stock": 10,
+                "max_stock": 1000,
+                "unit_cost": 120,
+                "selling_price": 180,
+                "supplier": "個護產品供應商",
+                "is_active": 1,
+                "created_at": "2025-08-13 15:35:58",
+                "updated_at": "2025-08-13 15:35:58"
+              },
+              {
+                "id": 1,
+                "uuid": "2087315e-b2bf-40f6-85cc-5811c4b507d0",
+                "code": "P001",
+                "name": "紙巾包",
+                "category": "清潔用品",
+                "description": null,
+                "unit": "個",
+                "current_stock": 150,
+                "min_stock": 20,
+                "max_stock": 1000,
+                "unit_cost": 25.5,
+                "selling_price": 35,
+                "supplier": "清潔用品供應商",
+                "is_active": 1,
+                "created_at": "2025-08-13 15:35:58",
+                "updated_at": "2025-08-13 15:35:58"
+              },
+              {
+                "id": 4,
+                "uuid": "933dd35c-61eb-4b07-a1b1-acb03d3856fa",
+                "code": "P004",
+                "name": "辦公紙",
+                "category": "辦公用品",
+                "description": null,
+                "unit": "個",
+                "current_stock": 200,
+                "min_stock": 30,
+                "max_stock": 1000,
+                "unit_cost": 15.5,
+                "selling_price": 25,
+                "supplier": "辦公用品供應商",
+                "is_active": 1,
+                "created_at": "2025-08-13 15:35:58",
+                "updated_at": "2025-08-13 15:35:58"
+              }
+            ],
+            "pagination": {
+              "page": 1,
+              "limit": 10,
+              "total": 5,
+              "pages": 1
+            }
+          },
+          "timestamp": "2025-08-13T17:10:16.186Z"
+        }
+      ],
+      "buttonTests": [
+        {
+          "section": "dashboard",
+          "name": "GPS打卡按鈕",
+          "selector": ".action-btn[data-action=\"attendance\"]",
+          "status": "passed",
+          "clickable": true,
+          "timestamp": "2025-08-13T17:10:24.069Z"
+        },
+        {
+          "section": "dashboard",
+          "name": "新增員工按鈕",
+          "selector": ".action-btn[data-action=\"addEmployee\"]",
+          "status": "failed",
+          "error": "Node is either not clickable or not an Element",
+          "timestamp": "2025-08-13T17:10:24.079Z"
+        },
+        {
+          "section": "dashboard",
+          "name": "庫存管理按鈕",
+          "selector": ".action-btn[data-action=\"inventory\"]",
+          "status": "failed",
+          "error": "Node is either not clickable or not an Element",
+          "timestamp": "2025-08-13T17:10:24.097Z"
+        },
+        {
+          "section": "dashboard",
+          "name": "營收記錄按鈕",
+          "selector": ".action-btn[data-action=\"revenue\"]",
+          "status": "failed",
+          "error": "Node is either not clickable or not an Element",
+          "timestamp": "2025-08-13T17:10:24.114Z"
+        },
+        {
+          "section": "employees",
+          "name": "新增員工模態框按鈕",
+          "selector": "button[data-bs-target=\"#addEmployeeModal\"]",
+          "status": "passed",
+          "clickable": true,
+          "timestamp": "2025-08-13T17:10:26.685Z"
+        },
+        {
+          "section": "employees",
+          "name": "員工表單提交按鈕",
+          "selector": "#addEmployeeForm button[type=\"submit\"]",
+          "status": "failed",
+          "error": "按鈕元素未找到",
+          "timestamp": "2025-08-13T17:10:26.691Z"
+        },
+        {
+          "section": "attendance",
+          "name": "GPS打卡按鈕",
+          "selector": "#gpsCheckInBtn",
+          "status": "failed",
+          "error": "Node is either not clickable or not an Element",
+          "timestamp": "2025-08-13T17:10:28.741Z"
+        },
+        {
+          "section": "attendance",
+          "name": "查看出勤記錄",
+          "selector": ".btn[data-action=\"view-attendance\"]",
+          "status": "failed",
+          "error": "按鈕元素未找到",
+          "timestamp": "2025-08-13T17:10:28.743Z"
+        },
+        {
+          "section": "revenue",
+          "name": "新增營收記錄按鈕",
+          "selector": "button[data-bs-target=\"#addRevenueModal\"]",
+          "status": "passed",
+          "clickable": true,
+          "timestamp": "2025-08-13T17:10:31.309Z"
+        },
+        {
+          "section": "revenue",
+          "name": "營收表單提交按鈕",
+          "selector": "#addRevenueForm button[type=\"submit\"]",
+          "status": "failed",
+          "error": "按鈕元素未找到",
+          "timestamp": "2025-08-13T17:10:31.312Z"
+        },
+        {
+          "section": "inventory",
+          "name": "叫貨申請按鈕",
+          "selector": "button[data-bs-target=\"#orderModal\"]",
+          "status": "failed",
+          "error": "Node is either not clickable or not an Element",
+          "timestamp": "2025-08-13T17:10:33.367Z"
+        },
+        {
+          "section": "inventory",
+          "name": "新增商品按鈕",
+          "selector": "button[data-bs-target=\"#addProductModal\"]",
+          "status": "failed",
+          "error": "按鈕元素未找到",
+          "timestamp": "2025-08-13T17:10:33.368Z"
+        },
+        {
+          "section": "inventory",
+          "name": "叫貨表單提交",
+          "selector": "#orderForm button[type=\"submit\"]",
+          "status": "failed",
+          "error": "按鈕元素未找到",
+          "timestamp": "2025-08-13T17:10:33.370Z"
+        },
+        {
+          "section": "maintenance",
+          "name": "新增維修申請按鈕",
+          "selector": "button[data-bs-target=\"#maintenanceModal\"]",
+          "status": "passed",
+          "clickable": true,
+          "timestamp": "2025-08-13T17:10:35.934Z"
+        },
+        {
+          "section": "maintenance",
+          "name": "維修表單提交按鈕",
+          "selector": "#maintenanceForm button[type=\"submit\"]",
+          "status": "failed",
+          "error": "按鈕元素未找到",
+          "timestamp": "2025-08-13T17:10:35.937Z"
+        }
+      ],
+      "integrationTests": [
+        {
+          "name": "員工新增完整流程",
+          "status": "failed",
+          "error": "Node is either not clickable or not an Element",
+          "timestamp": "2025-08-13T17:10:37.959Z"
+        },
+        {
+          "name": "GPS打卡功能測試",
+          "status": "passed",
+          "result": {
+            "success": true,
+            "message": "GPS打卡功能響應正常"
+          },
+          "timestamp": "2025-08-13T17:10:43.027Z"
+        },
+        {
+          "name": "維修申請提交測試",
+          "status": "passed",
+          "result": {
+            "success": true,
+            "message": "維修申請流程完成"
+          },
+          "timestamp": "2025-08-13T17:10:46.124Z"
+        }
+      ],
+      "summary": {
+        "totalTests": 25,
+        "passedTests": 13,
+        "failedTests": 12,
+        "duration": 30414,
+        "passRate": "52.0"
+      },
+      "endTime": 1755105046124,
+      "duration": 30414,
+      "passRate": "52.0",
+      "generatedAt": "2025-08-13T17:10:46.124Z"
+    },
+    "cross_browser": {
+      "startTime": 1755105136323,
+      "browsers": [
+        {
+          "name": "Chrome",
+          "startTime": 1755105136325,
+          "tests": [
+            {
+              "name": "首頁載入",
+              "startTime": 1755105136453,
+              "status": "passed",
+              "steps": [
+                "頁面標題: 登入 - GClaude 企業管理系統",
+                "登入表單存在: true",
+                "首頁載入測試通過"
+              ],
+              "duration": 2422
+            },
+            {
+              "name": "用戶登入",
+              "startTime": 1755105138875,
+              "status": "passed",
+              "steps": [
+                "登入表單填寫完成",
+                "提交登入表單",
+                "登入後URL: http://localhost:3007/admin",
+                "登入成功"
+              ],
+              "duration": 3027
+            },
+            {
+              "name": "儀表板功能",
+              "startTime": 1755105141903,
+              "status": "passed",
+              "steps": [
+                "儀表板載入完成",
+                "統計卡片數量: 30",
+                "儀表板測試通過"
+              ],
+              "duration": 207
+            },
+            {
+              "name": "響應式設計",
+              "startTime": 1755105142110,
+              "status": "passed",
+              "steps": [
+                "Desktop 視圖測試完成",
+                "Tablet 視圖測試完成",
+                "Mobile 視圖測試完成",
+                "響應式設計測試通過"
+              ],
+              "duration": 374
+            }
+          ],
+          "screenshots": [
+            {
+              "name": "homepage-Chrome",
+              "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\homepage-Chrome-1755105138486.png",
+              "timestamp": 1755105138875
+            },
+            {
+              "name": "login-Chrome",
+              "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\login-Chrome-1755105138902.png",
+              "timestamp": 1755105139298
+            },
+            {
+              "name": "dashboard-Chrome",
+              "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\dashboard-Chrome-1755105141928.png",
+              "timestamp": 1755105142110
+            },
+            {
+              "name": "responsive-Desktop-Chrome",
+              "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\responsive-Desktop-Chrome-1755105142110.png",
+              "timestamp": 1755105142281
+            },
+            {
+              "name": "responsive-Tablet-Chrome",
+              "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\responsive-Tablet-Chrome-1755105142288.png",
+              "timestamp": 1755105142414
+            },
+            {
+              "name": "responsive-Mobile-Chrome",
+              "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\responsive-Mobile-Chrome-1755105142420.png",
+              "timestamp": 1755105142484
+            }
+          ],
+          "errors": [],
+          "status": "completed",
+          "duration": 6208
+        },
+        {
+          "name": "Edge",
+          "startTime": 1755105142533,
+          "tests": [
+            {
+              "name": "首頁載入",
+              "startTime": 1755105142869,
+              "status": "passed",
+              "steps": [
+                "頁面標題: 登入 - GClaude 企業管理系統",
+                "登入表單存在: true",
+                "首頁載入測試通過"
+              ],
+              "duration": 2361
+            },
+            {
+              "name": "用戶登入",
+              "startTime": 1755105145230,
+              "status": "passed",
+              "steps": [
+                "登入表單填寫完成",
+                "提交登入表單",
+                "登入後URL: http://localhost:3007/admin",
+                "登入成功"
+              ],
+              "duration": 2792
+            },
+            {
+              "name": "儀表板功能",
+              "startTime": 1755105148022,
+              "status": "passed",
+              "steps": [
+                "儀表板載入完成",
+                "統計卡片數量: 30",
+                "儀表板測試通過"
+              ],
+              "duration": 231
+            },
+            {
+              "name": "響應式設計",
+              "startTime": 1755105148254,
+              "status": "passed",
+              "steps": [
+                "Desktop 視圖測試完成",
+                "Tablet 視圖測試完成",
+                "Mobile 視圖測試完成",
+                "響應式設計測試通過"
+              ],
+              "duration": 478
+            }
+          ],
+          "screenshots": [
+            {
+              "name": "homepage-Edge",
+              "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\homepage-Edge-1755105144888.png",
+              "timestamp": 1755105145230
+            },
+            {
+              "name": "login-Edge",
+              "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\login-Edge-1755105145267.png",
+              "timestamp": 1755105145555
+            },
+            {
+              "name": "dashboard-Edge",
+              "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\dashboard-Edge-1755105148047.png",
+              "timestamp": 1755105148253
+            },
+            {
+              "name": "responsive-Desktop-Edge",
+              "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\responsive-Desktop-Edge-1755105148254.png",
+              "timestamp": 1755105148434
+            },
+            {
+              "name": "responsive-Tablet-Edge",
+              "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\responsive-Tablet-Edge-1755105148443.png",
+              "timestamp": 1755105148608
+            },
+            {
+              "name": "responsive-Mobile-Edge",
+              "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\responsive-Mobile-Edge-1755105148617.png",
+              "timestamp": 1755105148732
+            }
+          ],
+          "errors": [
+            {
+              "type": "console_error",
+              "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+              "timestamp": 1755105143469
+            }
+          ],
+          "status": "completed",
+          "duration": 6385
+        }
+      ],
+      "summary": {
+        "totalBrowsers": 2,
+        "completedBrowsers": 2,
+        "totalTests": 8,
+        "passedTests": 8,
+        "failedTests": 0,
+        "totalDuration": 12595,
+        "timestamp": "2025-08-13T17:12:28.918Z"
+      }
+    }
+  },
+  "recommendations": [
+    {
+      "type": "critical",
+      "title": "修復失敗的測試",
+      "description": "發現 12 個失敗測試需要修復",
+      "priority": "high",
+      "action": "檢查具體失敗原因並進行代碼修復"
+    },
+    {
+      "type": "error_handling",
+      "title": "改善錯誤處理",
+      "description": "檢測到 8 個系統錯誤",
+      "priority": "high",
+      "action": "增強錯誤處理機制和用戶友好的錯誤訊息"
+    },
+    {
+      "type": "quality_improvement",
+      "title": "提升系統穩定性",
+      "description": "當前成功率為 70%，建議提升至90%以上",
+      "priority": "medium",
+      "action": "全面檢查系統功能並優化用戶體驗"
+    },
+    {
+      "type": "best_practice",
+      "title": "持續監控和改進",
+      "description": "建立定期的自動化測試流程",
+      "priority": "low",
+      "action": "設置CI/CD管道中的自動化瀏覽器測試"
+    }
+  ],
+  "flightReport": {
+    "stage": "Browser Verification Complete",
+    "timestamp": "2025-08-13T17:14:18.472Z",
+    "summary": {
+      "testCategories": 3,
+      "totalTests": 40,
+      "passedTests": 28,
+      "failedTests": 12,
+      "successRate": "70%",
+      "screenshots": 13
+    },
+    "achievements": [
+      "✅ 完成基本瀏覽器功能驗證",
+      "✅ 執行深度系統功能測試",
+      "✅ 實現跨瀏覽器相容性驗證",
+      "✅ 進行響應式設計測試",
+      "✅ 測試用戶體驗流程",
+      "✅ 生成完整驗證報告"
+    ],
+    "technicalFindings": [
+      "完成 40 項瀏覽器測試",
+      "生成 13 張測試截圖",
+      "驗證 Chrome 和 Edge 瀏覽器相容性",
+      "測試 Desktop/Tablet/Mobile 響應式設計",
+      "評估系統整體穩定性：70%"
+    ],
+    "nextSteps": [
+      "🎯 修復失敗的測試: 發現 12 個失敗測試需要修復",
+      "🎯 改善錯誤處理: 檢測到 8 個系統錯誤",
+      "🎯 提升系統穩定性: 當前成功率為 70%，建議提升至90%以上"
+    ],
+    "systemStatus": "🟡 系統需要優化，建議修復後再次驗證"
+  }
+}

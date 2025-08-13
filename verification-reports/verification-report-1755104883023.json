@@ -1,0 +1,266 @@
+{
+  "config": {
+    "baseUrl": "http://localhost:3007",
+    "headless": true,
+    "timeout": 30000,
+    "screenshotDir": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots",
+    "reportDir": "D:\\0813\\gclaude-enterprise-system\\verification-reports"
+  },
+  "results": {
+    "startTime": 1755104858203,
+    "tests": [
+      {
+        "name": "首頁載入測試",
+        "startTime": 1755104858344,
+        "status": "passed",
+        "steps": [
+          "導航到首頁",
+          "頁面標題: 登入 - GClaude 企業管理系統",
+          "登入表單存在: true"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 2407
+      },
+      {
+        "name": "API 健康檢查",
+        "startTime": 1755104860751,
+        "status": "passed",
+        "steps": [
+          "API 狀態: healthy",
+          "服務版本: 2.0.0",
+          "運行時間: 3408秒"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 2104
+      },
+      {
+        "name": "用戶登入測試: admin",
+        "startTime": 1755104862855,
+        "status": "passed",
+        "steps": [
+          "表單填寫完成",
+          "提交登入表單",
+          "登入後 URL: http://localhost:3007/admin",
+          "登入成功"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 4394
+      },
+      {
+        "name": "用戶登入測試: manager",
+        "startTime": 1755104867256,
+        "status": "passed",
+        "steps": [
+          "表單填寫完成",
+          "提交登入表單",
+          "登入後 URL: http://localhost:3007/dashboard?role=manager",
+          "登入成功"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 3695
+      },
+      {
+        "name": "用戶登入測試: employee",
+        "startTime": 1755104870960,
+        "status": "passed",
+        "steps": [
+          "表單填寫完成",
+          "提交登入表單",
+          "登入後 URL: http://localhost:3007/dashboard?role=employee",
+          "登入成功"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 3756
+      },
+      {
+        "name": "用戶登入測試: intern",
+        "startTime": 1755104874722,
+        "status": "passed",
+        "steps": [
+          "表單填寫完成",
+          "提交登入表單",
+          "登入後 URL: http://localhost:3007/dashboard?role=intern",
+          "登入成功"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 4393
+      },
+      {
+        "name": "響應式設計測試",
+        "startTime": 1755104879121,
+        "status": "passed",
+        "steps": [
+          "Desktop 視圖測試完成",
+          "Tablet 視圖測試完成",
+          "Mobile 視圖測試完成"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 3901
+      }
+    ],
+    "screenshots": [
+      {
+        "name": "homepage",
+        "description": "首頁載入完成",
+        "filename": "homepage-1755104860359.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\homepage-1755104860359.png",
+        "timestamp": 1755104860359
+      },
+      {
+        "name": "health-check",
+        "description": "API 健康檢查結果",
+        "filename": "health-check-1755104862769.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\health-check-1755104862769.png",
+        "timestamp": 1755104862769
+      },
+      {
+        "name": "login-form-filled-admin",
+        "description": "登入表單已填寫",
+        "filename": "login-form-filled-admin-1755104864026.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\login-form-filled-admin-1755104864026.png",
+        "timestamp": 1755104864026
+      },
+      {
+        "name": "login-result-admin",
+        "description": "登入結果",
+        "filename": "login-result-admin-1755104867035.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\login-result-admin-1755104867035.png",
+        "timestamp": 1755104867035
+      },
+      {
+        "name": "login-form-filled-manager",
+        "description": "登入表單已填寫",
+        "filename": "login-form-filled-manager-1755104867922.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\login-form-filled-manager-1755104867922.png",
+        "timestamp": 1755104867922
+      },
+      {
+        "name": "login-result-manager",
+        "description": "登入結果",
+        "filename": "login-result-manager-1755104870770.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\login-result-manager-1755104870770.png",
+        "timestamp": 1755104870770
+      },
+      {
+        "name": "login-form-filled-employee",
+        "description": "登入表單已填寫",
+        "filename": "login-form-filled-employee-1755104871941.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\login-form-filled-employee-1755104871941.png",
+        "timestamp": 1755104871941
+      },
+      {
+        "name": "login-result-employee",
+        "description": "登入結果",
+        "filename": "login-result-employee-1755104874526.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\login-result-employee-1755104874526.png",
+        "timestamp": 1755104874526
+      },
+      {
+        "name": "login-form-filled-intern",
+        "description": "登入表單已填寫",
+        "filename": "login-form-filled-intern-1755104875958.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\login-form-filled-intern-1755104875958.png",
+        "timestamp": 1755104875958
+      },
+      {
+        "name": "login-result-intern",
+        "description": "登入結果",
+        "filename": "login-result-intern-1755104878932.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\login-result-intern-1755104878932.png",
+        "timestamp": 1755104878932
+      },
+      {
+        "name": "responsive-Desktop",
+        "description": "Desktop 視圖",
+        "filename": "responsive-Desktop-1755104879753.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\responsive-Desktop-1755104879753.png",
+        "timestamp": 1755104879753
+      },
+      {
+        "name": "responsive-Tablet",
+        "description": "Tablet 視圖",
+        "filename": "responsive-Tablet-1755104880975.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\responsive-Tablet-1755104880975.png",
+        "timestamp": 1755104880975
+      },
+      {
+        "name": "responsive-Mobile",
+        "description": "Mobile 視圖",
+        "filename": "responsive-Mobile-1755104882954.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\verification-screenshots\\responsive-Mobile-1755104882954.png",
+        "timestamp": 1755104882954
+      }
+    ],
+    "errors": [
+      {
+        "type": "http_error",
+        "status": 404,
+        "url": "http://localhost:3007/api/auth/verify",
+        "timestamp": 1755104867270
+      },
+      {
+        "type": "console_error",
+        "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "timestamp": 1755104867270
+      },
+      {
+        "type": "http_error",
+        "status": 404,
+        "url": "http://localhost:3007/api/auth/verify",
+        "timestamp": 1755104870971
+      },
+      {
+        "type": "console_error",
+        "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "timestamp": 1755104870971
+      },
+      {
+        "type": "http_error",
+        "status": 404,
+        "url": "http://localhost:3007/api/auth/verify",
+        "timestamp": 1755104874734
+      },
+      {
+        "type": "console_error",
+        "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "timestamp": 1755104874734
+      },
+      {
+        "type": "http_error",
+        "status": 404,
+        "url": "http://localhost:3007/api/auth/verify",
+        "timestamp": 1755104879134
+      },
+      {
+        "type": "console_error",
+        "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "timestamp": 1755104879134
+      }
+    ],
+    "summary": {
+      "totalTests": 7,
+      "passedTests": 7,
+      "failedTests": 0,
+      "totalDuration": 24819,
+      "averageTestDuration": 3545.5714285714284,
+      "totalScreenshots": 13,
+      "totalErrors": 8,
+      "timestamp": "2025-08-13T17:08:03.022Z"
+    }
+  },
+  "recommendations": [
+    {
+      "type": "error",
+      "title": "修復發現的錯誤",
+      "description": "發現 8 個錯誤需要處理",
+      "priority": "high"
+    }
+  ]
+}

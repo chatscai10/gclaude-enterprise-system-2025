@@ -1,0 +1,210 @@
+{
+  "config": {
+    "baseUrl": "http://localhost:3007",
+    "timeout": 30000,
+    "screenshotDir": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots",
+    "reportDir": "D:\\0813\\gclaude-enterprise-system\\cross-browser-reports"
+  },
+  "results": {
+    "startTime": 1755105136323,
+    "browsers": [
+      {
+        "name": "Chrome",
+        "startTime": 1755105136325,
+        "tests": [
+          {
+            "name": "首頁載入",
+            "startTime": 1755105136453,
+            "status": "passed",
+            "steps": [
+              "頁面標題: 登入 - GClaude 企業管理系統",
+              "登入表單存在: true",
+              "首頁載入測試通過"
+            ],
+            "duration": 2422
+          },
+          {
+            "name": "用戶登入",
+            "startTime": 1755105138875,
+            "status": "passed",
+            "steps": [
+              "登入表單填寫完成",
+              "提交登入表單",
+              "登入後URL: http://localhost:3007/admin",
+              "登入成功"
+            ],
+            "duration": 3027
+          },
+          {
+            "name": "儀表板功能",
+            "startTime": 1755105141903,
+            "status": "passed",
+            "steps": [
+              "儀表板載入完成",
+              "統計卡片數量: 30",
+              "儀表板測試通過"
+            ],
+            "duration": 207
+          },
+          {
+            "name": "響應式設計",
+            "startTime": 1755105142110,
+            "status": "passed",
+            "steps": [
+              "Desktop 視圖測試完成",
+              "Tablet 視圖測試完成",
+              "Mobile 視圖測試完成",
+              "響應式設計測試通過"
+            ],
+            "duration": 374
+          }
+        ],
+        "screenshots": [
+          {
+            "name": "homepage-Chrome",
+            "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\homepage-Chrome-1755105138486.png",
+            "timestamp": 1755105138875
+          },
+          {
+            "name": "login-Chrome",
+            "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\login-Chrome-1755105138902.png",
+            "timestamp": 1755105139298
+          },
+          {
+            "name": "dashboard-Chrome",
+            "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\dashboard-Chrome-1755105141928.png",
+            "timestamp": 1755105142110
+          },
+          {
+            "name": "responsive-Desktop-Chrome",
+            "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\responsive-Desktop-Chrome-1755105142110.png",
+            "timestamp": 1755105142281
+          },
+          {
+            "name": "responsive-Tablet-Chrome",
+            "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\responsive-Tablet-Chrome-1755105142288.png",
+            "timestamp": 1755105142414
+          },
+          {
+            "name": "responsive-Mobile-Chrome",
+            "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\responsive-Mobile-Chrome-1755105142420.png",
+            "timestamp": 1755105142484
+          }
+        ],
+        "errors": [],
+        "status": "completed",
+        "duration": 6208
+      },
+      {
+        "name": "Edge",
+        "startTime": 1755105142533,
+        "tests": [
+          {
+            "name": "首頁載入",
+            "startTime": 1755105142869,
+            "status": "passed",
+            "steps": [
+              "頁面標題: 登入 - GClaude 企業管理系統",
+              "登入表單存在: true",
+              "首頁載入測試通過"
+            ],
+            "duration": 2361
+          },
+          {
+            "name": "用戶登入",
+            "startTime": 1755105145230,
+            "status": "passed",
+            "steps": [
+              "登入表單填寫完成",
+              "提交登入表單",
+              "登入後URL: http://localhost:3007/admin",
+              "登入成功"
+            ],
+            "duration": 2792
+          },
+          {
+            "name": "儀表板功能",
+            "startTime": 1755105148022,
+            "status": "passed",
+            "steps": [
+              "儀表板載入完成",
+              "統計卡片數量: 30",
+              "儀表板測試通過"
+            ],
+            "duration": 231
+          },
+          {
+            "name": "響應式設計",
+            "startTime": 1755105148254,
+            "status": "passed",
+            "steps": [
+              "Desktop 視圖測試完成",
+              "Tablet 視圖測試完成",
+              "Mobile 視圖測試完成",
+              "響應式設計測試通過"
+            ],
+            "duration": 478
+          }
+        ],
+        "screenshots": [
+          {
+            "name": "homepage-Edge",
+            "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\homepage-Edge-1755105144888.png",
+            "timestamp": 1755105145230
+          },
+          {
+            "name": "login-Edge",
+            "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\login-Edge-1755105145267.png",
+            "timestamp": 1755105145555
+          },
+          {
+            "name": "dashboard-Edge",
+            "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\dashboard-Edge-1755105148047.png",
+            "timestamp": 1755105148253
+          },
+          {
+            "name": "responsive-Desktop-Edge",
+            "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\responsive-Desktop-Edge-1755105148254.png",
+            "timestamp": 1755105148434
+          },
+          {
+            "name": "responsive-Tablet-Edge",
+            "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\responsive-Tablet-Edge-1755105148443.png",
+            "timestamp": 1755105148608
+          },
+          {
+            "name": "responsive-Mobile-Edge",
+            "path": "D:\\0813\\gclaude-enterprise-system\\cross-browser-screenshots\\responsive-Mobile-Edge-1755105148617.png",
+            "timestamp": 1755105148732
+          }
+        ],
+        "errors": [
+          {
+            "type": "console_error",
+            "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+            "timestamp": 1755105143469
+          }
+        ],
+        "status": "completed",
+        "duration": 6385
+      }
+    ],
+    "summary": {
+      "totalBrowsers": 2,
+      "completedBrowsers": 2,
+      "totalTests": 8,
+      "passedTests": 8,
+      "failedTests": 0,
+      "totalDuration": 12595,
+      "timestamp": "2025-08-13T17:12:28.918Z"
+    }
+  },
+  "recommendations": [
+    {
+      "type": "console_errors",
+      "title": "修復控制台錯誤",
+      "description": "在某些瀏覽器中發現控制台錯誤",
+      "priority": "medium"
+    }
+  ]
+}
