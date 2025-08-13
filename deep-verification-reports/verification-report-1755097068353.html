@@ -1,0 +1,401 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GClaude 智慧瀏覽器驗證報告</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .passed { color: #22c55e; } .failed { color: #ef4444; } .warning { color: #f59e0b; }
+        .test-item { margin-bottom: 15px; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #ddd; }
+        .test-item.passed { border-left-color: #22c55e; }
+        .test-item.failed { border-left-color: #ef4444; }
+        .screenshots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
+        .screenshot { text-align: center; }
+        .screenshot img { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 GClaude 智慧瀏覽器驗證報告</h1>
+        <p>生成時間: 2025/8/13 下午10:57:48</p>
+    </div>
+    
+    <div class="summary">
+        <div class="card">
+            <h3>測試總覽</h3>
+            <p>總測試數: 36</p>
+            <p class="passed">通過: 9</p>
+            <p class="failed">失敗: 27</p>
+        </div>
+        
+        <div class="card">
+            <h3>執行時間</h3>
+            <p>總耗時: 146秒</p>
+            <p>平均測試時間: 4秒</p>
+        </div>
+        
+        <div class="card">
+            <h3>資源統計</h3>
+            <p>截圖數量: 65</p>
+            <p>錯誤數量: 9</p>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h2>測試結果詳情</h2>
+        
+            <div class="test-item passed">
+                <h3>首頁載入測試 - <span class="passed">✅ 通過</span></h3>
+                <p>執行時間: 2934ms</p>
+                <ul><li>導航到首頁</li><li>頁面標題: 登入 - GClaude 企業管理系統</li><li>登入表單存在: true</li></ul>
+                
+            </div>
+        
+            <div class="test-item passed">
+                <h3>API 健康檢查 - <span class="passed">✅ 通過</span></h3>
+                <p>執行時間: 885ms</p>
+                <ul><li>API 狀態: healthy</li><li>服務版本: 2.0.0</li><li>運行時間: 11141秒</li></ul>
+                
+            </div>
+        
+            <div class="test-item failed">
+                <h3>深度登入測試: 店長 (manager) - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 11036ms</p>
+                <ul><li>訪問登入頁面</li></ul>
+                <p class="failed">錯誤: Waiting for selector `#username, input[name="username"]` failed: Waiting failed: 10000ms exceeded</p>
+            </div>
+        
+            <div class="test-item passed">
+                <h3>儀表板模組測試 - 店長 - <span class="passed">✅ 通過</span></h3>
+                <p>執行時間: 8340ms</p>
+                <ul><li>點擊儀表板連結</li><li>找到統計元件數量: 0</li><li>找到圖表元件數量: 0</li><li>統計數據載入狀態: ✅ 有數據</li></ul>
+                
+            </div>
+        
+            <div class="test-item failed">
+                <h3>員工管理模組測試 - 店長 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 213ms</p>
+                <ul><li>⚠️ 未找到員工管理連結，可能無權限訪問</li><li>員工列表項目數量: 32</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("新增"), .add-btn, .create-btn, [data-action="add"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>出勤管理模組測試 - 店長 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 189ms</p>
+                <ul><li>⚠️ 未找到出勤管理連結</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("打卡"), .clock-in, .punch-in, [data-action="clock-in"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>營收分析模組測試 - 店長 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 188ms</p>
+                <ul><li>⚠️ 未找到營收分析連結</li><li>營收圖表數量: 0</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("新增"), .add-revenue, [data-action="add-revenue"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>庫存管理模組測試 - 店長 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 205ms</p>
+                <ul><li>⚠️ 未找到庫存管理連結</li><li>庫存項目數量: 32</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("叫貨"), .order-btn, [data-action="order"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>智慧排程模組測試 - 店長 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 192ms</p>
+                <ul><li>⚠️ 未找到智慧排程連結</li><li>✅ 找到排班表</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("新增排班"), .add-schedule, [data-action="add-schedule"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>升遷投票模組測試 - 店長 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 197ms</p>
+                <ul><li>⚠️ 未找到升遷投票連結</li><li>投票項目數量: 32</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("發起投票"), .create-vote, [data-action="create-vote"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>維修申請模組測試 - 店長 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 212ms</p>
+                <ul><li>⚠️ 未找到維修申請連結</li><li>維修記錄數量: 32</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("提交申請"), .submit-request, [data-action="submit"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>報表系統模組測試 - 店長 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 205ms</p>
+                <ul><li>⚠️ 未找到報表系統連結</li><li>報表選項數量: 33</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("生成"), .generate-report, [data-action="generate"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item passed">
+                <h3>選單導航測試 - 店長 - <span class="passed">✅ 通過</span></h3>
+                <p>執行時間: 20464ms</p>
+                <ul><li>找到導航連結數量: 11</li><li>✅ "儀表板" 連結正常工作</li><li>✅ "員工管理" 連結正常工作</li><li>✅ "出勤管理" 連結正常工作</li><li>✅ "營收分析" 連結正常工作</li><li>✅ "庫存管理" 連結正常工作</li><li>✅ "智慧排程" 連結正常工作</li><li>✅ "升遷投票" 連結正常工作</li><li>✅ "維修申請" 連結正常工作</li><li>✅ "報表系統" 連結正常工作</li><li>✅ "系統設定" 連結正常工作</li><li>可點擊連結: 10, 正常工作: 10</li></ul>
+                
+            </div>
+        
+            <div class="test-item failed">
+                <h3>深度登入測試: 員工 (employee) - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 11346ms</p>
+                <ul><li>訪問登入頁面</li></ul>
+                <p class="failed">錯誤: Waiting for selector `#username, input[name="username"]` failed: Waiting failed: 10000ms exceeded</p>
+            </div>
+        
+            <div class="test-item passed">
+                <h3>儀表板模組測試 - 員工 - <span class="passed">✅ 通過</span></h3>
+                <p>執行時間: 8261ms</p>
+                <ul><li>點擊儀表板連結</li><li>找到統計元件數量: 0</li><li>找到圖表元件數量: 0</li><li>統計數據載入狀態: ✅ 有數據</li></ul>
+                
+            </div>
+        
+            <div class="test-item failed">
+                <h3>員工管理模組測試 - 員工 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 218ms</p>
+                <ul><li>⚠️ 未找到員工管理連結，可能無權限訪問</li><li>員工列表項目數量: 32</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("新增"), .add-btn, .create-btn, [data-action="add"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>出勤管理模組測試 - 員工 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 190ms</p>
+                <ul><li>⚠️ 未找到出勤管理連結</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("打卡"), .clock-in, .punch-in, [data-action="clock-in"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>營收分析模組測試 - 員工 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 199ms</p>
+                <ul><li>⚠️ 未找到營收分析連結</li><li>營收圖表數量: 0</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("新增"), .add-revenue, [data-action="add-revenue"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>庫存管理模組測試 - 員工 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 213ms</p>
+                <ul><li>⚠️ 未找到庫存管理連結</li><li>庫存項目數量: 32</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("叫貨"), .order-btn, [data-action="order"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>智慧排程模組測試 - 員工 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 197ms</p>
+                <ul><li>⚠️ 未找到智慧排程連結</li><li>✅ 找到排班表</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("新增排班"), .add-schedule, [data-action="add-schedule"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>升遷投票模組測試 - 員工 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 205ms</p>
+                <ul><li>⚠️ 未找到升遷投票連結</li><li>投票項目數量: 32</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("發起投票"), .create-vote, [data-action="create-vote"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>維修申請模組測試 - 員工 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 192ms</p>
+                <ul><li>⚠️ 未找到維修申請連結</li><li>維修記錄數量: 32</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("提交申請"), .submit-request, [data-action="submit"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>報表系統模組測試 - 員工 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 223ms</p>
+                <ul><li>⚠️ 未找到報表系統連結</li><li>報表選項數量: 33</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("生成"), .generate-report, [data-action="generate"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item passed">
+                <h3>選單導航測試 - 員工 - <span class="passed">✅ 通過</span></h3>
+                <p>執行時間: 20327ms</p>
+                <ul><li>找到導航連結數量: 11</li><li>✅ "儀表板" 連結正常工作</li><li>✅ "員工管理" 連結正常工作</li><li>✅ "出勤管理" 連結正常工作</li><li>✅ "營收分析" 連結正常工作</li><li>✅ "庫存管理" 連結正常工作</li><li>✅ "智慧排程" 連結正常工作</li><li>✅ "升遷投票" 連結正常工作</li><li>✅ "維修申請" 連結正常工作</li><li>✅ "報表系統" 連結正常工作</li><li>✅ "系統設定" 連結正常工作</li><li>可點擊連結: 10, 正常工作: 10</li></ul>
+                
+            </div>
+        
+            <div class="test-item failed">
+                <h3>深度登入測試: 實習生 (intern) - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 11044ms</p>
+                <ul><li>訪問登入頁面</li></ul>
+                <p class="failed">錯誤: Waiting for selector `#username, input[name="username"]` failed: Waiting failed: 10000ms exceeded</p>
+            </div>
+        
+            <div class="test-item passed">
+                <h3>儀表板模組測試 - 實習生 - <span class="passed">✅ 通過</span></h3>
+                <p>執行時間: 8253ms</p>
+                <ul><li>點擊儀表板連結</li><li>找到統計元件數量: 0</li><li>找到圖表元件數量: 0</li><li>統計數據載入狀態: ✅ 有數據</li></ul>
+                
+            </div>
+        
+            <div class="test-item failed">
+                <h3>員工管理模組測試 - 實習生 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 201ms</p>
+                <ul><li>⚠️ 未找到員工管理連結，可能無權限訪問</li><li>員工列表項目數量: 32</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("新增"), .add-btn, .create-btn, [data-action="add"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>出勤管理模組測試 - 實習生 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 184ms</p>
+                <ul><li>⚠️ 未找到出勤管理連結</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("打卡"), .clock-in, .punch-in, [data-action="clock-in"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>營收分析模組測試 - 實習生 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 206ms</p>
+                <ul><li>⚠️ 未找到營收分析連結</li><li>營收圖表數量: 0</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("新增"), .add-revenue, [data-action="add-revenue"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>庫存管理模組測試 - 實習生 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 201ms</p>
+                <ul><li>⚠️ 未找到庫存管理連結</li><li>庫存項目數量: 32</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("叫貨"), .order-btn, [data-action="order"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>智慧排程模組測試 - 實習生 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 186ms</p>
+                <ul><li>⚠️ 未找到智慧排程連結</li><li>✅ 找到排班表</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("新增排班"), .add-schedule, [data-action="add-schedule"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>升遷投票模組測試 - 實習生 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 201ms</p>
+                <ul><li>⚠️ 未找到升遷投票連結</li><li>投票項目數量: 32</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("發起投票"), .create-vote, [data-action="create-vote"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>維修申請模組測試 - 實習生 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 223ms</p>
+                <ul><li>⚠️ 未找到維修申請連結</li><li>維修記錄數量: 32</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("提交申請"), .submit-request, [data-action="submit"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item failed">
+                <h3>報表系統模組測試 - 實習生 - <span class="failed">❌ 失敗</span></h3>
+                <p>執行時間: 228ms</p>
+                <ul><li>⚠️ 未找到報表系統連結</li><li>報表選項數量: 33</li></ul>
+                <p class="failed">錯誤: Failed to execute 'querySelectorAll' on 'Document': 'button:contains("生成"), .generate-report, [data-action="generate"]' is not a valid selector.
+re (pptr:internal:3:12826)
+Ie (pptr:internal:3:13100)
+pptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16</p>
+            </div>
+        
+            <div class="test-item passed">
+                <h3>選單導航測試 - 實習生 - <span class="passed">✅ 通過</span></h3>
+                <p>執行時間: 20410ms</p>
+                <ul><li>找到導航連結數量: 11</li><li>✅ "儀表板" 連結正常工作</li><li>✅ "員工管理" 連結正常工作</li><li>✅ "出勤管理" 連結正常工作</li><li>✅ "營收分析" 連結正常工作</li><li>✅ "庫存管理" 連結正常工作</li><li>✅ "智慧排程" 連結正常工作</li><li>✅ "升遷投票" 連結正常工作</li><li>✅ "維修申請" 連結正常工作</li><li>✅ "報表系統" 連結正常工作</li><li>✅ "系統設定" 連結正常工作</li><li>可點擊連結: 10, 正常工作: 10</li></ul>
+                
+            </div>
+        
+            <div class="test-item passed">
+                <h3>深度響應式設計測試 - <span class="passed">✅ 通過</span></h3>
+                <p>執行時間: 4919ms</p>
+                <ul><li>桌面版本 視圖測試完成 (1920x1080)</li><li>筆記型電腦 視圖測試完成 (1366x768)</li><li>Tablet: ⚠️ 未找到移動版選單</li><li>平板版本 視圖測試完成 (768x1024)</li><li>Mobile: ⚠️ 未找到移動版選單</li><li>手機版本 視圖測試完成 (375x667)</li><li>Small-Mobile: ⚠️ 未找到移動版選單</li><li>小尺寸手機 視圖測試完成 (320x568)</li></ul>
+                
+            </div>
+        
+    </div>
+    
+    
+    <div class="card">
+        <h2>建議事項</h2>
+        
+            <div class="test-item">
+                <h4>修復發現的錯誤</h4>
+                <p>發現 9 個錯誤需要處理</p>
+                <p>優先級: <span class="failed">high</span></p>
+            </div>
+        
+            <div class="test-item">
+                <h4>修復失敗的測試</h4>
+                <p>有測試用例失敗，需要檢查相關功能</p>
+                <p>優先級: <span class="failed">high</span></p>
+            </div>
+        
+            <div class="test-item">
+                <h4>優化系統效能</h4>
+                <p>發現 6 個緩慢的操作，建議優化效能</p>
+                <p>優先級: <span class="warning">medium</span></p>
+            </div>
+        
+    </div>
+    
+</body>
+</html>

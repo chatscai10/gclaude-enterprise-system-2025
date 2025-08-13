@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: gclaude-enterprise-system
+    runtime: node
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    
+    autoDeploy: true
+    
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3007
+      - key: JWT_SECRET
+        generateValue: true
+      - key: LOG_LEVEL
+        value: info
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_GROUP_ID  
+        sync: false
+      - key: CORS_ORIGIN
+        value: "*"
+      - key: GCLAUDE_COMPATIBLE
+        value: "true"
+      - key: GCLAUDE_MONITORING
+        value: "true"
+    
+    # Disk storage for logs and uploads
+    disk:
+      name: gclaude-data
+      mountPath: /app/data
+      sizeGB: 1
+    
+    # Health check configuration
+    healthCheck:
+      path: /api/health
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      startPeriod: 60s

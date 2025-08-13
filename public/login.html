@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登入 - GClaude 企業管理系統</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .login-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 40px 30px 30px;
+        }
+        
+        .login-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .login-header p {
+            opacity: 0.9;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+        
+        .login-body {
+            padding: 40px 30px 30px;
+        }
+        
+        .form-floating {
+            margin-bottom: 20px;
+        }
+        
+        .form-control {
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        
+        .btn-login:disabled {
+            opacity: 0.7;
+            transform: none;
+        }
+        
+        .test-accounts {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .test-accounts h6 {
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .test-account {
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+        
+        .test-account:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .test-account strong {
+            color: #495057;
+        }
+        
+        .test-account small {
+            color: #6c757d;
+        }
+        
+        .alert {
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .status-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-size: 0.85rem;
+            backdrop-filter: blur(5px);
+        }
+        
+        .status-indicator.online {
+            color: #28a745;
+        }
+        
+        .status-indicator.offline {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-indicator" id="statusIndicator">
+        <span id="statusText">🔄 檢查連線中...</span>
+    </div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>🏢 企業管理系統</h1>
+                <p>GClaude Enterprise v2.0</p>
+            </div>
+            
+            <div class="login-body">
+                <form id="loginForm">
+                    <div class="form-floating">
+                        <input type="text" 
+                               class="form-control" 
+                               id="username" 
+                               name="username" 
+                               placeholder="用戶名" 
+                               required 
+                               autocomplete="username">
+                        <label for="username">🔑 用戶名</label>
+                    </div>
+                    
+                    <div class="form-floating">
+                        <input type="password" 
+                               class="form-control" 
+                               id="password" 
+                               name="password" 
+                               placeholder="密碼" 
+                               required 
+                               autocomplete="current-password">
+                        <label for="password">🔒 密碼</label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-login" id="loginBtn">
+                        <span class="loading-spinner" id="loadingSpinner"></span>
+                        <span id="loginBtnText">登入系統</span>
+                    </button>
+                    
+                    <div id="alertContainer"></div>
+                </form>
+                
+                <div class="test-accounts">
+                    <h6>🧪 測試帳號</h6>
+                    <div class="test-account" data-username="admin" data-password="admin123">
+                        <strong>管理員</strong> <small class="text-muted">admin / admin123</small>
+                    </div>
+                    <div class="test-account" data-username="manager" data-password="manager123">
+                        <strong>店長</strong> <small class="text-muted">manager / manager123</small>
+                    </div>
+                    <div class="test-account" data-username="employee" data-password="employee123">
+                        <strong>員工</strong> <small class="text-muted">employee / employee123</small>
+                    </div>
+                    <div class="test-account" data-username="intern" data-password="intern123">
+                        <strong>實習生</strong> <small class="text-muted">intern / intern123</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 全域變數
+        let isLoggingIn = false;
+
+        // DOM 載入完成後初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 GClaude 企業管理系統載入完成');
+            initializeApp();
+        });
+
+        // 應用初始化
+        async function initializeApp() {
+            checkSystemStatus();
+            bindEventListeners();
+            
+            // 檢查是否已有有效的登入狀態
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                try {
+                    await verifyToken(token);
+                } catch (error) {
+                    console.warn('Token 驗證失敗，清除本地儲存');
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('userInfo');
+                }
+            }
+        }
+
+        // 綁定事件監聽器
+        function bindEventListeners() {
+            // 登入表單提交
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            
+            // 測試帳號點擊
+            document.querySelectorAll('.test-account').forEach(account => {
+                account.addEventListener('click', function() {
+                    const username = this.dataset.username;
+                    const password = this.dataset.password;
+                    
+                    document.getElementById('username').value = username;
+                    document.getElementById('password').value = password;
+                    
+                    // 添加點擊效果
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                });
+            });
+
+            // 回車鍵提交
+            ['username', 'password'].forEach(id => {
+                document.getElementById(id).addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && !isLoggingIn) {
+                        handleLogin(e);
+                    }
+                });
+            });
+        }
+
+        // 檢查系統狀態
+        async function checkSystemStatus() {
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            
+            try {
+                const response = await fetch('/api/health', {
+                    timeout: 5000
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    statusIndicator.className = 'status-indicator online';
+                    statusText.textContent = `✅ 系統正常 - v${data.version}`;
+                } else {
+                    throw new Error('Health check failed');
+                }
+                
+            } catch (error) {
+                statusIndicator.className = 'status-indicator offline';
+                statusText.textContent = '❌ 系統離線';
+                console.error('System health check failed:', error);
+            }
+        }
+
+        // 處理登入
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            if (isLoggingIn) {
+                return;
+            }
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                showAlert('請輸入用戶名和密碼', 'warning');
+                return;
+            }
+            
+            setLoadingState(true);
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // 登入成功
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('userInfo', JSON.stringify(data.user));
+                    
+                    showAlert(`登入成功！歡迎 ${data.user.name}`, 'success');
+                    
+                    console.log(`✅ 登入成功: ${data.user.name} (${data.user.role})`);
+                    
+                    // 延遲跳轉以顯示成功訊息
+                    setTimeout(() => {
+                        redirectToDashboard(data.user.role);
+                    }, 1500);
+                    
+                } else {
+                    // 登入失敗
+                    showAlert(data.message || '登入失敗，請檢查您的憑證', 'danger');
+                    console.warn('登入失敗:', data.message);
+                }
+                
+            } catch (error) {
+                showAlert('連線錯誤，請稍後再試', 'danger');
+                console.error('登入錯誤:', error);
+            } finally {
+                setLoadingState(false);
+            }
+        }
+
+        // Token 驗證
+        async function verifyToken(token) {
+            const response = await fetch('/api/auth/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    console.log('Token 有效，重定向到儀表板');
+                    redirectToDashboard(data.user.role);
+                    return;
+                }
+            }
+            
+            throw new Error('Token invalid');
+        }
+
+        // 設置載入狀態
+        function setLoadingState(loading) {
+            isLoggingIn = loading;
+            
+            const loginBtn = document.getElementById('loginBtn');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const loginBtnText = document.getElementById('loginBtnText');
+            
+            if (loading) {
+                loginBtn.disabled = true;
+                loadingSpinner.style.display = 'inline-block';
+                loginBtnText.textContent = '登入中...';
+            } else {
+                loginBtn.disabled = false;
+                loadingSpinner.style.display = 'none';
+                loginBtnText.textContent = '登入系統';
+            }
+        }
+
+        // 顯示提示訊息
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+            
+            // 自動關閉成功訊息
+            if (type === 'success') {
+                setTimeout(() => {
+                    const alert = bootstrap.Alert.getOrCreateInstance(alertDiv);
+                    alert.close();
+                }, 3000);
+            }
+        }
+
+        // 根據角色重定向
+        function redirectToDashboard(role) {
+            let targetUrl = '/dashboard';
+            
+            switch (role) {
+                case 'admin':
+                    targetUrl = '/admin';
+                    break;
+                case 'manager':
+                    targetUrl = '/dashboard?role=manager';
+                    break;
+                case 'employee':
+                    targetUrl = '/dashboard?role=employee';
+                    break;
+                case 'intern':
+                    targetUrl = '/dashboard?role=intern';
+                    break;
+                default:
+                    targetUrl = '/dashboard';
+            }
+            
+            console.log(`重定向到: ${targetUrl}`);
+            window.location.href = targetUrl;
+        }
+
+        // 錯誤處理
+        window.addEventListener('error', function(event) {
+            console.error('JavaScript 錯誤:', event.error);
+        });
+
+        // 連線狀態監控
+        window.addEventListener('online', function() {
+            checkSystemStatus();
+        });
+
+        window.addEventListener('offline', function() {
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            statusIndicator.className = 'status-indicator offline';
+            statusText.textContent = '❌ 網路離線';
+        });
+    </script>
+</body>
+</html>

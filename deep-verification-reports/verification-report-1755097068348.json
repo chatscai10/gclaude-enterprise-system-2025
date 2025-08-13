@@ -1,0 +1,1136 @@
+{
+  "config": {
+    "baseUrl": "http://localhost:3007",
+    "headless": true,
+    "timeout": 60000,
+    "screenshotDir": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots",
+    "reportDir": "D:\\0813\\gclaude-enterprise-system\\deep-verification-reports"
+  },
+  "results": {
+    "startTime": 1755096922103,
+    "tests": [
+      {
+        "name": "首頁載入測試",
+        "startTime": 1755096923556,
+        "status": "passed",
+        "steps": [
+          "導航到首頁",
+          "頁面標題: 登入 - GClaude 企業管理系統",
+          "登入表單存在: true"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 2934
+      },
+      {
+        "name": "API 健康檢查",
+        "startTime": 1755096926490,
+        "status": "passed",
+        "steps": [
+          "API 狀態: healthy",
+          "服務版本: 2.0.0",
+          "運行時間: 11141秒"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 885
+      },
+      {
+        "name": "深度登入測試: 店長 (manager)",
+        "startTime": 1755096931117,
+        "status": "failed",
+        "steps": [
+          "訪問登入頁面"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 11036,
+        "error": {
+          "message": "Waiting for selector `#username, input[name=\"username\"]` failed: Waiting failed: 10000ms exceeded",
+          "stack": "TimeoutError: Waiting for selector `#username, input[name=\"username\"]` failed: Waiting failed: 10000ms exceeded\n    at new WaitTask (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\WaitTask.js:50:34)\n    at IsolatedWorld.waitForFunction (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\Realm.js:25:26)\n    at PQueryHandler.waitFor (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:170:95)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async CdpFrame.waitForSelector (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\Frame.js:494:21)\n    at async CdpPage.waitForSelector (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\Page.js:1351:20)\n    at async D:\\0813\\gclaude-enterprise-system\\scripts\\gclaude-deep-verification.js:120:13\n    at async GClaudeDeepVerification.runTest (D:\\0813\\gclaude-enterprise-system\\scripts\\intelligent-browser-verification.js:129:13)\n    at async GClaudeDeepVerification.deepLogin (D:\\0813\\gclaude-enterprise-system\\scripts\\gclaude-deep-verification.js:114:16)\n    at async GClaudeDeepVerification.runDeepVerification (D:\\0813\\gclaude-enterprise-system\\scripts\\gclaude-deep-verification.js:826:21)"
+        }
+      },
+      {
+        "name": "儀表板模組測試 - 店長",
+        "startTime": 1755096942354,
+        "status": "passed",
+        "steps": [
+          "點擊儀表板連結",
+          "找到統計元件數量: 0",
+          "找到圖表元件數量: 0",
+          "統計數據載入狀態: ✅ 有數據"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 8340
+      },
+      {
+        "name": "員工管理模組測試 - 店長",
+        "startTime": 1755096950694,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到員工管理連結，可能無權限訪問",
+          "員工列表項目數量: 32"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 213,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"新增\"), .add-btn, .create-btn, [data-action=\"add\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"新增\"), .add-btn, .create-btn, [data-action=\"add\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "出勤管理模組測試 - 店長",
+        "startTime": 1755096951080,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到出勤管理連結"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 189,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"打卡\"), .clock-in, .punch-in, [data-action=\"clock-in\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"打卡\"), .clock-in, .punch-in, [data-action=\"clock-in\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "營收分析模組測試 - 店長",
+        "startTime": 1755096951445,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到營收分析連結",
+          "營收圖表數量: 0"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 188,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"新增\"), .add-revenue, [data-action=\"add-revenue\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"新增\"), .add-revenue, [data-action=\"add-revenue\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "庫存管理模組測試 - 店長",
+        "startTime": 1755096951810,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到庫存管理連結",
+          "庫存項目數量: 32"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 205,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"叫貨\"), .order-btn, [data-action=\"order\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"叫貨\"), .order-btn, [data-action=\"order\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "智慧排程模組測試 - 店長",
+        "startTime": 1755096952195,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到智慧排程連結",
+          "✅ 找到排班表"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 192,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"新增排班\"), .add-schedule, [data-action=\"add-schedule\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"新增排班\"), .add-schedule, [data-action=\"add-schedule\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "升遷投票模組測試 - 店長",
+        "startTime": 1755096952569,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到升遷投票連結",
+          "投票項目數量: 32"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 197,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"發起投票\"), .create-vote, [data-action=\"create-vote\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"發起投票\"), .create-vote, [data-action=\"create-vote\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "維修申請模組測試 - 店長",
+        "startTime": 1755096952953,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到維修申請連結",
+          "維修記錄數量: 32"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 212,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"提交申請\"), .submit-request, [data-action=\"submit\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"提交申請\"), .submit-request, [data-action=\"submit\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "報表系統模組測試 - 店長",
+        "startTime": 1755096953346,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到報表系統連結",
+          "報表選項數量: 33"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 205,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"生成\"), .generate-report, [data-action=\"generate\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"生成\"), .generate-report, [data-action=\"generate\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "選單導航測試 - 店長",
+        "startTime": 1755096953727,
+        "status": "passed",
+        "steps": [
+          "找到導航連結數量: 11",
+          "✅ \"儀表板\" 連結正常工作",
+          "✅ \"員工管理\" 連結正常工作",
+          "✅ \"出勤管理\" 連結正常工作",
+          "✅ \"營收分析\" 連結正常工作",
+          "✅ \"庫存管理\" 連結正常工作",
+          "✅ \"智慧排程\" 連結正常工作",
+          "✅ \"升遷投票\" 連結正常工作",
+          "✅ \"維修申請\" 連結正常工作",
+          "✅ \"報表系統\" 連結正常工作",
+          "✅ \"系統設定\" 連結正常工作",
+          "可點擊連結: 10, 正常工作: 10"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 20464
+      },
+      {
+        "name": "深度登入測試: 員工 (employee)",
+        "startTime": 1755096974196,
+        "status": "failed",
+        "steps": [
+          "訪問登入頁面"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 11346,
+        "error": {
+          "message": "Waiting for selector `#username, input[name=\"username\"]` failed: Waiting failed: 10000ms exceeded",
+          "stack": "TimeoutError: Waiting for selector `#username, input[name=\"username\"]` failed: Waiting failed: 10000ms exceeded\n    at new WaitTask (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\WaitTask.js:50:34)\n    at IsolatedWorld.waitForFunction (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\Realm.js:25:26)\n    at PQueryHandler.waitFor (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:170:95)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async CdpFrame.waitForSelector (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\Frame.js:494:21)\n    at async CdpPage.waitForSelector (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\Page.js:1351:20)\n    at async D:\\0813\\gclaude-enterprise-system\\scripts\\gclaude-deep-verification.js:120:13\n    at async GClaudeDeepVerification.runTest (D:\\0813\\gclaude-enterprise-system\\scripts\\intelligent-browser-verification.js:129:13)\n    at async GClaudeDeepVerification.deepLogin (D:\\0813\\gclaude-enterprise-system\\scripts\\gclaude-deep-verification.js:114:16)\n    at async GClaudeDeepVerification.runDeepVerification (D:\\0813\\gclaude-enterprise-system\\scripts\\gclaude-deep-verification.js:826:21)"
+        }
+      },
+      {
+        "name": "儀表板模組測試 - 員工",
+        "startTime": 1755096985823,
+        "status": "passed",
+        "steps": [
+          "點擊儀表板連結",
+          "找到統計元件數量: 0",
+          "找到圖表元件數量: 0",
+          "統計數據載入狀態: ✅ 有數據"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 8261
+      },
+      {
+        "name": "員工管理模組測試 - 員工",
+        "startTime": 1755096994084,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到員工管理連結，可能無權限訪問",
+          "員工列表項目數量: 32"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 218,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"新增\"), .add-btn, .create-btn, [data-action=\"add\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"新增\"), .add-btn, .create-btn, [data-action=\"add\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "出勤管理模組測試 - 員工",
+        "startTime": 1755096994476,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到出勤管理連結"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 190,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"打卡\"), .clock-in, .punch-in, [data-action=\"clock-in\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"打卡\"), .clock-in, .punch-in, [data-action=\"clock-in\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "營收分析模組測試 - 員工",
+        "startTime": 1755096994854,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到營收分析連結",
+          "營收圖表數量: 0"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 199,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"新增\"), .add-revenue, [data-action=\"add-revenue\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"新增\"), .add-revenue, [data-action=\"add-revenue\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "庫存管理模組測試 - 員工",
+        "startTime": 1755096995228,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到庫存管理連結",
+          "庫存項目數量: 32"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 213,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"叫貨\"), .order-btn, [data-action=\"order\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"叫貨\"), .order-btn, [data-action=\"order\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "智慧排程模組測試 - 員工",
+        "startTime": 1755096995629,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到智慧排程連結",
+          "✅ 找到排班表"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 197,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"新增排班\"), .add-schedule, [data-action=\"add-schedule\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"新增排班\"), .add-schedule, [data-action=\"add-schedule\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "升遷投票模組測試 - 員工",
+        "startTime": 1755096996007,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到升遷投票連結",
+          "投票項目數量: 32"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 205,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"發起投票\"), .create-vote, [data-action=\"create-vote\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"發起投票\"), .create-vote, [data-action=\"create-vote\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "維修申請模組測試 - 員工",
+        "startTime": 1755096996398,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到維修申請連結",
+          "維修記錄數量: 32"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 192,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"提交申請\"), .submit-request, [data-action=\"submit\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"提交申請\"), .submit-request, [data-action=\"submit\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "報表系統模組測試 - 員工",
+        "startTime": 1755096996760,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到報表系統連結",
+          "報表選項數量: 33"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 223,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"生成\"), .generate-report, [data-action=\"generate\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"生成\"), .generate-report, [data-action=\"generate\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "選單導航測試 - 員工",
+        "startTime": 1755096997162,
+        "status": "passed",
+        "steps": [
+          "找到導航連結數量: 11",
+          "✅ \"儀表板\" 連結正常工作",
+          "✅ \"員工管理\" 連結正常工作",
+          "✅ \"出勤管理\" 連結正常工作",
+          "✅ \"營收分析\" 連結正常工作",
+          "✅ \"庫存管理\" 連結正常工作",
+          "✅ \"智慧排程\" 連結正常工作",
+          "✅ \"升遷投票\" 連結正常工作",
+          "✅ \"維修申請\" 連結正常工作",
+          "✅ \"報表系統\" 連結正常工作",
+          "✅ \"系統設定\" 連結正常工作",
+          "可點擊連結: 10, 正常工作: 10"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 20327
+      },
+      {
+        "name": "深度登入測試: 實習生 (intern)",
+        "startTime": 1755097018932,
+        "status": "failed",
+        "steps": [
+          "訪問登入頁面"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 11044,
+        "error": {
+          "message": "Waiting for selector `#username, input[name=\"username\"]` failed: Waiting failed: 10000ms exceeded",
+          "stack": "TimeoutError: Waiting for selector `#username, input[name=\"username\"]` failed: Waiting failed: 10000ms exceeded\n    at new WaitTask (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\WaitTask.js:50:34)\n    at IsolatedWorld.waitForFunction (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\Realm.js:25:26)\n    at PQueryHandler.waitFor (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:170:95)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async CdpFrame.waitForSelector (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\Frame.js:494:21)\n    at async CdpPage.waitForSelector (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\Page.js:1351:20)\n    at async D:\\0813\\gclaude-enterprise-system\\scripts\\gclaude-deep-verification.js:120:13\n    at async GClaudeDeepVerification.runTest (D:\\0813\\gclaude-enterprise-system\\scripts\\intelligent-browser-verification.js:129:13)\n    at async GClaudeDeepVerification.deepLogin (D:\\0813\\gclaude-enterprise-system\\scripts\\gclaude-deep-verification.js:114:16)\n    at async GClaudeDeepVerification.runDeepVerification (D:\\0813\\gclaude-enterprise-system\\scripts\\gclaude-deep-verification.js:826:21)"
+        }
+      },
+      {
+        "name": "儀表板模組測試 - 實習生",
+        "startTime": 1755097030173,
+        "status": "passed",
+        "steps": [
+          "點擊儀表板連結",
+          "找到統計元件數量: 0",
+          "找到圖表元件數量: 0",
+          "統計數據載入狀態: ✅ 有數據"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 8253
+      },
+      {
+        "name": "員工管理模組測試 - 實習生",
+        "startTime": 1755097038426,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到員工管理連結，可能無權限訪問",
+          "員工列表項目數量: 32"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 201,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"新增\"), .add-btn, .create-btn, [data-action=\"add\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"新增\"), .add-btn, .create-btn, [data-action=\"add\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "出勤管理模組測試 - 實習生",
+        "startTime": 1755097038808,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到出勤管理連結"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 184,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"打卡\"), .clock-in, .punch-in, [data-action=\"clock-in\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"打卡\"), .clock-in, .punch-in, [data-action=\"clock-in\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "營收分析模組測試 - 實習生",
+        "startTime": 1755097039183,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到營收分析連結",
+          "營收圖表數量: 0"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 206,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"新增\"), .add-revenue, [data-action=\"add-revenue\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"新增\"), .add-revenue, [data-action=\"add-revenue\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "庫存管理模組測試 - 實習生",
+        "startTime": 1755097039576,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到庫存管理連結",
+          "庫存項目數量: 32"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 201,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"叫貨\"), .order-btn, [data-action=\"order\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"叫貨\"), .order-btn, [data-action=\"order\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "智慧排程模組測試 - 實習生",
+        "startTime": 1755097039959,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到智慧排程連結",
+          "✅ 找到排班表"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 186,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"新增排班\"), .add-schedule, [data-action=\"add-schedule\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"新增排班\"), .add-schedule, [data-action=\"add-schedule\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "升遷投票模組測試 - 實習生",
+        "startTime": 1755097040325,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到升遷投票連結",
+          "投票項目數量: 32"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 201,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"發起投票\"), .create-vote, [data-action=\"create-vote\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"發起投票\"), .create-vote, [data-action=\"create-vote\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "維修申請模組測試 - 實習生",
+        "startTime": 1755097040712,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到維修申請連結",
+          "維修記錄數量: 32"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 223,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"提交申請\"), .submit-request, [data-action=\"submit\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"提交申請\"), .submit-request, [data-action=\"submit\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "報表系統模組測試 - 實習生",
+        "startTime": 1755097041107,
+        "status": "failed",
+        "steps": [
+          "⚠️ 未找到報表系統連結",
+          "報表選項數量: 33"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 228,
+        "error": {
+          "message": "Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"生成\"), .generate-report, [data-action=\"generate\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16",
+          "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'button:contains(\"生成\"), .generate-report, [data-action=\"generate\"]' is not a valid selector.\nre (pptr:internal:3:12826)\nIe (pptr:internal:3:13100)\npptr:evaluateHandle;PQueryHandler.queryOne%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CQueryHandler.js%3A130%3A73):2:16\n    at #evaluate (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:222:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async ExecutionContext.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\ExecutionContext.js:169:16)\n    at async IsolatedWorld.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\cdp\\IsolatedWorld.js:116:16)\n    at async CdpJSHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\JSHandle.js:150:20)\n    at async CdpElementHandle.evaluateHandle (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:337:20)\n    at async PQueryHandler.queryOne (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\common\\QueryHandler.js:130:59)\n    at async CdpElementHandle.$ (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:378:21)\n    at async CdpElementHandle.<anonymous> (D:\\0813\\gclaude-enterprise-system\\node_modules\\puppeteer-core\\lib\\cjs\\puppeteer\\api\\ElementHandle.js:253:36)"
+        }
+      },
+      {
+        "name": "選單導航測試 - 實習生",
+        "startTime": 1755097041505,
+        "status": "passed",
+        "steps": [
+          "找到導航連結數量: 11",
+          "✅ \"儀表板\" 連結正常工作",
+          "✅ \"員工管理\" 連結正常工作",
+          "✅ \"出勤管理\" 連結正常工作",
+          "✅ \"營收分析\" 連結正常工作",
+          "✅ \"庫存管理\" 連結正常工作",
+          "✅ \"智慧排程\" 連結正常工作",
+          "✅ \"升遷投票\" 連結正常工作",
+          "✅ \"維修申請\" 連結正常工作",
+          "✅ \"報表系統\" 連結正常工作",
+          "✅ \"系統設定\" 連結正常工作",
+          "可點擊連結: 10, 正常工作: 10"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 20410
+      },
+      {
+        "name": "深度響應式設計測試",
+        "startTime": 1755097061919,
+        "status": "passed",
+        "steps": [
+          "桌面版本 視圖測試完成 (1920x1080)",
+          "筆記型電腦 視圖測試完成 (1366x768)",
+          "Tablet: ⚠️ 未找到移動版選單",
+          "平板版本 視圖測試完成 (768x1024)",
+          "Mobile: ⚠️ 未找到移動版選單",
+          "手機版本 視圖測試完成 (375x667)",
+          "Small-Mobile: ⚠️ 未找到移動版選單",
+          "小尺寸手機 視圖測試完成 (320x568)"
+        ],
+        "screenshots": [],
+        "errors": [],
+        "duration": 4919
+      }
+    ],
+    "screenshots": [
+      {
+        "name": "homepage",
+        "description": "首頁載入完成",
+        "filename": "homepage-1755096926088.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\homepage-1755096926088.png",
+        "timestamp": 1755096926088
+      },
+      {
+        "name": "health-check",
+        "description": "API 健康檢查結果",
+        "filename": "health-check-1755096927283.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\health-check-1755096927283.png",
+        "timestamp": 1755096927283
+      },
+      {
+        "name": "deep-login-form-admin",
+        "description": "系統管理員登入表單",
+        "filename": "deep-login-form-admin-1755096929164.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\deep-login-form-admin-1755096929164.png",
+        "timestamp": 1755096929164
+      },
+      {
+        "name": "error-深度登入測試: 店長 (manager)",
+        "description": "測試失敗截圖: 深度登入測試: 店長 (manager)",
+        "filename": "error-深度登入測試: 店長 (manager)-1755096942154.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-深度登入測試: 店長 (manager)-1755096942154.png",
+        "timestamp": 1755096942154
+      },
+      {
+        "name": "dashboard-manager",
+        "description": "店長的儀表板視圖",
+        "filename": "dashboard-manager-1755096950408.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\dashboard-manager-1755096950408.png",
+        "timestamp": 1755096950408
+      },
+      {
+        "name": "employees-manager",
+        "description": "店長的員工管理視圖",
+        "filename": "employees-manager-1755096950700.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\employees-manager-1755096950700.png",
+        "timestamp": 1755096950700
+      },
+      {
+        "name": "error-員工管理模組測試 - 店長",
+        "description": "測試失敗截圖: 員工管理模組測試 - 店長",
+        "filename": "error-員工管理模組測試 - 店長-1755096950907.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-員工管理模組測試 - 店長-1755096950907.png",
+        "timestamp": 1755096950907
+      },
+      {
+        "name": "attendance-manager",
+        "description": "店長的出勤管理視圖",
+        "filename": "attendance-manager-1755096951088.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\attendance-manager-1755096951088.png",
+        "timestamp": 1755096951088
+      },
+      {
+        "name": "error-出勤管理模組測試 - 店長",
+        "description": "測試失敗截圖: 出勤管理模組測試 - 店長",
+        "filename": "error-出勤管理模組測試 - 店長-1755096951269.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-出勤管理模組測試 - 店長-1755096951269.png",
+        "timestamp": 1755096951269
+      },
+      {
+        "name": "revenue-manager",
+        "description": "店長的營收分析視圖",
+        "filename": "revenue-manager-1755096951452.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\revenue-manager-1755096951452.png",
+        "timestamp": 1755096951452
+      },
+      {
+        "name": "error-營收分析模組測試 - 店長",
+        "description": "測試失敗截圖: 營收分析模組測試 - 店長",
+        "filename": "error-營收分析模組測試 - 店長-1755096951633.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-營收分析模組測試 - 店長-1755096951633.png",
+        "timestamp": 1755096951633
+      },
+      {
+        "name": "inventory-manager",
+        "description": "店長的庫存管理視圖",
+        "filename": "inventory-manager-1755096951818.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\inventory-manager-1755096951818.png",
+        "timestamp": 1755096951818
+      },
+      {
+        "name": "error-庫存管理模組測試 - 店長",
+        "description": "測試失敗截圖: 庫存管理模組測試 - 店長",
+        "filename": "error-庫存管理模組測試 - 店長-1755096952016.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-庫存管理模組測試 - 店長-1755096952016.png",
+        "timestamp": 1755096952016
+      },
+      {
+        "name": "scheduling-manager",
+        "description": "店長的智慧排程視圖",
+        "filename": "scheduling-manager-1755096952202.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\scheduling-manager-1755096952202.png",
+        "timestamp": 1755096952202
+      },
+      {
+        "name": "error-智慧排程模組測試 - 店長",
+        "description": "測試失敗截圖: 智慧排程模組測試 - 店長",
+        "filename": "error-智慧排程模組測試 - 店長-1755096952387.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-智慧排程模組測試 - 店長-1755096952387.png",
+        "timestamp": 1755096952387
+      },
+      {
+        "name": "promotion-manager",
+        "description": "店長的升遷投票視圖",
+        "filename": "promotion-manager-1755096952575.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\promotion-manager-1755096952575.png",
+        "timestamp": 1755096952575
+      },
+      {
+        "name": "error-升遷投票模組測試 - 店長",
+        "description": "測試失敗截圖: 升遷投票模組測試 - 店長",
+        "filename": "error-升遷投票模組測試 - 店長-1755096952767.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-升遷投票模組測試 - 店長-1755096952767.png",
+        "timestamp": 1755096952767
+      },
+      {
+        "name": "maintenance-manager",
+        "description": "店長的維修申請視圖",
+        "filename": "maintenance-manager-1755096952960.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\maintenance-manager-1755096952960.png",
+        "timestamp": 1755096952960
+      },
+      {
+        "name": "error-維修申請模組測試 - 店長",
+        "description": "測試失敗截圖: 維修申請模組測試 - 店長",
+        "filename": "error-維修申請模組測試 - 店長-1755096953165.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-維修申請模組測試 - 店長-1755096953165.png",
+        "timestamp": 1755096953165
+      },
+      {
+        "name": "reports-manager",
+        "description": "店長的報表系統視圖",
+        "filename": "reports-manager-1755096953352.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\reports-manager-1755096953352.png",
+        "timestamp": 1755096953352
+      },
+      {
+        "name": "error-報表系統模組測試 - 店長",
+        "description": "測試失敗截圖: 報表系統模組測試 - 店長",
+        "filename": "error-報表系統模組測試 - 店長-1755096953551.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-報表系統模組測試 - 店長-1755096953551.png",
+        "timestamp": 1755096953551
+      },
+      {
+        "name": "navigation-test-manager",
+        "description": "店長導航測試結果",
+        "filename": "navigation-test-manager-1755096973960.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\navigation-test-manager-1755096973960.png",
+        "timestamp": 1755096973960
+      },
+      {
+        "name": "error-深度登入測試: 員工 (employee)",
+        "description": "測試失敗截圖: 深度登入測試: 員工 (employee)",
+        "filename": "error-深度登入測試: 員工 (employee)-1755096985542.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-深度登入測試: 員工 (employee)-1755096985542.png",
+        "timestamp": 1755096985542
+      },
+      {
+        "name": "dashboard-employee",
+        "description": "員工的儀表板視圖",
+        "filename": "dashboard-employee-1755096993884.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\dashboard-employee-1755096993884.png",
+        "timestamp": 1755096993884
+      },
+      {
+        "name": "employees-employee",
+        "description": "員工的員工管理視圖",
+        "filename": "employees-employee-1755096994088.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\employees-employee-1755096994088.png",
+        "timestamp": 1755096994088
+      },
+      {
+        "name": "error-員工管理模組測試 - 員工",
+        "description": "測試失敗截圖: 員工管理模組測試 - 員工",
+        "filename": "error-員工管理模組測試 - 員工-1755096994302.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-員工管理模組測試 - 員工-1755096994302.png",
+        "timestamp": 1755096994302
+      },
+      {
+        "name": "attendance-employee",
+        "description": "員工的出勤管理視圖",
+        "filename": "attendance-employee-1755096994482.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\attendance-employee-1755096994482.png",
+        "timestamp": 1755096994482
+      },
+      {
+        "name": "error-出勤管理模組測試 - 員工",
+        "description": "測試失敗截圖: 出勤管理模組測試 - 員工",
+        "filename": "error-出勤管理模組測試 - 員工-1755096994666.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-出勤管理模組測試 - 員工-1755096994666.png",
+        "timestamp": 1755096994666
+      },
+      {
+        "name": "revenue-employee",
+        "description": "員工的營收分析視圖",
+        "filename": "revenue-employee-1755096994860.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\revenue-employee-1755096994860.png",
+        "timestamp": 1755096994860
+      },
+      {
+        "name": "error-營收分析模組測試 - 員工",
+        "description": "測試失敗截圖: 營收分析模組測試 - 員工",
+        "filename": "error-營收分析模組測試 - 員工-1755096995053.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-營收分析模組測試 - 員工-1755096995053.png",
+        "timestamp": 1755096995053
+      },
+      {
+        "name": "inventory-employee",
+        "description": "員工的庫存管理視圖",
+        "filename": "inventory-employee-1755096995233.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\inventory-employee-1755096995233.png",
+        "timestamp": 1755096995233
+      },
+      {
+        "name": "error-庫存管理模組測試 - 員工",
+        "description": "測試失敗截圖: 庫存管理模組測試 - 員工",
+        "filename": "error-庫存管理模組測試 - 員工-1755096995442.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-庫存管理模組測試 - 員工-1755096995442.png",
+        "timestamp": 1755096995442
+      },
+      {
+        "name": "scheduling-employee",
+        "description": "員工的智慧排程視圖",
+        "filename": "scheduling-employee-1755096995635.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\scheduling-employee-1755096995635.png",
+        "timestamp": 1755096995635
+      },
+      {
+        "name": "error-智慧排程模組測試 - 員工",
+        "description": "測試失敗截圖: 智慧排程模組測試 - 員工",
+        "filename": "error-智慧排程模組測試 - 員工-1755096995826.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-智慧排程模組測試 - 員工-1755096995826.png",
+        "timestamp": 1755096995826
+      },
+      {
+        "name": "promotion-employee",
+        "description": "員工的升遷投票視圖",
+        "filename": "promotion-employee-1755096996014.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\promotion-employee-1755096996014.png",
+        "timestamp": 1755096996014
+      },
+      {
+        "name": "error-升遷投票模組測試 - 員工",
+        "description": "測試失敗截圖: 升遷投票模組測試 - 員工",
+        "filename": "error-升遷投票模組測試 - 員工-1755096996212.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-升遷投票模組測試 - 員工-1755096996212.png",
+        "timestamp": 1755096996212
+      },
+      {
+        "name": "maintenance-employee",
+        "description": "員工的維修申請視圖",
+        "filename": "maintenance-employee-1755096996405.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\maintenance-employee-1755096996405.png",
+        "timestamp": 1755096996405
+      },
+      {
+        "name": "error-維修申請模組測試 - 員工",
+        "description": "測試失敗截圖: 維修申請模組測試 - 員工",
+        "filename": "error-維修申請模組測試 - 員工-1755096996590.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-維修申請模組測試 - 員工-1755096996590.png",
+        "timestamp": 1755096996590
+      },
+      {
+        "name": "reports-employee",
+        "description": "員工的報表系統視圖",
+        "filename": "reports-employee-1755096996766.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\reports-employee-1755096996766.png",
+        "timestamp": 1755096996766
+      },
+      {
+        "name": "error-報表系統模組測試 - 員工",
+        "description": "測試失敗截圖: 報表系統模組測試 - 員工",
+        "filename": "error-報表系統模組測試 - 員工-1755096996983.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-報表系統模組測試 - 員工-1755096996983.png",
+        "timestamp": 1755096996983
+      },
+      {
+        "name": "navigation-test-employee",
+        "description": "員工導航測試結果",
+        "filename": "navigation-test-employee-1755097017342.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\navigation-test-employee-1755097017342.png",
+        "timestamp": 1755097017342
+      },
+      {
+        "name": "error-深度登入測試: 實習生 (intern)",
+        "description": "測試失敗截圖: 深度登入測試: 實習生 (intern)",
+        "filename": "error-深度登入測試: 實習生 (intern)-1755097029976.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-深度登入測試: 實習生 (intern)-1755097029976.png",
+        "timestamp": 1755097029976
+      },
+      {
+        "name": "dashboard-intern",
+        "description": "實習生的儀表板視圖",
+        "filename": "dashboard-intern-1755097038228.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\dashboard-intern-1755097038228.png",
+        "timestamp": 1755097038228
+      },
+      {
+        "name": "employees-intern",
+        "description": "實習生的員工管理視圖",
+        "filename": "employees-intern-1755097038432.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\employees-intern-1755097038432.png",
+        "timestamp": 1755097038432
+      },
+      {
+        "name": "error-員工管理模組測試 - 實習生",
+        "description": "測試失敗截圖: 員工管理模組測試 - 實習生",
+        "filename": "error-員工管理模組測試 - 實習生-1755097038627.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-員工管理模組測試 - 實習生-1755097038627.png",
+        "timestamp": 1755097038627
+      },
+      {
+        "name": "attendance-intern",
+        "description": "實習生的出勤管理視圖",
+        "filename": "attendance-intern-1755097038815.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\attendance-intern-1755097038815.png",
+        "timestamp": 1755097038815
+      },
+      {
+        "name": "error-出勤管理模組測試 - 實習生",
+        "description": "測試失敗截圖: 出勤管理模組測試 - 實習生",
+        "filename": "error-出勤管理模組測試 - 實習生-1755097038992.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-出勤管理模組測試 - 實習生-1755097038992.png",
+        "timestamp": 1755097038992
+      },
+      {
+        "name": "revenue-intern",
+        "description": "實習生的營收分析視圖",
+        "filename": "revenue-intern-1755097039189.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\revenue-intern-1755097039189.png",
+        "timestamp": 1755097039189
+      },
+      {
+        "name": "error-營收分析模組測試 - 實習生",
+        "description": "測試失敗截圖: 營收分析模組測試 - 實習生",
+        "filename": "error-營收分析模組測試 - 實習生-1755097039389.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-營收分析模組測試 - 實習生-1755097039389.png",
+        "timestamp": 1755097039389
+      },
+      {
+        "name": "inventory-intern",
+        "description": "實習生的庫存管理視圖",
+        "filename": "inventory-intern-1755097039582.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\inventory-intern-1755097039582.png",
+        "timestamp": 1755097039582
+      },
+      {
+        "name": "error-庫存管理模組測試 - 實習生",
+        "description": "測試失敗截圖: 庫存管理模組測試 - 實習生",
+        "filename": "error-庫存管理模組測試 - 實習生-1755097039778.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-庫存管理模組測試 - 實習生-1755097039778.png",
+        "timestamp": 1755097039778
+      },
+      {
+        "name": "scheduling-intern",
+        "description": "實習生的智慧排程視圖",
+        "filename": "scheduling-intern-1755097039965.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\scheduling-intern-1755097039965.png",
+        "timestamp": 1755097039965
+      },
+      {
+        "name": "error-智慧排程模組測試 - 實習生",
+        "description": "測試失敗截圖: 智慧排程模組測試 - 實習生",
+        "filename": "error-智慧排程模組測試 - 實習生-1755097040145.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-智慧排程模組測試 - 實習生-1755097040145.png",
+        "timestamp": 1755097040145
+      },
+      {
+        "name": "promotion-intern",
+        "description": "實習生的升遷投票視圖",
+        "filename": "promotion-intern-1755097040333.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\promotion-intern-1755097040333.png",
+        "timestamp": 1755097040333
+      },
+      {
+        "name": "error-升遷投票模組測試 - 實習生",
+        "description": "測試失敗截圖: 升遷投票模組測試 - 實習生",
+        "filename": "error-升遷投票模組測試 - 實習生-1755097040526.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-升遷投票模組測試 - 實習生-1755097040526.png",
+        "timestamp": 1755097040526
+      },
+      {
+        "name": "maintenance-intern",
+        "description": "實習生的維修申請視圖",
+        "filename": "maintenance-intern-1755097040718.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\maintenance-intern-1755097040718.png",
+        "timestamp": 1755097040718
+      },
+      {
+        "name": "error-維修申請模組測試 - 實習生",
+        "description": "測試失敗截圖: 維修申請模組測試 - 實習生",
+        "filename": "error-維修申請模組測試 - 實習生-1755097040935.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-維修申請模組測試 - 實習生-1755097040935.png",
+        "timestamp": 1755097040935
+      },
+      {
+        "name": "reports-intern",
+        "description": "實習生的報表系統視圖",
+        "filename": "reports-intern-1755097041113.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\reports-intern-1755097041113.png",
+        "timestamp": 1755097041113
+      },
+      {
+        "name": "error-報表系統模組測試 - 實習生",
+        "description": "測試失敗截圖: 報表系統模組測試 - 實習生",
+        "filename": "error-報表系統模組測試 - 實習生-1755097041335.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-報表系統模組測試 - 實習生-1755097041335.png",
+        "timestamp": 1755097041335
+      },
+      {
+        "name": "navigation-test-intern",
+        "description": "實習生導航測試結果",
+        "filename": "navigation-test-intern-1755097061685.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\navigation-test-intern-1755097061685.png",
+        "timestamp": 1755097061685
+      },
+      {
+        "name": "responsive-Desktop",
+        "description": "桌面版本",
+        "filename": "responsive-Desktop-1755097063254.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\responsive-Desktop-1755097063254.png",
+        "timestamp": 1755097063254
+      },
+      {
+        "name": "responsive-Laptop",
+        "description": "筆記型電腦",
+        "filename": "responsive-Laptop-1755097064269.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\responsive-Laptop-1755097064269.png",
+        "timestamp": 1755097064269
+      },
+      {
+        "name": "responsive-Tablet",
+        "description": "平板版本",
+        "filename": "responsive-Tablet-1755097065172.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\responsive-Tablet-1755097065172.png",
+        "timestamp": 1755097065172
+      },
+      {
+        "name": "responsive-Mobile",
+        "description": "手機版本",
+        "filename": "responsive-Mobile-1755097066026.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\responsive-Mobile-1755097066026.png",
+        "timestamp": 1755097066026
+      },
+      {
+        "name": "responsive-Small-Mobile",
+        "description": "小尺寸手機",
+        "filename": "responsive-Small-Mobile-1755097066743.png",
+        "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\responsive-Small-Mobile-1755097066743.png",
+        "timestamp": 1755097066743
+      }
+    ],
+    "errors": [
+      {
+        "type": "request_failed",
+        "method": "GET",
+        "url": "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css",
+        "error": "net::ERR_ABORTED",
+        "timestamp": 1755096931122
+      },
+      {
+        "type": "page_error",
+        "message": "Failed to execute 'querySelectorAll' on 'Document': 'a:contains(\"儀表板\")' is not a valid selector.",
+        "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'a:contains(\"儀表板\")' is not a valid selector.\n    at re (pptr:internal:3:12826)\n    at Ie (pptr:internal:3:13100)\n    at eval (:4:16)\n    at eval (:5:44)\n    at <anonymous> (pptr:evaluateHandle;WaitTask.rerun%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CWaitTask.js%3A80%3A54):4:36)\n    at start (pptr:internal:3:3249)\n    at <anonymous> (pptr:evaluate;WaitTask.rerun%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CWaitTask.js%3A100%3A32):2:29)",
+        "timestamp": 1755096944361
+      },
+      {
+        "type": "page_error",
+        "message": "Failed to execute 'querySelectorAll' on 'Document': 'a:contains(\"首頁\")' is not a valid selector.",
+        "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'a:contains(\"首頁\")' is not a valid selector.\n    at re (pptr:internal:3:12826)\n    at Ie (pptr:internal:3:13100)\n    at eval (:4:16)\n    at eval (:5:44)\n    at <anonymous> (pptr:evaluateHandle;WaitTask.rerun%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CWaitTask.js%3A80%3A54):4:36)\n    at start (pptr:internal:3:3249)\n    at <anonymous> (pptr:evaluate;WaitTask.rerun%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CWaitTask.js%3A100%3A32):2:29)",
+        "timestamp": 1755096946378
+      },
+      {
+        "type": "page_error",
+        "message": "Failed to execute 'querySelectorAll' on 'Document': 'a:contains(\"儀表板\")' is not a valid selector.",
+        "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'a:contains(\"儀表板\")' is not a valid selector.\n    at re (pptr:internal:3:12826)\n    at Ie (pptr:internal:3:13100)\n    at eval (:4:16)\n    at eval (:5:44)\n    at <anonymous> (pptr:evaluateHandle;WaitTask.rerun%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CWaitTask.js%3A80%3A54):4:36)\n    at start (pptr:internal:3:3249)\n    at <anonymous> (pptr:evaluate;WaitTask.rerun%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CWaitTask.js%3A100%3A32):2:29)",
+        "timestamp": 1755096987835
+      },
+      {
+        "type": "page_error",
+        "message": "Failed to execute 'querySelectorAll' on 'Document': 'a:contains(\"首頁\")' is not a valid selector.",
+        "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'a:contains(\"首頁\")' is not a valid selector.\n    at re (pptr:internal:3:12826)\n    at Ie (pptr:internal:3:13100)\n    at eval (:4:16)\n    at eval (:5:44)\n    at <anonymous> (pptr:evaluateHandle;WaitTask.rerun%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CWaitTask.js%3A80%3A54):4:36)\n    at start (pptr:internal:3:3249)\n    at <anonymous> (pptr:evaluate;WaitTask.rerun%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CWaitTask.js%3A100%3A32):2:29)",
+        "timestamp": 1755096989847
+      },
+      {
+        "type": "page_error",
+        "message": "Failed to execute 'querySelectorAll' on 'Document': 'a:contains(\"儀表板\")' is not a valid selector.",
+        "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'a:contains(\"儀表板\")' is not a valid selector.\n    at re (pptr:internal:3:12826)\n    at Ie (pptr:internal:3:13100)\n    at eval (:4:16)\n    at eval (:5:44)\n    at <anonymous> (pptr:evaluateHandle;WaitTask.rerun%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CWaitTask.js%3A80%3A54):4:36)\n    at start (pptr:internal:3:3249)\n    at <anonymous> (pptr:evaluate;WaitTask.rerun%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CWaitTask.js%3A100%3A32):2:29)",
+        "timestamp": 1755097032184
+      },
+      {
+        "type": "page_error",
+        "message": "Failed to execute 'querySelectorAll' on 'Document': 'a:contains(\"首頁\")' is not a valid selector.",
+        "stack": "DOMException: Failed to execute 'querySelectorAll' on 'Document': 'a:contains(\"首頁\")' is not a valid selector.\n    at re (pptr:internal:3:12826)\n    at Ie (pptr:internal:3:13100)\n    at eval (:4:16)\n    at eval (:5:44)\n    at <anonymous> (pptr:evaluateHandle;WaitTask.rerun%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CWaitTask.js%3A80%3A54):4:36)\n    at start (pptr:internal:3:3249)\n    at <anonymous> (pptr:evaluate;WaitTask.rerun%20(D%3A%5C0813%5Cgclaude-enterprise-system%5Cnode_modules%5Cpuppeteer-core%5Clib%5Ccjs%5Cpuppeteer%5Ccommon%5CWaitTask.js%3A100%3A32):2:29)",
+        "timestamp": 1755097034195
+      },
+      {
+        "type": "request_failed",
+        "method": "GET",
+        "url": "http://localhost:3007/api/employees/stats/overview",
+        "error": "net::ERR_ABORTED",
+        "timestamp": 1755097064454
+      },
+      {
+        "type": "console_error",
+        "message": "載入統計資料失敗: JSHandle@error",
+        "timestamp": 1755097064454
+      }
+    ],
+    "summary": {
+      "totalTests": 36,
+      "passedTests": 9,
+      "failedTests": 27,
+      "totalDuration": 146244,
+      "averageTestDuration": 4062.3333333333335,
+      "totalScreenshots": 65,
+      "totalErrors": 9,
+      "timestamp": "2025-08-13T14:57:48.348Z"
+    }
+  },
+  "recommendations": [
+    {
+      "type": "error",
+      "title": "修復發現的錯誤",
+      "description": "發現 9 個錯誤需要處理",
+      "priority": "high"
+    },
+    {
+      "type": "test_failure",
+      "title": "修復失敗的測試",
+      "description": "有測試用例失敗，需要檢查相關功能",
+      "priority": "high"
+    },
+    {
+      "type": "performance",
+      "title": "優化系統效能",
+      "description": "發現 6 個緩慢的操作，建議優化效能",
+      "priority": "medium"
+    }
+  ]
+}

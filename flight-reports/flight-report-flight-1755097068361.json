@@ -1,0 +1,101 @@
+{
+  "id": "flight-1755097068361",
+  "timestamp": "2025-08-13T14:57:48.361Z",
+  "stage": 5,
+  "testResults": {
+    "passed": 9,
+    "failed": 27,
+    "successRate": 25
+  },
+  "systemHealth": {
+    "stabilityScore": 0,
+    "errorCount": 9
+  },
+  "recommendations": [
+    {
+      "title": "修復 27 個失敗的測試項目",
+      "priority": "high"
+    },
+    {
+      "title": "處理 9 個系統錯誤",
+      "priority": "high"
+    },
+    {
+      "title": "優化 3 個緩慢操作的效能",
+      "priority": "medium"
+    }
+  ],
+  "screenshots": [
+    {
+      "name": "maintenance-intern",
+      "description": "實習生的維修申請視圖",
+      "filename": "maintenance-intern-1755097040718.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\maintenance-intern-1755097040718.png",
+      "timestamp": 1755097040718
+    },
+    {
+      "name": "error-維修申請模組測試 - 實習生",
+      "description": "測試失敗截圖: 維修申請模組測試 - 實習生",
+      "filename": "error-維修申請模組測試 - 實習生-1755097040935.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-維修申請模組測試 - 實習生-1755097040935.png",
+      "timestamp": 1755097040935
+    },
+    {
+      "name": "reports-intern",
+      "description": "實習生的報表系統視圖",
+      "filename": "reports-intern-1755097041113.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\reports-intern-1755097041113.png",
+      "timestamp": 1755097041113
+    },
+    {
+      "name": "error-報表系統模組測試 - 實習生",
+      "description": "測試失敗截圖: 報表系統模組測試 - 實習生",
+      "filename": "error-報表系統模組測試 - 實習生-1755097041335.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-報表系統模組測試 - 實習生-1755097041335.png",
+      "timestamp": 1755097041335
+    },
+    {
+      "name": "navigation-test-intern",
+      "description": "實習生導航測試結果",
+      "filename": "navigation-test-intern-1755097061685.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\navigation-test-intern-1755097061685.png",
+      "timestamp": 1755097061685
+    },
+    {
+      "name": "responsive-Desktop",
+      "description": "桌面版本",
+      "filename": "responsive-Desktop-1755097063254.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\responsive-Desktop-1755097063254.png",
+      "timestamp": 1755097063254
+    },
+    {
+      "name": "responsive-Laptop",
+      "description": "筆記型電腦",
+      "filename": "responsive-Laptop-1755097064269.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\responsive-Laptop-1755097064269.png",
+      "timestamp": 1755097064269
+    },
+    {
+      "name": "responsive-Tablet",
+      "description": "平板版本",
+      "filename": "responsive-Tablet-1755097065172.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\responsive-Tablet-1755097065172.png",
+      "timestamp": 1755097065172
+    },
+    {
+      "name": "responsive-Mobile",
+      "description": "手機版本",
+      "filename": "responsive-Mobile-1755097066026.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\responsive-Mobile-1755097066026.png",
+      "timestamp": 1755097066026
+    },
+    {
+      "name": "responsive-Small-Mobile",
+      "description": "小尺寸手機",
+      "filename": "responsive-Small-Mobile-1755097066743.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\responsive-Small-Mobile-1755097066743.png",
+      "timestamp": 1755097066743
+    }
+  ],
+  "executionTime": 146258
+}

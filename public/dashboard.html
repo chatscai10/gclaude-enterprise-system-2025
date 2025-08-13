@@ -1,0 +1,2346 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>儀表板 - GClaude 企業管理系統</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #2196F3 0%, #00BCD4 100%);
+            --primary-color: #2196F3;
+            --secondary-color: #00BCD4;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: var(--primary-gradient);
+            color: white;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .sidebar-header h4 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            margin: 0.25rem 0;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-link i {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .top-navbar {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .content-area {
+            padding: 2rem;
+        }
+
+        .welcome-card {
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card .icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-btn {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            text-decoration: none;
+            color: #495057;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: #f8f9ff;
+            transform: translateY(-2px);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            margin-right: 1rem;
+        }
+
+        .mobile-toggle {
+            display: none;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1976D2 0%, #00ACC1 100%);
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            padding: 0.75rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25);
+        }
+
+        @media (max-width: 992px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .mobile-toggle {
+                display: block;
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                color: #495057;
+                cursor: pointer;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .top-navbar {
+                padding: 1rem;
+            }
+
+            .content-area {
+                padding: 1rem;
+            }
+
+            .welcome-card {
+                padding: 1.5rem;
+            }
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            color: #6c757d;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 側邊欄 -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h4>🏢 企業管理</h4>
+            <small>GClaude Enterprise v2.0</small>
+        </div>
+        <div class="sidebar-nav">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" data-section="dashboard">
+                        <i class="bi bi-speedometer2"></i>
+                        儀表板
+                    </a>
+                </li>
+                <li class="nav-item" id="nav-employees">
+                    <a class="nav-link" href="#" data-section="employees">
+                        <i class="bi bi-people"></i>
+                        員工管理
+                    </a>
+                </li>
+                <li class="nav-item" id="nav-attendance">
+                    <a class="nav-link" href="#" data-section="attendance">
+                        <i class="bi bi-clock"></i>
+                        出勤管理
+                    </a>
+                </li>
+                <li class="nav-item" id="nav-revenue">
+                    <a class="nav-link" href="#" data-section="revenue">
+                        <i class="bi bi-graph-up"></i>
+                        營收分析
+                    </a>
+                </li>
+                <li class="nav-item" id="nav-inventory">
+                    <a class="nav-link" href="#" data-section="inventory">
+                        <i class="bi bi-box"></i>
+                        庫存管理
+                    </a>
+                </li>
+                <li class="nav-item" id="nav-scheduling">
+                    <a class="nav-link" href="#" data-section="scheduling">
+                        <i class="bi bi-calendar"></i>
+                        智慧排程
+                    </a>
+                </li>
+                <li class="nav-item" id="nav-promotion">
+                    <a class="nav-link" href="#" data-section="promotion">
+                        <i class="bi bi-award"></i>
+                        升遷投票
+                    </a>
+                </li>
+                <li class="nav-item" id="nav-maintenance">
+                    <a class="nav-link" href="#" data-section="maintenance">
+                        <i class="bi bi-tools"></i>
+                        維修申請
+                    </a>
+                </li>
+                <li class="nav-item" id="nav-reports">
+                    <a class="nav-link" href="#" data-section="reports">
+                        <i class="bi bi-bar-chart"></i>
+                        報表系統
+                    </a>
+                </li>
+                <li class="nav-item" id="nav-settings">
+                    <a class="nav-link" href="#" data-section="settings">
+                        <i class="bi bi-gear"></i>
+                        系統設定
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <hr style="border-color: rgba(255,255,255,0.1); margin: 1rem 0;">
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="logoutBtn">
+                        <i class="bi bi-box-arrow-right"></i>
+                        登出系統
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主要內容區 -->
+    <div class="main-content">
+        <!-- 頂部導航 -->
+        <div class="top-navbar">
+            <button class="mobile-toggle" id="mobileToggle">
+                <i class="bi bi-list"></i>
+            </button>
+            
+            <div class="user-profile">
+                <div class="user-avatar" id="userAvatar">?</div>
+                <div>
+                    <div class="fw-bold" id="userName">載入中...</div>
+                    <small class="text-muted" id="userRole">-</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- 內容區域 -->
+        <div class="content-area">
+            <!-- 儀表板區段 -->
+            <div id="dashboard-section" class="section active">
+                <!-- 歡迎卡片 -->
+                <div class="welcome-card">
+                    <h2>歡迎回來！</h2>
+                    <p class="mb-0">今天是 <span id="currentDate">-</span></p>
+                    <p class="mb-0">系統運行正常，所有服務可用</p>
+                </div>
+
+                <!-- 統計卡片 -->
+                <div class="stats-grid" id="statsGrid">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <span>載入統計資料中...</span>
+                    </div>
+                </div>
+
+                <!-- 快速操作 -->
+                <div class="row">
+                    <div class="col-12">
+                        <h5 class="mb-3">快速操作</h5>
+                        <div class="quick-actions" id="quickActions">
+                            <!-- 動態載入 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 員工管理區段 -->
+            <div id="employees-section" class="section">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="bi bi-people me-2"></i>員工管理</h2>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+                        <i class="bi bi-person-plus me-1"></i>新增員工
+                    </button>
+                </div>
+                
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>編號</th>
+                                    <th>姓名</th>
+                                    <th>身分證號</th>
+                                    <th>職位</th>
+                                    <th>聯絡電話</th>
+                                    <th>到職日期</th>
+                                    <th>狀態</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employeeTableBody">
+                                <tr>
+                                    <td>001</td>
+                                    <td>系統管理員</td>
+                                    <td>A123456789</td>
+                                    <td>系統管理員</td>
+                                    <td>0912-345-678</td>
+                                    <td>2023-01-01</td>
+                                    <td><span class="badge bg-success">在職</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1">編輯</button>
+                                        <button class="btn btn-sm btn-outline-danger">刪除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>002</td>
+                                    <td>王店長</td>
+                                    <td>B234567890</td>
+                                    <td>店長</td>
+                                    <td>0923-456-789</td>
+                                    <td>2023-02-01</td>
+                                    <td><span class="badge bg-success">在職</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1">編輯</button>
+                                        <button class="btn btn-sm btn-outline-danger">刪除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>003</td>
+                                    <td>張員工</td>
+                                    <td>C345678901</td>
+                                    <td>員工</td>
+                                    <td>0934-567-890</td>
+                                    <td>2023-03-01</td>
+                                    <td><span class="badge bg-success">在職</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1">編輯</button>
+                                        <button class="btn btn-sm btn-outline-danger">刪除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>004</td>
+                                    <td>李實習生</td>
+                                    <td>D456789012</td>
+                                    <td>實習生</td>
+                                    <td>0945-678-901</td>
+                                    <td>2023-07-01</td>
+                                    <td><span class="badge bg-warning">實習</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1">編輯</button>
+                                        <button class="btn btn-sm btn-outline-danger">刪除</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 新增員工模態框 -->
+                <div class="modal fade" id="addEmployeeModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">新增員工</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="addEmployeeForm">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="employeeName" class="form-label">姓名 *</label>
+                                                <input type="text" class="form-control" id="employeeName" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="employeeId" class="form-label">身分證號 *</label>
+                                                <input type="text" class="form-control" id="employeeId" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="employeePhone" class="form-label">聯絡電話 *</label>
+                                                <input type="tel" class="form-control" id="employeePhone" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="employeeBirthDate" class="form-label">出生日期 *</label>
+                                                <input type="date" class="form-control" id="employeeBirthDate" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="employeeGender" class="form-label">性別 *</label>
+                                                <select class="form-control" id="employeeGender" required>
+                                                    <option value="">請選擇</option>
+                                                    <option value="男">男</option>
+                                                    <option value="女">女</option>
+                                                    <option value="其他">其他</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="employeeHasLicense" class="form-label">駕照</label>
+                                                <select class="form-control" id="employeeHasLicense">
+                                                    <option value="false">無</option>
+                                                    <option value="true">有</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="employeeAddress" class="form-label">住址 *</label>
+                                        <input type="text" class="form-control" id="employeeAddress" required>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="emergencyContactName" class="form-label">緊急聯絡人姓名 *</label>
+                                                <input type="text" class="form-control" id="emergencyContactName" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="emergencyContactRelation" class="form-label">關係 *</label>
+                                                <input type="text" class="form-control" id="emergencyContactRelation" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="emergencyContactPhone" class="form-label">緊急聯絡人電話 *</label>
+                                                <input type="tel" class="form-control" id="emergencyContactPhone" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="employeeHireDate" class="form-label">到職日期 *</label>
+                                        <input type="date" class="form-control" id="employeeHireDate" required>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                <button type="submit" form="addEmployeeForm" class="btn btn-primary">新增員工</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 出勤管理區段 -->
+            <div id="attendance-section" class="section">
+                <h2><i class="bi bi-clock me-2"></i>出勤管理</h2>
+                
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-success text-white">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+                            <div class="value text-success">23</div>
+                            <div class="label">今日出勤</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-warning text-white">
+                                <i class="bi bi-exclamation-circle"></i>
+                            </div>
+                            <div class="value text-warning">2</div>
+                            <div class="label">遲到人數</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-danger text-white">
+                                <i class="bi bi-x-circle"></i>
+                            </div>
+                            <div class="value text-danger">1</div>
+                            <div class="label">缺勤人數</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-info text-white">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <div class="value text-info">156</div>
+                            <div class="label">本月工時</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>GPS打卡記錄</h5>
+                        <button class="btn btn-success" id="gpsCheckInBtn">
+                            <i class="bi bi-geo-alt me-1"></i>GPS打卡
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>員工</th>
+                                    <th>打卡時間</th>
+                                    <th>打卡類型</th>
+                                    <th>GPS位置</th>
+                                    <th>狀態</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>王店長</td>
+                                    <td>2025-08-13 08:00:00</td>
+                                    <td>上班</td>
+                                    <td>25.033, 121.565</td>
+                                    <td><span class="badge bg-success">正常</span></td>
+                                </tr>
+                                <tr>
+                                    <td>張員工</td>
+                                    <td>2025-08-13 08:30:00</td>
+                                    <td>上班</td>
+                                    <td>25.033, 121.565</td>
+                                    <td><span class="badge bg-warning">遲到30分</span></td>
+                                </tr>
+                                <tr>
+                                    <td>李實習生</td>
+                                    <td>2025-08-13 17:30:00</td>
+                                    <td>下班</td>
+                                    <td>25.033, 121.565</td>
+                                    <td><span class="badge bg-success">正常</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 營收分析區段 -->
+            <div id="revenue-section" class="section">
+                <h2><i class="bi bi-graph-up me-2"></i>營收分析</h2>
+                
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-success text-white">
+                                <i class="bi bi-currency-dollar"></i>
+                            </div>
+                            <div class="value text-success">$2,125,000</div>
+                            <div class="label">本月營收</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-info text-white">
+                                <i class="bi bi-graph-up-arrow"></i>
+                            </div>
+                            <div class="value text-info">+15.8%</div>
+                            <div class="label">成長率</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-warning text-white">
+                                <i class="bi bi-cart"></i>
+                            </div>
+                            <div class="value text-warning">1,250</div>
+                            <div class="label">訂單數</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-primary text-white">
+                                <i class="bi bi-calculator"></i>
+                            </div>
+                            <div class="value text-primary">$1,700</div>
+                            <div class="label">平均客單價</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>營收記錄管理</h5>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRevenueModal">
+                            <i class="bi bi-plus me-1"></i>新增營收記錄
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>日期</th>
+                                    <th>分店</th>
+                                    <th>營收金額</th>
+                                    <th>訂單數</th>
+                                    <th>平均客單價</th>
+                                    <th>成長率</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2025-08-13</td>
+                                    <td>台北總店</td>
+                                    <td>$85,000</td>
+                                    <td>50</td>
+                                    <td>$1,700</td>
+                                    <td><span class="text-success">+12%</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1">編輯</button>
+                                        <button class="btn btn-sm btn-outline-danger">刪除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2025-08-12</td>
+                                    <td>台北總店</td>
+                                    <td>$78,000</td>
+                                    <td>46</td>
+                                    <td>$1,695</td>
+                                    <td><span class="text-success">+8%</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1">編輯</button>
+                                        <button class="btn btn-sm btn-outline-danger">刪除</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 新增營收記錄模態框 -->
+                <div class="modal fade" id="addRevenueModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">新增營收記錄</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="addRevenueForm">
+                                    <div class="mb-3">
+                                        <label for="revenueDate" class="form-label">日期</label>
+                                        <input type="date" class="form-control" id="revenueDate" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="revenueStore" class="form-label">分店</label>
+                                        <select class="form-control" id="revenueStore" required>
+                                            <option value="">請選擇分店</option>
+                                            <option value="1">台北總店</option>
+                                            <option value="2">台中分店</option>
+                                            <option value="3">高雄分店</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="revenueAmount" class="form-label">營收金額</label>
+                                        <input type="number" class="form-control" id="revenueAmount" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="revenueOrders" class="form-label">訂單數</label>
+                                        <input type="number" class="form-control" id="revenueOrders" required>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                <button type="submit" form="addRevenueForm" class="btn btn-primary">新增記錄</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 庫存管理區段 -->
+            <div id="inventory-section" class="section">
+                <h2><i class="bi bi-box me-2"></i>庫存管理</h2>
+                
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-primary text-white">
+                                <i class="bi bi-boxes"></i>
+                            </div>
+                            <div class="value text-primary">156</div>
+                            <div class="label">庫存品項</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-warning text-white">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div class="value text-warning">12</div>
+                            <div class="label">低庫存警告</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-danger text-white">
+                                <i class="bi bi-x-octagon"></i>
+                            </div>
+                            <div class="value text-danger">3</div>
+                            <div class="label">缺貨品項</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-success text-white">
+                                <i class="bi bi-currency-dollar"></i>
+                            </div>
+                            <div class="value text-success">$1,850,000</div>
+                            <div class="label">庫存價值</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>庫存清單</h5>
+                        <div>
+                            <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#orderModal">
+                                <i class="bi bi-cart-plus me-1"></i>叫貨
+                            </button>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addInventoryModal">
+                                <i class="bi bi-plus me-1"></i>新增商品
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>商品代碼</th>
+                                    <th>商品名稱</th>
+                                    <th>分類</th>
+                                    <th>目前庫存</th>
+                                    <th>安全庫存</th>
+                                    <th>單價</th>
+                                    <th>狀態</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>P001</td>
+                                    <td>商品A</td>
+                                    <td>食品</td>
+                                    <td>25</td>
+                                    <td>10</td>
+                                    <td>$50</td>
+                                    <td><span class="badge bg-success">充足</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1">編輯</button>
+                                        <button class="btn btn-sm btn-outline-warning me-1">調整</button>
+                                        <button class="btn btn-sm btn-outline-danger">刪除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>P002</td>
+                                    <td>商品B</td>
+                                    <td>日用品</td>
+                                    <td>8</td>
+                                    <td>15</td>
+                                    <td>$80</td>
+                                    <td><span class="badge bg-warning">不足</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1">編輯</button>
+                                        <button class="btn btn-sm btn-outline-warning me-1">調整</button>
+                                        <button class="btn btn-sm btn-outline-danger">刪除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>P003</td>
+                                    <td>商品C</td>
+                                    <td>電子產品</td>
+                                    <td>0</td>
+                                    <td>5</td>
+                                    <td>$200</td>
+                                    <td><span class="badge bg-danger">缺貨</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1">編輯</button>
+                                        <button class="btn btn-sm btn-outline-warning me-1">調整</button>
+                                        <button class="btn btn-sm btn-outline-danger">刪除</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 叫貨模態框 -->
+                <div class="modal fade" id="orderModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">建立叫貨單</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="orderForm">
+                                    <div class="mb-3">
+                                        <label for="orderProduct" class="form-label">選擇商品</label>
+                                        <select class="form-control" id="orderProduct" required>
+                                            <option value="">請選擇商品</option>
+                                            <option value="P002">商品B (庫存不足)</option>
+                                            <option value="P003">商品C (缺貨)</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="orderQuantity" class="form-label">叫貨數量</label>
+                                        <input type="number" class="form-control" id="orderQuantity" required min="1">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="orderNote" class="form-label">備註</label>
+                                        <textarea class="form-control" id="orderNote" rows="3"></textarea>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                <button type="submit" form="orderForm" class="btn btn-success">提交叫貨單</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 新增商品模態框 -->
+                <div class="modal fade" id="addInventoryModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">新增庫存商品</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="addInventoryForm">
+                                    <div class="mb-3">
+                                        <label for="inventoryCode" class="form-label">商品代碼</label>
+                                        <input type="text" class="form-control" id="inventoryCode" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="inventoryName" class="form-label">商品名稱</label>
+                                        <input type="text" class="form-control" id="inventoryName" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="inventoryCategory" class="form-label">分類</label>
+                                        <select class="form-control" id="inventoryCategory" required>
+                                            <option value="">請選擇分類</option>
+                                            <option value="食品">食品</option>
+                                            <option value="日用品">日用品</option>
+                                            <option value="電子產品">電子產品</option>
+                                            <option value="其他">其他</option>
+                                        </select>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="inventoryQuantity" class="form-label">初始庫存</label>
+                                                <input type="number" class="form-control" id="inventoryQuantity" required min="0">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="inventorySafeStock" class="form-label">安全庫存</label>
+                                                <input type="number" class="form-control" id="inventorySafeStock" required min="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="inventoryPrice" class="form-label">單價</label>
+                                        <input type="number" class="form-control" id="inventoryPrice" required min="0" step="0.01">
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                <button type="submit" form="addInventoryForm" class="btn btn-primary">新增商品</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 智慧排程區段 -->
+            <div id="scheduling-section" class="section">
+                <h2><i class="bi bi-calendar me-2"></i>智慧排程管理</h2>
+                
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-primary text-white">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                            <div class="value text-primary">85%</div>
+                            <div class="label">排程完成度</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-success text-white">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                            <div class="value text-success">18</div>
+                            <div class="label">已排班人數</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-warning text-white">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div class="value text-warning">3</div>
+                            <div class="label">排程衝突</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-info text-white">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <div class="value text-info">160</div>
+                            <div class="label">本月總工時</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>本週排班表</h5>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#scheduleModal">
+                            <i class="bi bi-plus me-1"></i>新增排班
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>員工</th>
+                                    <th>星期一</th>
+                                    <th>星期二</th>
+                                    <th>星期三</th>
+                                    <th>星期四</th>
+                                    <th>星期五</th>
+                                    <th>星期六</th>
+                                    <th>星期日</th>
+                                    <th>週總工時</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>王店長</strong></td>
+                                    <td><span class="badge bg-success">09-18</span></td>
+                                    <td><span class="badge bg-success">09-18</span></td>
+                                    <td><span class="badge bg-success">09-18</span></td>
+                                    <td><span class="badge bg-success">09-18</span></td>
+                                    <td><span class="badge bg-success">09-18</span></td>
+                                    <td><span class="badge bg-secondary">休</span></td>
+                                    <td><span class="badge bg-secondary">休</span></td>
+                                    <td>45小時</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>張員工</strong></td>
+                                    <td><span class="badge bg-primary">14-22</span></td>
+                                    <td><span class="badge bg-primary">14-22</span></td>
+                                    <td><span class="badge bg-secondary">休</span></td>
+                                    <td><span class="badge bg-primary">14-22</span></td>
+                                    <td><span class="badge bg-primary">14-22</span></td>
+                                    <td><span class="badge bg-primary">14-22</span></td>
+                                    <td><span class="badge bg-secondary">休</span></td>
+                                    <td>40小時</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>李實習生</strong></td>
+                                    <td><span class="badge bg-info">10-16</span></td>
+                                    <td><span class="badge bg-info">10-16</span></td>
+                                    <td><span class="badge bg-info">10-16</span></td>
+                                    <td><span class="badge bg-secondary">休</span></td>
+                                    <td><span class="badge bg-info">10-16</span></td>
+                                    <td><span class="badge bg-secondary">休</span></td>
+                                    <td><span class="badge bg-secondary">休</span></td>
+                                    <td>24小時</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 智慧排程建議 -->
+                <div class="table-container">
+                    <h5>智慧排程建議</h5>
+                    <div class="alert alert-info">
+                        <h6><i class="bi bi-lightbulb me-2"></i>系統建議</h6>
+                        <ul class="mb-0">
+                            <li>週三下午人力不足，建議調整張員工排班時間</li>
+                            <li>週末需要增加兼職人員以應對客流高峰</li>
+                            <li>李實習生可增加週末排班以增加工作經驗</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 新增排班模態框 -->
+                <div class="modal fade" id="scheduleModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">新增排班</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="scheduleForm">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="scheduleEmployee" class="form-label">員工</label>
+                                                <select class="form-control" id="scheduleEmployee" required>
+                                                    <option value="">請選擇員工</option>
+                                                    <option value="2">王店長</option>
+                                                    <option value="3">張員工</option>
+                                                    <option value="4">李實習生</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="scheduleDate" class="form-label">日期</label>
+                                                <input type="date" class="form-control" id="scheduleDate" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="scheduleStartTime" class="form-label">開始時間</label>
+                                                <input type="time" class="form-control" id="scheduleStartTime" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="scheduleEndTime" class="form-label">結束時間</label>
+                                                <input type="time" class="form-control" id="scheduleEndTime" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="scheduleNote" class="form-label">備註</label>
+                                        <textarea class="form-control" id="scheduleNote" rows="2"></textarea>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                <button type="submit" form="scheduleForm" class="btn btn-primary">新增排班</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 升遷投票區段 -->
+            <div id="promotion-section" class="section">
+                <h2><i class="bi bi-award me-2"></i>升遷投票系統</h2>
+                
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-primary text-white">
+                                <i class="bi bi-person-check"></i>
+                            </div>
+                            <div class="value text-primary">3</div>
+                            <div class="label">進行中投票</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-success text-white">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+                            <div class="value text-success">8</div>
+                            <div class="label">已完成投票</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-info text-white">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div class="value text-info">23</div>
+                            <div class="label">有投票權人數</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-warning text-white">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <div class="value text-warning">2</div>
+                            <div class="label">即將到期</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>投票活動</h5>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#promotionModal">
+                            <i class="bi bi-plus me-1"></i>發起投票
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>投票名稱</th>
+                                    <th>候選人</th>
+                                    <th>投票類型</th>
+                                    <th>開始時間</th>
+                                    <th>結束時間</th>
+                                    <th>參與率</th>
+                                    <th>狀態</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>李實習生轉正投票</td>
+                                    <td>李實習生</td>
+                                    <td><span class="badge bg-info">轉正投票</span></td>
+                                    <td>2025-08-10</td>
+                                    <td>2025-08-15</td>
+                                    <td>76% (17/23)</td>
+                                    <td><span class="badge bg-success">進行中</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">投票</button>
+                                        <button class="btn btn-sm btn-outline-info">詳情</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>店長職位升遷投票</td>
+                                    <td>CANDIDATE_A_001</td>
+                                    <td><span class="badge bg-warning">升遷投票</span></td>
+                                    <td>2025-08-05</td>
+                                    <td>2025-08-12</td>
+                                    <td>91% (21/23)</td>
+                                    <td><span class="badge bg-secondary">已完成</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-success">查看結果</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>遲到懲罰投票</td>
+                                    <td>CANDIDATE_B_002</td>
+                                    <td><span class="badge bg-danger">懲罰投票</span></td>
+                                    <td>2025-08-12</td>
+                                    <td>2025-08-15</td>
+                                    <td>48% (11/23)</td>
+                                    <td><span class="badge bg-warning">即將到期</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">投票</button>
+                                        <button class="btn btn-sm btn-outline-info">詳情</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 我的投票記錄 -->
+                <div class="table-container">
+                    <h5>我的投票記錄</h5>
+                    <div class="alert alert-info">
+                        <strong>匿名投票保護：</strong>所有投票均採用SHA-256加密技術，確保投票者身份完全保密。
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>投票活動</th>
+                                    <th>投票時間</th>
+                                    <th>可修改次數</th>
+                                    <th>狀態</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>李實習生轉正投票</td>
+                                    <td>2025-08-13 14:30</td>
+                                    <td>剩餘 2 次</td>
+                                    <td><span class="badge bg-success">已投票</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-warning">修改投票</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>店長職位升遷投票</td>
+                                    <td>2025-08-10 09:15</td>
+                                    <td>已用完</td>
+                                    <td><span class="badge bg-secondary">投票結束</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-secondary" disabled>不可修改</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 發起投票模態框 -->
+                <div class="modal fade" id="promotionModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">發起升遷投票</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="promotionForm">
+                                    <div class="mb-3">
+                                        <label for="promotionTitle" class="form-label">投票名稱</label>
+                                        <input type="text" class="form-control" id="promotionTitle" required>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="promotionCandidate" class="form-label">候選人</label>
+                                                <select class="form-control" id="promotionCandidate" required>
+                                                    <option value="">請選擇候選人</option>
+                                                    <option value="3">張員工</option>
+                                                    <option value="4">李實習生</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="promotionType" class="form-label">投票類型</label>
+                                                <select class="form-control" id="promotionType" required>
+                                                    <option value="">請選擇類型</option>
+                                                    <option value="promotion">升遷投票</option>
+                                                    <option value="regularization">轉正投票</option>
+                                                    <option value="punishment">懲罰投票</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="promotionStartDate" class="form-label">開始時間</label>
+                                                <input type="datetime-local" class="form-control" id="promotionStartDate" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="promotionEndDate" class="form-label">結束時間</label>
+                                                <input type="datetime-local" class="form-control" id="promotionEndDate" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="promotionDescription" class="form-label">投票說明</label>
+                                        <textarea class="form-control" id="promotionDescription" rows="3" placeholder="請描述投票的背景和目的..."></textarea>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                <button type="submit" form="promotionForm" class="btn btn-primary">發起投票</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 維修申請區段 -->
+            <div id="maintenance-section" class="section">
+                <h2><i class="bi bi-tools me-2"></i>維修申請系統</h2>
+                
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-warning text-white">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div class="value text-warning">5</div>
+                            <div class="label">待處理申請</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-primary text-white">
+                                <i class="bi bi-wrench"></i>
+                            </div>
+                            <div class="value text-primary">3</div>
+                            <div class="label">維修中</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-success text-white">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+                            <div class="value text-success">12</div>
+                            <div class="label">本月完成</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-info text-white">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <div class="value text-info">2.5天</div>
+                            <div class="label">平均處理時間</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>維修申請記錄</h5>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#maintenanceModal">
+                            <i class="bi bi-plus me-1"></i>提交維修申請
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>申請編號</th>
+                                    <th>申請人</th>
+                                    <th>維修項目</th>
+                                    <th>緊急程度</th>
+                                    <th>申請時間</th>
+                                    <th>預計完成</th>
+                                    <th>狀態</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>MR-20250813-001</td>
+                                    <td>張員工</td>
+                                    <td>收銀機故障</td>
+                                    <td><span class="badge bg-danger">緊急</span></td>
+                                    <td>2025-08-13 09:30</td>
+                                    <td>2025-08-13 18:00</td>
+                                    <td><span class="badge bg-primary">維修中</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-info">詳情</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>MR-20250812-002</td>
+                                    <td>王店長</td>
+                                    <td>空調系統檢修</td>
+                                    <td><span class="badge bg-warning">中等</span></td>
+                                    <td>2025-08-12 14:20</td>
+                                    <td>2025-08-15 12:00</td>
+                                    <td><span class="badge bg-warning">待處理</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">處理</button>
+                                        <button class="btn btn-sm btn-outline-info">詳情</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>MR-20250811-003</td>
+                                    <td>李實習生</td>
+                                    <td>門鎖更換</td>
+                                    <td><span class="badge bg-success">一般</span></td>
+                                    <td>2025-08-11 16:45</td>
+                                    <td>2025-08-14 17:00</td>
+                                    <td><span class="badge bg-success">已完成</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-info">詳情</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 維修申請模態框 -->
+                <div class="modal fade" id="maintenanceModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">提交維修申請</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="maintenanceForm">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="maintenanceItem" class="form-label">維修項目</label>
+                                                <input type="text" class="form-control" id="maintenanceItem" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="maintenanceUrgency" class="form-label">緊急程度</label>
+                                                <select class="form-control" id="maintenanceUrgency" required>
+                                                    <option value="">請選擇</option>
+                                                    <option value="低">一般</option>
+                                                    <option value="中">中等</option>
+                                                    <option value="高">緊急</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="maintenanceLocation" class="form-label">維修地點</label>
+                                        <input type="text" class="form-control" id="maintenanceLocation" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="maintenanceDescription" class="form-label">問題描述</label>
+                                        <textarea class="form-control" id="maintenanceDescription" rows="4" required placeholder="請詳細描述需要維修的問題..."></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="maintenancePhoto" class="form-label">上傳照片</label>
+                                        <input type="file" class="form-control" id="maintenancePhoto" accept="image/*" multiple>
+                                        <small class="text-muted">可上傳多張照片，支援JPG、PNG格式</small>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                <button type="submit" form="maintenanceForm" class="btn btn-primary">提交申請</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 報表系統區段 -->
+            <div id="reports-section" class="section">
+                <h2><i class="bi bi-bar-chart me-2"></i>報表系統</h2>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="action-btn" data-report="employee">
+                            <i class="bi bi-people" style="font-size: 2rem; color: var(--primary-color);"></i>
+                            <div class="fw-bold">員工績效報表</div>
+                            <small class="text-muted">員工工作表現統計分析</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="action-btn" data-report="attendance">
+                            <i class="bi bi-clock-history" style="font-size: 2rem; color: var(--secondary-color);"></i>
+                            <div class="fw-bold">出勤摘要分析</div>
+                            <small class="text-muted">出勤記錄統計報表</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="action-btn" data-report="revenue">
+                            <i class="bi bi-graph-up" style="font-size: 2rem; color: #28a745;"></i>
+                            <div class="fw-bold">營收深度分析</div>
+                            <small class="text-muted">營收趨勢和預測分析</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="action-btn" data-report="schedule">
+                            <i class="bi bi-calendar-check" style="font-size: 2rem; color: #ffc107;"></i>
+                            <div class="fw-bold">排程使用率統計</div>
+                            <small class="text-muted">排班效率分析報表</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="action-btn" data-report="promotion">
+                            <i class="bi bi-award" style="font-size: 2rem; color: #dc3545;"></i>
+                            <div class="fw-bold">升遷歷史記錄</div>
+                            <small class="text-muted">升遷投票結果統計</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="action-btn" data-report="department">
+                            <i class="bi bi-building" style="font-size: 2rem; color: #6f42c1;"></i>
+                            <div class="fw-bold">部門統計報表</div>
+                            <small class="text-muted">各部門績效比較</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="action-btn" data-report="monthly">
+                            <i class="bi bi-calendar-month" style="font-size: 2rem; color: #17a2b8;"></i>
+                            <div class="fw-bold">月度總覽報表</div>
+                            <small class="text-muted">月度營運綜合報告</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="action-btn" data-report="system">
+                            <i class="bi bi-cpu" style="font-size: 2rem; color: #6c757d;"></i>
+                            <div class="fw-bold">系統健康報表</div>
+                            <small class="text-muted">系統效能監控報告</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 系統設定區段 -->
+            <div id="settings-section" class="section">
+                <h2><i class="bi bi-gear me-2"></i>系統設定</h2>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="table-container">
+                            <h5>基本設定</h5>
+                            <form>
+                                <div class="mb-3">
+                                    <label for="systemName" class="form-label">系統名稱</label>
+                                    <input type="text" class="form-control" id="systemName" value="GClaude 企業管理系統">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="companyName" class="form-label">公司名稱</label>
+                                    <input type="text" class="form-control" id="companyName" value="GClaude Enterprise">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="systemVersion" class="form-label">系統版本</label>
+                                    <input type="text" class="form-control" id="systemVersion" value="v2.0.0" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="workingHours" class="form-label">工作時間</label>
+                                    <input type="text" class="form-control" id="workingHours" value="09:00-18:00">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="gpsRange" class="form-label">GPS打卡範圍(公尺)</label>
+                                    <input type="number" class="form-control" id="gpsRange" value="50">
+                                </div>
+                                <button type="submit" class="btn btn-primary">保存設定</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="table-container">
+                            <h5>權限管理</h5>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>功能</th>
+                                            <th>管理員</th>
+                                            <th>店長</th>
+                                            <th>員工</th>
+                                            <th>實習生</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>員工管理</td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td>出勤管理</td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td>營收分析</td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td>庫存管理</td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td>智慧排程</td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td>升遷投票</td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td>維修申請</td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td>報表系統</td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td>系統設定</td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="table-container mt-3">
+                            <h5>系統狀態</h5>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="stat-card">
+                                        <div class="icon bg-success text-white">
+                                            <i class="bi bi-server"></i>
+                                        </div>
+                                        <div class="value text-success">正常</div>
+                                        <div class="label">伺服器狀態</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-card">
+                                        <div class="icon bg-info text-white">
+                                            <i class="bi bi-database"></i>
+                                        </div>
+                                        <div class="value text-info">98%</div>
+                                        <div class="label">資料庫健康度</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 全域變數
+        let currentUser = null;
+        let currentSection = 'dashboard';
+
+        // DOM 載入完成後初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 儀表板載入完成');
+            initializeDashboard();
+        });
+
+        // 儀表板初始化
+        async function initializeDashboard() {
+            try {
+                await loadUserInfo();
+                updateCurrentDate();
+                bindEventListeners();
+                await loadDashboardData();
+            } catch (error) {
+                console.error('儀表板初始化失敗:', error);
+                redirectToLogin();
+            }
+        }
+
+        // 載入用戶資訊
+        async function loadUserInfo() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                throw new Error('No authentication token');
+            }
+
+            try {
+                const response = await fetch('/api/auth/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Token verification failed');
+                }
+
+                const data = await response.json();
+                if (data.success) {
+                    currentUser = data.data;
+                    updateUserInterface();
+                } else {
+                    throw new Error('User data retrieval failed');
+                }
+            } catch (error) {
+                console.error('用戶資訊載入失敗:', error);
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userInfo');
+                throw error;
+            }
+        }
+
+        // 更新用戶介面
+        function updateUserInterface() {
+            if (!currentUser) return;
+
+            // 更新用戶資訊顯示
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userRole').textContent = getRoleDisplayName(currentUser.role);
+            
+            // 更新用戶頭像
+            const userAvatar = document.getElementById('userAvatar');
+            userAvatar.textContent = currentUser.name.charAt(0);
+
+            // 根據用戶權限顯示導航項目
+            updateNavigationByRole(currentUser.role);
+
+            console.log(`✅ 用戶載入完成: ${currentUser.name} (${currentUser.role})`);
+        }
+
+        // 根據角色更新導航
+        function updateNavigationByRole(role) {
+            const navItems = {
+                'admin': ['employees', 'attendance', 'revenue', 'inventory', 'scheduling', 'promotion', 'maintenance', 'reports', 'settings'],
+                'manager': ['employees', 'attendance', 'revenue', 'inventory', 'scheduling', 'promotion', 'maintenance', 'reports'],
+                'employee': ['attendance', 'inventory', 'scheduling', 'promotion', 'maintenance', 'reports'],
+                'intern': ['attendance', 'scheduling', 'promotion', 'maintenance']
+            };
+
+            const allowedItems = navItems[role] || [];
+            
+            // 隱藏無權限的導航項目
+            ['employees', 'attendance', 'revenue', 'inventory', 'scheduling', 'promotion', 'maintenance', 'reports', 'settings'].forEach(item => {
+                const navItem = document.getElementById(`nav-${item}`);
+                if (navItem) {
+                    navItem.style.display = allowedItems.includes(item) ? 'block' : 'none';
+                }
+            });
+        }
+
+        // 更新當前日期
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+            };
+            document.getElementById('currentDate').textContent = 
+                now.toLocaleDateString('zh-TW', options);
+        }
+
+        // 綁定事件監聽器
+        function bindEventListeners() {
+            // 手機版側邊欄切換
+            document.getElementById('mobileToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('show');
+            });
+
+            // 側邊欄導航 - 修復的關鍵部分
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                if (link.dataset.section) {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        switchSection(this.dataset.section);
+                    });
+                }
+            });
+
+            // 登出按鈕
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+
+            // GPS打卡按鈕
+            const gpsBtn = document.getElementById('gpsCheckInBtn');
+            if (gpsBtn) {
+                gpsBtn.addEventListener('click', handleGPSCheckIn);
+            }
+
+            // 表單提交事件
+            bindFormEvents();
+
+            // 點擊側邊欄外的區域關閉手機版側邊欄
+            document.addEventListener('click', function(e) {
+                const sidebar = document.getElementById('sidebar');
+                const mobileToggle = document.getElementById('mobileToggle');
+                
+                if (window.innerWidth <= 768 && 
+                    !sidebar.contains(e.target) && 
+                    e.target !== mobileToggle) {
+                    sidebar.classList.remove('show');
+                }
+            });
+        }
+
+        // 綁定表單事件
+        function bindFormEvents() {
+            // 新增員工表單
+            const addEmployeeForm = document.getElementById('addEmployeeForm');
+            if (addEmployeeForm) {
+                addEmployeeForm.addEventListener('submit', handleAddEmployee);
+            }
+
+            // 新增營收記錄表單
+            const addRevenueForm = document.getElementById('addRevenueForm');
+            if (addRevenueForm) {
+                addRevenueForm.addEventListener('submit', handleAddRevenue);
+            }
+
+            // 其他表單可以在這裡添加
+        }
+
+        // 處理GPS打卡
+        function handleGPSCheckIn() {
+            if (navigator.geolocation) {
+                showAlert('正在獲取GPS位置...', 'info');
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    // 模擬打卡API調用
+                    setTimeout(() => {
+                        showAlert(`GPS打卡成功！位置: ${lat.toFixed(6)}, ${lng.toFixed(6)}`, 'success');
+                    }, 1000);
+                }, function(error) {
+                    showAlert('GPS定位失敗，請檢查定位權限設置', 'error');
+                });
+            } else {
+                showAlert('瀏覽器不支援GPS定位功能', 'error');
+            }
+        }
+
+        // 處理新增員工
+        function handleAddEmployee(e) {
+            e.preventDefault();
+            
+            // 獲取表單數據
+            const formData = new FormData(e.target);
+            const employeeData = Object.fromEntries(formData);
+            
+            // 模擬API調用
+            showAlert('員工資料新增中...', 'info');
+            setTimeout(() => {
+                showAlert('員工新增成功！', 'success');
+                // 關閉模態框
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addEmployeeModal'));
+                modal.hide();
+                // 清空表單
+                e.target.reset();
+            }, 1000);
+        }
+
+        // 處理新增營收記錄
+        function handleAddRevenue(e) {
+            e.preventDefault();
+            
+            showAlert('營收記錄新增中...', 'info');
+            setTimeout(() => {
+                showAlert('營收記錄新增成功！', 'success');
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addRevenueModal'));
+                modal.hide();
+                e.target.reset();
+            }, 1000);
+        }
+
+        // 載入儀表板數據
+        async function loadDashboardData() {
+            try {
+                await Promise.all([
+                    loadStats(),
+                    loadQuickActions()
+                ]);
+            } catch (error) {
+                console.error('載入儀表板數據失敗:', error);
+                showError('載入數據失敗，請重新整理頁面');
+            }
+        }
+
+        // 載入統計資料
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/employees/stats/overview', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    }
+                });
+
+                let stats = {};
+                if (response.ok) {
+                    const data = await response.json();
+                    stats = data.data || {};
+                } else {
+                    // 使用模擬數據
+                    stats = {
+                        total: 25,
+                        active: 23,
+                        recentHires: 3,
+                        averageSalary: 45000
+                    };
+                }
+
+                displayStats(stats);
+            } catch (error) {
+                console.error('載入統計資料失敗:', error);
+                displayStats({});
+            }
+        }
+
+        // 顯示統計資料
+        function displayStats(stats) {
+            const statsGrid = document.getElementById('statsGrid');
+            
+            const statCards = [
+                {
+                    icon: 'bi bi-people',
+                    iconBg: 'bg-primary',
+                    value: stats.total || '25',
+                    label: '總員工數',
+                    color: 'text-primary'
+                },
+                {
+                    icon: 'bi bi-person-check',
+                    iconBg: 'bg-success',
+                    value: stats.active || '23',
+                    label: '在職員工',
+                    color: 'text-success'
+                },
+                {
+                    icon: 'bi bi-cash-stack',
+                    iconBg: 'bg-success',
+                    value: '$2,125,000',
+                    label: '本月營收',
+                    color: 'text-success'
+                },
+                {
+                    icon: 'bi bi-boxes',
+                    iconBg: 'bg-warning',
+                    value: '156',
+                    label: '庫存品項',
+                    color: 'text-warning'
+                }
+            ];
+
+            statsGrid.innerHTML = statCards.map(card => `
+                <div class="stat-card">
+                    <div class="icon ${card.iconBg} text-white">
+                        <i class="${card.icon}"></i>
+                    </div>
+                    <div class="value ${card.color}">${card.value}</div>
+                    <div class="label">${card.label}</div>
+                </div>
+            `).join('');
+        }
+
+        // 載入快速操作
+        function loadQuickActions() {
+            const actions = getQuickActionsByRole(currentUser?.role);
+            const quickActions = document.getElementById('quickActions');
+            
+            quickActions.innerHTML = actions.map(action => `
+                <a href="#" class="action-btn" data-action="${action.id}">
+                    <i class="${action.icon}" style="font-size: 2rem; margin-bottom: 0.5rem; color: ${action.color};"></i>
+                    <div class="fw-bold">${action.title}</div>
+                    <small class="text-muted">${action.description}</small>
+                </a>
+            `).join('');
+
+            // 綁定快速操作點擊事件
+            quickActions.querySelectorAll('.action-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    handleQuickAction(this.dataset.action);
+                });
+            });
+        }
+
+        // 根據角色獲取快速操作
+        function getQuickActionsByRole(role) {
+            const allActions = {
+                addEmployee: {
+                    id: 'addEmployee',
+                    title: '新增員工',
+                    description: '註冊新員工',
+                    icon: 'bi bi-person-plus',
+                    color: '#28a745',
+                    roles: ['admin', 'manager']
+                },
+                attendance: {
+                    id: 'attendance',
+                    title: 'GPS打卡',
+                    description: '定位打卡記錄',
+                    icon: 'bi bi-geo-alt',
+                    color: '#007bff',
+                    roles: ['admin', 'manager', 'employee', 'intern']
+                },
+                inventory: {
+                    id: 'inventory',
+                    title: '庫存管理',
+                    description: '叫貨與庫存',
+                    icon: 'bi bi-box',
+                    color: '#ffc107',
+                    roles: ['admin', 'manager', 'employee']
+                },
+                revenue: {
+                    id: 'revenue',
+                    title: '營收記錄',
+                    description: '營收數據管理',
+                    icon: 'bi bi-graph-up',
+                    color: '#28a745',
+                    roles: ['admin', 'manager']
+                },
+                promotion: {
+                    id: 'promotion',
+                    title: '升遷投票',
+                    description: '參與升遷投票',
+                    icon: 'bi bi-award',
+                    color: '#6f42c1',
+                    roles: ['admin', 'manager', 'employee', 'intern']
+                },
+                maintenance: {
+                    id: 'maintenance',
+                    title: '維修申請',
+                    description: '提交維修需求',
+                    icon: 'bi bi-tools',
+                    color: '#dc3545',
+                    roles: ['admin', 'manager', 'employee', 'intern']
+                },
+                reports: {
+                    id: 'reports',
+                    title: '報表系統',
+                    description: '生成分析報告',
+                    icon: 'bi bi-bar-chart',
+                    color: '#17a2b8',
+                    roles: ['admin', 'manager', 'employee']
+                },
+                settings: {
+                    id: 'settings',
+                    title: '系統設定',
+                    description: '管理系統配置',
+                    icon: 'bi bi-gear',
+                    color: '#6c757d',
+                    roles: ['admin']
+                }
+            };
+
+            return Object.values(allActions).filter(action => 
+                action.roles.includes(role || 'intern')
+            );
+        }
+
+        // 處理快速操作
+        function handleQuickAction(actionId) {
+            console.log(`執行快速操作: ${actionId}`);
+            
+            switch (actionId) {
+                case 'addEmployee':
+                    switchSection('employees');
+                    break;
+                case 'attendance':
+                    switchSection('attendance');
+                    break;
+                case 'inventory':
+                    switchSection('inventory');
+                    break;
+                case 'revenue':
+                    switchSection('revenue');
+                    break;
+                case 'promotion':
+                    switchSection('promotion');
+                    break;
+                case 'maintenance':
+                    switchSection('maintenance');
+                    break;
+                case 'reports':
+                    switchSection('reports');
+                    break;
+                case 'settings':
+                    switchSection('settings');
+                    break;
+                default:
+                    showAlert('功能開發中...', 'info');
+            }
+        }
+
+        // 切換功能區段 - 修復的核心函數
+        function switchSection(section) {
+            currentSection = section;
+            console.log(`切換到區段: ${section}`);
+            
+            // 更新導航狀態
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.section === section) {
+                    link.classList.add('active');
+                }
+            });
+
+            // 隱藏所有區段
+            document.querySelectorAll('.section').forEach(sectionEl => {
+                sectionEl.classList.remove('active');
+            });
+
+            // 顯示目標區段
+            const targetSection = document.getElementById(`${section}-section`);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            } else {
+                console.warn(`找不到區段: ${section}-section`);
+            }
+            
+            // 手機版自動關閉側邊欄
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('show');
+            }
+        }
+
+        // 處理登出
+        function handleLogout() {
+            if (confirm('確定要登出系統嗎？')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userInfo');
+                
+                showAlert('已成功登出', 'success');
+                
+                setTimeout(() => {
+                    redirectToLogin();
+                }, 1000);
+            }
+        }
+
+        // 重定向到登入頁面
+        function redirectToLogin() {
+            window.location.href = '/';
+        }
+
+        // 獲取角色顯示名稱
+        function getRoleDisplayName(role) {
+            const roleNames = {
+                'admin': '系統管理員',
+                'manager': '店長',
+                'employee': '員工',
+                'intern': '實習生'
+            };
+            return roleNames[role] || role;
+        }
+
+        // 顯示提示訊息
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 1060; min-width: 300px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 5000);
+        }
+
+        // 顯示錯誤訊息
+        function showError(message) {
+            showAlert(message, 'danger');
+        }
+
+        // 錯誤處理
+        window.addEventListener('error', function(event) {
+            console.error('JavaScript 錯誤:', event.error);
+        });
+    </script>
+</body>
+</html>

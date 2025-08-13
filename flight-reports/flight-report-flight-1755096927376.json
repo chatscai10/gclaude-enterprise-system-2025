@@ -1,0 +1,37 @@
+{
+  "id": "flight-1755096927376",
+  "timestamp": "2025-08-13T14:55:27.376Z",
+  "stage": 2,
+  "testResults": {
+    "passed": 2,
+    "failed": 0,
+    "successRate": 100
+  },
+  "systemHealth": {
+    "stabilityScore": 100,
+    "errorCount": 0
+  },
+  "recommendations": [
+    {
+      "title": "系統運行穩定，繼續監控",
+      "priority": "low"
+    }
+  ],
+  "screenshots": [
+    {
+      "name": "homepage",
+      "description": "首頁載入完成",
+      "filename": "homepage-1755096926088.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\homepage-1755096926088.png",
+      "timestamp": 1755096926088
+    },
+    {
+      "name": "health-check",
+      "description": "API 健康檢查結果",
+      "filename": "health-check-1755096927283.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\health-check-1755096927283.png",
+      "timestamp": 1755096927283
+    }
+  ],
+  "executionTime": 5273
+}

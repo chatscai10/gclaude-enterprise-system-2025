@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>儀表板 - GClaude 企業管理系統</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #2196F3 0%, #00BCD4 100%);
+            --primary-color: #2196F3;
+            --secondary-color: #00BCD4;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: var(--primary-gradient);
+            color: white;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .sidebar-header h4 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            margin: 0.25rem 0;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-link i {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .top-navbar {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .content-area {
+            padding: 2rem;
+        }
+
+        .welcome-card {
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card .icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-btn {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            text-decoration: none;
+            color: #495057;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: #f8f9ff;
+            transform: translateY(-2px);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            margin-right: 1rem;
+        }
+
+        .mobile-toggle {
+            display: none;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1976D2 0%, #00ACC1 100%);
+        }
+
+        @media (max-width: 992px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .mobile-toggle {
+                display: block;
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                color: #495057;
+                cursor: pointer;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .top-navbar {
+                padding: 1rem;
+            }
+
+            .content-area {
+                padding: 1rem;
+            }
+
+            .welcome-card {
+                padding: 1.5rem;
+            }
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            color: #6c757d;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 側邊欄 -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h4>🏢 企業管理</h4>
+            <small>GClaude Enterprise v2.0</small>
+        </div>
+        <div class="sidebar-nav">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" data-section="dashboard">
+                        <i class="bi bi-speedometer2"></i>
+                        儀表板
+                    </a>
+                </li>
+                <li class="nav-item" id="nav-employees">
+                    <a class="nav-link" href="#" data-section="employees">
+                        <i class="bi bi-people"></i>
+                        員工管理
+                    </a>
+                </li>
+                <li class="nav-item" id="nav-attendance">
+                    <a class="nav-link" href="#" data-section="attendance">
+                        <i class="bi bi-clock"></i>
+                        出勤管理
+                    </a>
+                </li>
+                <li class="nav-item" id="nav-revenue">
+                    <a class="nav-link" href="#" data-section="revenue">
+                        <i class="bi bi-graph-up"></i>
+                        營收分析
+                    </a>
+                </li>
+                <li class="nav-item" id="nav-inventory">
+                    <a class="nav-link" href="#" data-section="inventory">
+                        <i class="bi bi-box"></i>
+                        庫存管理
+                    </a>
+                </li>
+                <li class="nav-item" id="nav-reports">
+                    <a class="nav-link" href="#" data-section="reports">
+                        <i class="bi bi-bar-chart"></i>
+                        報表系統
+                    </a>
+                </li>
+                <li class="nav-item" id="nav-settings">
+                    <a class="nav-link" href="#" data-section="settings">
+                        <i class="bi bi-gear"></i>
+                        系統設定
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <hr style="border-color: rgba(255,255,255,0.1); margin: 1rem 0;">
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="logoutBtn">
+                        <i class="bi bi-box-arrow-right"></i>
+                        登出系統
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主要內容區 -->
+    <div class="main-content">
+        <!-- 頂部導航 -->
+        <div class="top-navbar">
+            <button class="mobile-toggle" id="mobileToggle">
+                <i class="bi bi-list"></i>
+            </button>
+            
+            <div class="user-profile">
+                <div class="user-avatar" id="userAvatar">?</div>
+                <div>
+                    <div class="fw-bold" id="userName">載入中...</div>
+                    <small class="text-muted" id="userRole">-</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- 內容區域 -->
+        <div class="content-area">
+            <!-- 儀表板區段 -->
+            <div id="dashboard-section" class="section active">
+                <!-- 歡迎卡片 -->
+                <div class="welcome-card">
+                    <h2>歡迎回來！</h2>
+                    <p class="mb-0">今天是 <span id="currentDate">-</span></p>
+                    <p class="mb-0">系統運行正常，所有服務可用</p>
+                </div>
+
+                <!-- 統計卡片 -->
+                <div class="stats-grid" id="statsGrid">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <span>載入統計資料中...</span>
+                    </div>
+                </div>
+
+                <!-- 快速操作 -->
+                <div class="row">
+                    <div class="col-12">
+                        <h5 class="mb-3">快速操作</h5>
+                        <div class="quick-actions" id="quickActions">
+                            <!-- 動態載入 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 員工管理區段 -->
+            <div id="employees-section" class="section">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="bi bi-people me-2"></i>員工管理</h2>
+                    <button class="btn btn-primary">
+                        <i class="bi bi-person-plus me-1"></i>新增員工
+                    </button>
+                </div>
+                
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>編號</th>
+                                    <th>姓名</th>
+                                    <th>職位</th>
+                                    <th>部門</th>
+                                    <th>狀態</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>001</td>
+                                    <td>系統管理員</td>
+                                    <td>系統管理員</td>
+                                    <td>資訊部</td>
+                                    <td><span class="badge bg-success">在職</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1">編輯</button>
+                                        <button class="btn btn-sm btn-outline-danger">刪除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>002</td>
+                                    <td>王店長</td>
+                                    <td>店長</td>
+                                    <td>營運部</td>
+                                    <td><span class="badge bg-success">在職</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1">編輯</button>
+                                        <button class="btn btn-sm btn-outline-danger">刪除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>003</td>
+                                    <td>張員工</td>
+                                    <td>員工</td>
+                                    <td>服務部</td>
+                                    <td><span class="badge bg-success">在職</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1">編輯</button>
+                                        <button class="btn btn-sm btn-outline-danger">刪除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>004</td>
+                                    <td>李實習生</td>
+                                    <td>實習生</td>
+                                    <td>服務部</td>
+                                    <td><span class="badge bg-warning">實習</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1">編輯</button>
+                                        <button class="btn btn-sm btn-outline-danger">刪除</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 出勤管理區段 -->
+            <div id="attendance-section" class="section">
+                <h2><i class="bi bi-clock me-2"></i>出勤管理</h2>
+                
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-success text-white">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+                            <div class="value text-success">23</div>
+                            <div class="label">今日出勤</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-warning text-white">
+                                <i class="bi bi-exclamation-circle"></i>
+                            </div>
+                            <div class="value text-warning">2</div>
+                            <div class="label">遲到人數</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-danger text-white">
+                                <i class="bi bi-x-circle"></i>
+                            </div>
+                            <div class="value text-danger">1</div>
+                            <div class="label">缺勤人數</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-info text-white">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <div class="value text-info">156</div>
+                            <div class="label">本月工時</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <h5>今日出勤記錄</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>員工</th>
+                                    <th>上班時間</th>
+                                    <th>下班時間</th>
+                                    <th>工作時數</th>
+                                    <th>狀態</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>王店長</td>
+                                    <td>08:00</td>
+                                    <td>18:00</td>
+                                    <td>10小時</td>
+                                    <td><span class="badge bg-success">正常</span></td>
+                                </tr>
+                                <tr>
+                                    <td>張員工</td>
+                                    <td>08:30</td>
+                                    <td>17:30</td>
+                                    <td>9小時</td>
+                                    <td><span class="badge bg-warning">遲到</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 營收分析區段 -->
+            <div id="revenue-section" class="section">
+                <h2><i class="bi bi-graph-up me-2"></i>營收分析</h2>
+                
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-success text-white">
+                                <i class="bi bi-currency-dollar"></i>
+                            </div>
+                            <div class="value text-success">$125,000</div>
+                            <div class="label">本月營收</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-info text-white">
+                                <i class="bi bi-graph-up-arrow"></i>
+                            </div>
+                            <div class="value text-info">+15%</div>
+                            <div class="label">成長率</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-warning text-white">
+                                <i class="bi bi-cart"></i>
+                            </div>
+                            <div class="value text-warning">1,250</div>
+                            <div class="label">訂單數</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-primary text-white">
+                                <i class="bi bi-calculator"></i>
+                            </div>
+                            <div class="value text-primary">$100</div>
+                            <div class="label">平均客單價</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <h5>月度營收詳細</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>月份</th>
+                                    <th>營收</th>
+                                    <th>訂單數</th>
+                                    <th>成長率</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2025-08</td>
+                                    <td>$125,000</td>
+                                    <td>1,250</td>
+                                    <td><span class="text-success">+15%</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2025-07</td>
+                                    <td>$110,000</td>
+                                    <td>1,100</td>
+                                    <td><span class="text-success">+8%</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 庫存管理區段 -->
+            <div id="inventory-section" class="section">
+                <h2><i class="bi bi-box me-2"></i>庫存管理</h2>
+                
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-primary text-white">
+                                <i class="bi bi-boxes"></i>
+                            </div>
+                            <div class="value text-primary">156</div>
+                            <div class="label">庫存品項</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-warning text-white">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div class="value text-warning">12</div>
+                            <div class="label">低庫存警告</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-danger text-white">
+                                <i class="bi bi-x-octagon"></i>
+                            </div>
+                            <div class="value text-danger">3</div>
+                            <div class="label">缺貨品項</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="icon bg-success text-white">
+                                <i class="bi bi-currency-dollar"></i>
+                            </div>
+                            <div class="value text-success">$85,000</div>
+                            <div class="label">庫存價值</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <h5>庫存清單</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>品項代碼</th>
+                                    <th>品項名稱</th>
+                                    <th>目前庫存</th>
+                                    <th>安全庫存</th>
+                                    <th>狀態</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>P001</td>
+                                    <td>商品A</td>
+                                    <td>25</td>
+                                    <td>10</td>
+                                    <td><span class="badge bg-success">充足</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">調整</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>P002</td>
+                                    <td>商品B</td>
+                                    <td>8</td>
+                                    <td>10</td>
+                                    <td><span class="badge bg-warning">不足</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">調整</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 報表系統區段 -->
+            <div id="reports-section" class="section">
+                <h2><i class="bi bi-bar-chart me-2"></i>報表系統</h2>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="action-btn" data-report="employee">
+                            <i class="bi bi-people" style="font-size: 2rem; color: var(--primary-color);"></i>
+                            <div class="fw-bold">員工報表</div>
+                            <small class="text-muted">員工資料統計</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="action-btn" data-report="attendance">
+                            <i class="bi bi-clock-history" style="font-size: 2rem; color: var(--secondary-color);"></i>
+                            <div class="fw-bold">出勤報表</div>
+                            <small class="text-muted">出勤記錄統計</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="action-btn" data-report="revenue">
+                            <i class="bi bi-graph-up" style="font-size: 2rem; color: #28a745;"></i>
+                            <div class="fw-bold">營收報表</div>
+                            <small class="text-muted">營收分析統計</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="action-btn" data-report="inventory">
+                            <i class="bi bi-box" style="font-size: 2rem; color: #ffc107;"></i>
+                            <div class="fw-bold">庫存報表</div>
+                            <small class="text-muted">庫存統計分析</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="action-btn" data-report="financial">
+                            <i class="bi bi-calculator" style="font-size: 2rem; color: #dc3545;"></i>
+                            <div class="fw-bold">財務報表</div>
+                            <small class="text-muted">財務狀況分析</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="action-btn" data-report="custom">
+                            <i class="bi bi-gear" style="font-size: 2rem; color: #6c757d;"></i>
+                            <div class="fw-bold">自訂報表</div>
+                            <small class="text-muted">客製化報表</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 系統設定區段 -->
+            <div id="settings-section" class="section">
+                <h2><i class="bi bi-gear me-2"></i>系統設定</h2>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="table-container">
+                            <h5>基本設定</h5>
+                            <div class="mb-3">
+                                <label class="form-label">系統名稱</label>
+                                <input type="text" class="form-control" value="GClaude 企業管理系統">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">公司名稱</label>
+                                <input type="text" class="form-control" value="GClaude Enterprise">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">系統版本</label>
+                                <input type="text" class="form-control" value="v2.0.0" readonly>
+                            </div>
+                            <button class="btn btn-primary">保存設定</button>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="table-container">
+                            <h5>權限管理</h5>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>功能</th>
+                                            <th>管理員</th>
+                                            <th>店長</th>
+                                            <th>員工</th>
+                                            <th>實習生</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>員工管理</td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td>出勤管理</td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td>營收分析</td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td>系統設定</td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 全域變數
+        let currentUser = null;
+        let currentSection = 'dashboard';
+
+        // DOM 載入完成後初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 儀表板載入完成');
+            initializeDashboard();
+        });
+
+        // 儀表板初始化
+        async function initializeDashboard() {
+            try {
+                await loadUserInfo();
+                updateCurrentDate();
+                bindEventListeners();
+                await loadDashboardData();
+            } catch (error) {
+                console.error('儀表板初始化失敗:', error);
+                redirectToLogin();
+            }
+        }
+
+        // 載入用戶資訊
+        async function loadUserInfo() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                throw new Error('No authentication token');
+            }
+
+            try {
+                const response = await fetch('/api/auth/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Token verification failed');
+                }
+
+                const data = await response.json();
+                if (data.success) {
+                    currentUser = data.data;
+                    updateUserInterface();
+                } else {
+                    throw new Error('User data retrieval failed');
+                }
+            } catch (error) {
+                console.error('用戶資訊載入失敗:', error);
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userInfo');
+                throw error;
+            }
+        }
+
+        // 更新用戶介面
+        function updateUserInterface() {
+            if (!currentUser) return;
+
+            // 更新用戶資訊顯示
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userRole').textContent = getRoleDisplayName(currentUser.role);
+            
+            // 更新用戶頭像
+            const userAvatar = document.getElementById('userAvatar');
+            userAvatar.textContent = currentUser.name.charAt(0);
+
+            // 根據用戶權限顯示導航項目
+            updateNavigationByRole(currentUser.role);
+
+            console.log(`✅ 用戶載入完成: ${currentUser.name} (${currentUser.role})`);
+        }
+
+        // 根據角色更新導航
+        function updateNavigationByRole(role) {
+            const navItems = {
+                'admin': ['employees', 'attendance', 'revenue', 'inventory', 'reports', 'settings'],
+                'manager': ['employees', 'attendance', 'revenue', 'inventory', 'reports'],
+                'employee': ['attendance', 'inventory', 'reports'],
+                'intern': ['attendance']
+            };
+
+            const allowedItems = navItems[role] || [];
+            
+            // 隱藏無權限的導航項目
+            ['employees', 'attendance', 'revenue', 'inventory', 'reports', 'settings'].forEach(item => {
+                const navItem = document.getElementById(`nav-${item}`);
+                if (navItem) {
+                    navItem.style.display = allowedItems.includes(item) ? 'block' : 'none';
+                }
+            });
+        }
+
+        // 更新當前日期
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+            };
+            document.getElementById('currentDate').textContent = 
+                now.toLocaleDateString('zh-TW', options);
+        }
+
+        // 綁定事件監聽器
+        function bindEventListeners() {
+            // 手機版側邊欄切換
+            document.getElementById('mobileToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('show');
+            });
+
+            // 側邊欄導航 - 修復的關鍵部分
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                if (link.dataset.section) {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        switchSection(this.dataset.section);
+                    });
+                }
+            });
+
+            // 登出按鈕
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+
+            // 點擊側邊欄外的區域關閉手機版側邊欄
+            document.addEventListener('click', function(e) {
+                const sidebar = document.getElementById('sidebar');
+                const mobileToggle = document.getElementById('mobileToggle');
+                
+                if (window.innerWidth <= 768 && 
+                    !sidebar.contains(e.target) && 
+                    e.target !== mobileToggle) {
+                    sidebar.classList.remove('show');
+                }
+            });
+        }
+
+        // 載入儀表板數據
+        async function loadDashboardData() {
+            try {
+                await Promise.all([
+                    loadStats(),
+                    loadQuickActions()
+                ]);
+            } catch (error) {
+                console.error('載入儀表板數據失敗:', error);
+                showError('載入數據失敗，請重新整理頁面');
+            }
+        }
+
+        // 載入統計資料
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/employees/stats/overview', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    }
+                });
+
+                let stats = {};
+                if (response.ok) {
+                    const data = await response.json();
+                    stats = data.data || {};
+                } else {
+                    // 使用模擬數據
+                    stats = {
+                        total: 25,
+                        active: 23,
+                        recentHires: 3,
+                        averageSalary: 45000
+                    };
+                }
+
+                displayStats(stats);
+            } catch (error) {
+                console.error('載入統計資料失敗:', error);
+                displayStats({});
+            }
+        }
+
+        // 顯示統計資料
+        function displayStats(stats) {
+            const statsGrid = document.getElementById('statsGrid');
+            
+            const statCards = [
+                {
+                    icon: 'bi bi-people',
+                    iconBg: 'bg-primary',
+                    value: stats.total || '0',
+                    label: '總員工數',
+                    color: 'text-primary'
+                },
+                {
+                    icon: 'bi bi-person-check',
+                    iconBg: 'bg-success',
+                    value: stats.active || '0',
+                    label: '在職員工',
+                    color: 'text-success'
+                },
+                {
+                    icon: 'bi bi-person-plus',
+                    iconBg: 'bg-info',
+                    value: stats.recentHires || '0',
+                    label: '近期聘用',
+                    color: 'text-info'
+                },
+                {
+                    icon: 'bi bi-cash-stack',
+                    iconBg: 'bg-warning',
+                    value: stats.averageSalary ? `$${stats.averageSalary.toLocaleString()}` : '$0',
+                    label: '平均薪資',
+                    color: 'text-warning'
+                }
+            ];
+
+            statsGrid.innerHTML = statCards.map(card => `
+                <div class="stat-card">
+                    <div class="icon ${card.iconBg} text-white">
+                        <i class="${card.icon}"></i>
+                    </div>
+                    <div class="value ${card.color}">${card.value}</div>
+                    <div class="label">${card.label}</div>
+                </div>
+            `).join('');
+        }
+
+        // 載入快速操作
+        function loadQuickActions() {
+            const actions = getQuickActionsByRole(currentUser?.role);
+            const quickActions = document.getElementById('quickActions');
+            
+            quickActions.innerHTML = actions.map(action => `
+                <a href="#" class="action-btn" data-action="${action.id}">
+                    <i class="${action.icon}" style="font-size: 2rem; margin-bottom: 0.5rem; color: ${action.color};"></i>
+                    <div class="fw-bold">${action.title}</div>
+                    <small class="text-muted">${action.description}</small>
+                </a>
+            `).join('');
+
+            // 綁定快速操作點擊事件
+            quickActions.querySelectorAll('.action-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    handleQuickAction(this.dataset.action);
+                });
+            });
+        }
+
+        // 根據角色獲取快速操作
+        function getQuickActionsByRole(role) {
+            const allActions = {
+                addEmployee: {
+                    id: 'addEmployee',
+                    title: '新增員工',
+                    description: '註冊新員工',
+                    icon: 'bi bi-person-plus',
+                    color: '#28a745',
+                    roles: ['admin', 'manager']
+                },
+                attendance: {
+                    id: 'attendance',
+                    title: '打卡記錄',
+                    description: '查看出勤狀況',
+                    icon: 'bi bi-clock-history',
+                    color: '#007bff',
+                    roles: ['admin', 'manager', 'employee', 'intern']
+                },
+                reports: {
+                    id: 'reports',
+                    title: '生成報表',
+                    description: '產生分析報告',
+                    icon: 'bi bi-file-earmark-text',
+                    color: '#6f42c1',
+                    roles: ['admin', 'manager', 'employee']
+                },
+                settings: {
+                    id: 'settings',
+                    title: '系統設定',
+                    description: '管理系統配置',
+                    icon: 'bi bi-gear',
+                    color: '#6c757d',
+                    roles: ['admin']
+                }
+            };
+
+            return Object.values(allActions).filter(action => 
+                action.roles.includes(role || 'intern')
+            );
+        }
+
+        // 處理快速操作
+        function handleQuickAction(actionId) {
+            console.log(`執行快速操作: ${actionId}`);
+            
+            switch (actionId) {
+                case 'addEmployee':
+                    switchSection('employees');
+                    break;
+                case 'attendance':
+                    switchSection('attendance');
+                    break;
+                case 'reports':
+                    switchSection('reports');
+                    break;
+                case 'settings':
+                    switchSection('settings');
+                    break;
+                default:
+                    showAlert('功能開發中...', 'info');
+            }
+        }
+
+        // 切換功能區段 - 修復的核心函數
+        function switchSection(section) {
+            currentSection = section;
+            console.log(`切換到區段: ${section}`);
+            
+            // 更新導航狀態
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.section === section) {
+                    link.classList.add('active');
+                }
+            });
+
+            // 隱藏所有區段
+            document.querySelectorAll('.section').forEach(sectionEl => {
+                sectionEl.classList.remove('active');
+            });
+
+            // 顯示目標區段
+            const targetSection = document.getElementById(`${section}-section`);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            } else {
+                console.warn(`找不到區段: ${section}-section`);
+            }
+            
+            // 手機版自動關閉側邊欄
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('show');
+            }
+        }
+
+        // 處理登出
+        function handleLogout() {
+            if (confirm('確定要登出系統嗎？')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userInfo');
+                
+                showAlert('已成功登出', 'success');
+                
+                setTimeout(() => {
+                    redirectToLogin();
+                }, 1000);
+            }
+        }
+
+        // 重定向到登入頁面
+        function redirectToLogin() {
+            window.location.href = '/';
+        }
+
+        // 獲取角色顯示名稱
+        function getRoleDisplayName(role) {
+            const roleNames = {
+                'admin': '系統管理員',
+                'manager': '店長',
+                'employee': '員工',
+                'intern': '實習生'
+            };
+            return roleNames[role] || role;
+        }
+
+        // 顯示提示訊息
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 1060; min-width: 300px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 5000);
+        }
+
+        // 顯示錯誤訊息
+        function showError(message) {
+            showAlert(message, 'danger');
+        }
+
+        // 錯誤處理
+        window.addEventListener('error', function(event) {
+            console.error('JavaScript 錯誤:', event.error);
+        });
+    </script>
+</body>
+</html>

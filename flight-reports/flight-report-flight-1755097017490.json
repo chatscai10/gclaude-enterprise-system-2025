@@ -1,0 +1,97 @@
+{
+  "id": "flight-1755097017490",
+  "timestamp": "2025-08-13T14:56:57.490Z",
+  "stage": 3,
+  "testResults": {
+    "passed": 6,
+    "failed": 18,
+    "successRate": 25
+  },
+  "systemHealth": {
+    "stabilityScore": 0,
+    "errorCount": 5
+  },
+  "recommendations": [
+    {
+      "title": "修復 18 個失敗的測試項目",
+      "priority": "high"
+    },
+    {
+      "title": "優化 2 個緩慢操作的效能",
+      "priority": "medium"
+    }
+  ],
+  "screenshots": [
+    {
+      "name": "error-庫存管理模組測試 - 員工",
+      "description": "測試失敗截圖: 庫存管理模組測試 - 員工",
+      "filename": "error-庫存管理模組測試 - 員工-1755096995442.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-庫存管理模組測試 - 員工-1755096995442.png",
+      "timestamp": 1755096995442
+    },
+    {
+      "name": "scheduling-employee",
+      "description": "員工的智慧排程視圖",
+      "filename": "scheduling-employee-1755096995635.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\scheduling-employee-1755096995635.png",
+      "timestamp": 1755096995635
+    },
+    {
+      "name": "error-智慧排程模組測試 - 員工",
+      "description": "測試失敗截圖: 智慧排程模組測試 - 員工",
+      "filename": "error-智慧排程模組測試 - 員工-1755096995826.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-智慧排程模組測試 - 員工-1755096995826.png",
+      "timestamp": 1755096995826
+    },
+    {
+      "name": "promotion-employee",
+      "description": "員工的升遷投票視圖",
+      "filename": "promotion-employee-1755096996014.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\promotion-employee-1755096996014.png",
+      "timestamp": 1755096996014
+    },
+    {
+      "name": "error-升遷投票模組測試 - 員工",
+      "description": "測試失敗截圖: 升遷投票模組測試 - 員工",
+      "filename": "error-升遷投票模組測試 - 員工-1755096996212.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-升遷投票模組測試 - 員工-1755096996212.png",
+      "timestamp": 1755096996212
+    },
+    {
+      "name": "maintenance-employee",
+      "description": "員工的維修申請視圖",
+      "filename": "maintenance-employee-1755096996405.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\maintenance-employee-1755096996405.png",
+      "timestamp": 1755096996405
+    },
+    {
+      "name": "error-維修申請模組測試 - 員工",
+      "description": "測試失敗截圖: 維修申請模組測試 - 員工",
+      "filename": "error-維修申請模組測試 - 員工-1755096996590.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-維修申請模組測試 - 員工-1755096996590.png",
+      "timestamp": 1755096996590
+    },
+    {
+      "name": "reports-employee",
+      "description": "員工的報表系統視圖",
+      "filename": "reports-employee-1755096996766.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\reports-employee-1755096996766.png",
+      "timestamp": 1755096996766
+    },
+    {
+      "name": "error-報表系統模組測試 - 員工",
+      "description": "測試失敗截圖: 報表系統模組測試 - 員工",
+      "filename": "error-報表系統模組測試 - 員工-1755096996983.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\error-報表系統模組測試 - 員工-1755096996983.png",
+      "timestamp": 1755096996983
+    },
+    {
+      "name": "navigation-test-employee",
+      "description": "員工導航測試結果",
+      "filename": "navigation-test-employee-1755097017342.png",
+      "filepath": "D:\\0813\\gclaude-enterprise-system\\deep-verification-screenshots\\navigation-test-employee-1755097017342.png",
+      "timestamp": 1755097017342
+    }
+  ],
+  "executionTime": 95386
+}
