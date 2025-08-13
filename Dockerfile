@@ -1,34 +1,29 @@
-# 使用官方 Node.js 18 LTS 映像
 FROM node:18-alpine
 
-# 設置工作目錄
 WORKDIR /app
 
-# 複製 package 文件
+# 複製依賴檔案
 COPY package*.json ./
 
 # 安裝依賴
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci --only=production
 
-# 創建非 root 用戶
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nodeuser -u 1001
+# 複製應用程式檔案
+COPY . .
 
-# 複製應用程序文件
-COPY --chown=nodeuser:nodejs . .
+# 建立資料目錄
+RUN mkdir -p data
 
-# 創建數據目錄
-RUN mkdir -p data && chown nodeuser:nodejs data
+# 設定權限
+RUN chown -R node:node /app
+USER node
 
-# 切換到非 root 用戶
-USER nodeuser
-
-# 暴露端口
+# 暴露連接埠
 EXPOSE 3007
 
-# 健康檢查
+# 設定健康檢查
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3007/api/health || exit 1
 
 # 啟動應用
-CMD ["node", "enterprise-server.js"]
+CMD ["npm", "start"]

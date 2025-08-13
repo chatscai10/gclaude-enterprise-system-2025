@@ -1,0 +1,70 @@
+{
+  "timestamp": "2025-08-13T19:29:23.429Z",
+  "summary": {
+    "totalSites": 3,
+    "accessibleSites": 1,
+    "functionalSites": 0,
+    "totalScreenshots": 0
+  },
+  "details": [
+    {
+      "name": "Railway Production",
+      "url": "https://gclaude-enterprise-railway.app",
+      "platform": "railway",
+      "accessible": false,
+      "loadTime": 0,
+      "httpStatus": null,
+      "loginWorking": false,
+      "featuresWorking": [],
+      "errors": [
+        "HTTP連線失敗: getaddrinfo ENOTFOUND gclaude-enterprise-railway.app",
+        "瀏覽器載入錯誤: net::ERR_NAME_NOT_RESOLVED at https://gclaude-enterprise-railway.app"
+      ],
+      "screenshots": [],
+      "fullyFunctional": false,
+      "timestamp": "2025-08-13T19:29:18.446Z"
+    },
+    {
+      "name": "Render Production",
+      "url": "https://gclaude-enterprise-render.app",
+      "platform": "render",
+      "accessible": false,
+      "loadTime": 0,
+      "httpStatus": null,
+      "loginWorking": false,
+      "featuresWorking": [],
+      "errors": [
+        "HTTP連線失敗: getaddrinfo ENOTFOUND gclaude-enterprise-render.app",
+        "瀏覽器載入錯誤: net::ERR_NAME_NOT_RESOLVED at https://gclaude-enterprise-render.app"
+      ],
+      "screenshots": [],
+      "fullyFunctional": false,
+      "timestamp": "2025-08-13T19:29:18.828Z"
+    },
+    {
+      "name": "Local Development",
+      "url": "http://localhost:3007",
+      "platform": "local",
+      "accessible": true,
+      "loadTime": 996,
+      "httpStatus": 200,
+      "loginWorking": true,
+      "featuresWorking": [],
+      "errors": [],
+      "screenshots": [
+        null,
+        null,
+        null
+      ],
+      "fullyFunctional": false,
+      "timestamp": "2025-08-13T19:29:19.325Z"
+    }
+  ],
+  "screenshots": [],
+  "recommendations": [
+    "部分生產網址無法訪問，請檢查部署狀態和DNS配置",
+    "部分網站功能異常，建議檢查應用程式配置和資料庫連線",
+    "定期執行生產環境驗證，確保服務穩定性",
+    "建立監控告警機制，即時發現問題"
+  ]
+}

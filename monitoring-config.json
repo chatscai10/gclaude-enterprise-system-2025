@@ -1,0 +1,37 @@
+{
+  "healthChecks": {
+    "interval": "30s",
+    "timeout": "10s",
+    "endpoints": [
+      "/api/health",
+      "/api/status"
+    ]
+  },
+  "alerts": {
+    "responseTime": {
+      "threshold": "3s",
+      "action": "notify"
+    },
+    "errorRate": {
+      "threshold": "5%",
+      "action": "alert"
+    },
+    "downtime": {
+      "threshold": "2min",
+      "action": "emergency"
+    }
+  },
+  "logging": {
+    "level": "info",
+    "rotation": "daily",
+    "retention": "30d"
+  },
+  "metrics": [
+    "response_time",
+    "request_count",
+    "error_rate",
+    "memory_usage",
+    "cpu_usage",
+    "active_connections"
+  ]
+}

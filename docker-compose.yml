@@ -7,9 +7,7 @@ services:
       - "3007:3007"
     environment:
       - NODE_ENV=production
-      - JWT_SECRET=${JWT_SECRET}
-      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
-      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - PORT=3007
     volumes:
       - ./data:/app/data
     restart: unless-stopped
@@ -18,15 +16,15 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 10s
 
-  nginx:
-    image: nginx:alpine
+  monitoring:
+    image: gclaude-enterprise
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - "3008:3008"
+    environment:
+      - NODE_ENV=production
+      - MONITORING_PORT=3008
     depends_on:
       - gclaude-enterprise
     restart: unless-stopped

@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-08-13T18:53:38.510Z",
+  "environment": "development",
+  "totalDuration": 27008,
+  "summary": {
+    "total": 6,
+    "passed": 3,
+    "failed": 3
+  },
+  "details": {
+    "summary": {},
+    "unit": {
+      "success": true,
+      "duration": 2002,
+      "testCount": 15,
+      "passCount": 5
+    },
+    "integration": {
+      "success": false,
+      "error": "模擬的integration測試失敗"
+    },
+    "e2e": {
+      "success": true,
+      "duration": 10000,
+      "testCount": 17,
+      "passCount": 7
+    },
+    "performance": {
+      "success": true,
+      "duration": 15006,
+      "testCount": 10,
+      "passCount": 8
+    },
+    "coverage": {}
+  }
+}

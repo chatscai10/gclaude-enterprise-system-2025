@@ -1,0 +1,208 @@
+{
+  "timestamp": "2025-08-13T18:16:04.913Z",
+  "summary": {
+    "totalAnalyses": 6,
+    "totalRecommendations": 3,
+    "criticalIssues": 1,
+    "overallScore": 92
+  },
+  "analysis": [
+    {
+      "type": "memory",
+      "timestamp": "2025-08-13T18:16:04.730Z",
+      "metrics": {
+        "heapUsed": 4.01,
+        "heapTotal": 4.47,
+        "external": 1.49,
+        "rss": 46.36
+      },
+      "evaluation": {
+        "status": "good",
+        "recommendation": "記憶體使用正常"
+      }
+    },
+    {
+      "type": "cpu",
+      "timestamp": "2025-08-13T18:16:04.831Z",
+      "metrics": {
+        "userTime": 110,
+        "systemTime": 15,
+        "totalTime": 125
+      },
+      "evaluation": {
+        "status": "critical",
+        "recommendation": "考慮實施CPU優化策略"
+      }
+    },
+    {
+      "type": "response_time",
+      "timestamp": "2025-08-13T18:16:04.831Z",
+      "endpoints": [
+        {
+          "url": "http://localhost:3007/api/health",
+          "responseTime": 74,
+          "status": "good",
+          "recommendation": "回應時間良好"
+        },
+        {
+          "url": "http://localhost:3007/api/employees",
+          "responseTime": 229.87687427028445,
+          "status": "simulated",
+          "recommendation": "實際測試需要伺服器運行"
+        },
+        {
+          "url": "http://localhost:3007/api/attendance/stats",
+          "responseTime": 105.13293442213319,
+          "status": "simulated",
+          "recommendation": "實際測試需要伺服器運行"
+        }
+      ]
+    },
+    {
+      "type": "file_sizes",
+      "timestamp": "2025-08-13T18:16:04.909Z",
+      "files": [
+        {
+          "path": "enterprise-server.js",
+          "size": 8.89,
+          "unit": "KB",
+          "status": "good",
+          "recommendation": "檔案大小合理"
+        },
+        {
+          "path": "database.js",
+          "size": 33.23,
+          "unit": "KB",
+          "status": "good",
+          "recommendation": "檔案大小合理"
+        }
+      ]
+    },
+    {
+      "type": "database",
+      "timestamp": "2025-08-13T18:16:04.910Z",
+      "queries": [
+        {
+          "name": "user_list",
+          "complexity": "simple",
+          "executionTime": 31,
+          "status": "fast",
+          "recommendation": "查詢效能良好",
+          "suggestedCache": false
+        },
+        {
+          "name": "attendance_summary",
+          "complexity": "medium",
+          "executionTime": 167,
+          "status": "acceptable",
+          "recommendation": "查詢效能良好",
+          "suggestedCache": true
+        },
+        {
+          "name": "revenue_stats",
+          "complexity": "complex",
+          "executionTime": 319,
+          "status": "slow",
+          "recommendation": "考慮添加索引或查詢優化",
+          "suggestedCache": true
+        }
+      ]
+    },
+    {
+      "type": "cache",
+      "timestamp": "2025-08-13T18:16:04.910Z",
+      "metrics": {
+        "hitRatio": 94.45953084240669,
+        "missRatio": 5.540469157593307,
+        "totalRequests": 1482,
+        "cacheSize": 58
+      },
+      "evaluation": {
+        "status": "good",
+        "recommendation": "緩存效率良好"
+      }
+    }
+  ],
+  "recommendations": [
+    {
+      "category": "資料庫優化",
+      "priority": "high",
+      "title": "優化資料庫查詢效能",
+      "description": "發現1個慢查詢",
+      "actions": [
+        "添加適當的索引",
+        "優化查詢語句",
+        "實施查詢快取",
+        "考慮讀寫分離"
+      ]
+    },
+    {
+      "category": "靜態資源優化",
+      "priority": "low",
+      "title": "優化靜態資源載入",
+      "description": "提升頁面載入速度和用戶體驗",
+      "actions": [
+        "啟用Gzip壓縮",
+        "設定適當的快取標頭",
+        "使用圖片壓縮",
+        "實施懶載入 (Lazy Loading)"
+      ]
+    },
+    {
+      "category": "程式碼優化",
+      "priority": "medium",
+      "title": "程式碼層面優化",
+      "description": "提升程式碼執行效率",
+      "actions": [
+        "移除未使用的程式碼",
+        "優化迴圈和條件邏輯",
+        "使用更高效的演算法",
+        "實施程式碼分割"
+      ]
+    }
+  ],
+  "optimizationPlan": {
+    "immediate": [
+      {
+        "category": "資料庫優化",
+        "priority": "high",
+        "title": "優化資料庫查詢效能",
+        "description": "發現1個慢查詢",
+        "actions": [
+          "添加適當的索引",
+          "優化查詢語句",
+          "實施查詢快取",
+          "考慮讀寫分離"
+        ]
+      }
+    ],
+    "shortTerm": [
+      {
+        "category": "程式碼優化",
+        "priority": "medium",
+        "title": "程式碼層面優化",
+        "description": "提升程式碼執行效率",
+        "actions": [
+          "移除未使用的程式碼",
+          "優化迴圈和條件邏輯",
+          "使用更高效的演算法",
+          "實施程式碼分割"
+        ]
+      }
+    ],
+    "longTerm": [
+      {
+        "category": "靜態資源優化",
+        "priority": "low",
+        "title": "優化靜態資源載入",
+        "description": "提升頁面載入速度和用戶體驗",
+        "actions": [
+          "啟用Gzip壓縮",
+          "設定適當的快取標頭",
+          "使用圖片壓縮",
+          "實施懶載入 (Lazy Loading)"
+        ]
+      }
+    ]
+  }
+}

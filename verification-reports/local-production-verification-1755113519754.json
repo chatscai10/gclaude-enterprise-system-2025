@@ -1,0 +1,195 @@
+{
+  "timestamp": "2025-08-13T19:31:59.754Z",
+  "testUrl": "http://localhost:3007",
+  "summary": {
+    "totalTests": 8,
+    "passedTests": 8,
+    "failedTests": 0,
+    "screenshots": 10
+  },
+  "testResults": [
+    {
+      "test": "homepage",
+      "name": "首頁載入測試",
+      "success": true,
+      "result": {
+        "title": "登入 - GClaude 企業管理系統",
+        "hasLoginForm": true,
+        "url": "http://localhost:3007/",
+        "screenshot": "D:\\0813\\gclaude-enterprise-system\\production-screenshots\\local-production-homepage-1755113492131.png"
+      },
+      "timestamp": "2025-08-13T19:31:32.544Z"
+    },
+    {
+      "test": "login",
+      "name": "登入系統測試",
+      "success": true,
+      "result": {
+        "loginSuccessful": true,
+        "redirectUrl": "http://localhost:3007/admin",
+        "hasLogoutOption": false
+      },
+      "timestamp": "2025-08-13T19:31:36.781Z"
+    },
+    {
+      "test": "employees",
+      "name": "員工管理測試",
+      "success": true,
+      "result": {
+        "pageAccessed": true,
+        "hasEmployeeTable": false,
+        "hasAddButton": false,
+        "url": "http://localhost:3007/employees"
+      },
+      "timestamp": "2025-08-13T19:31:41.975Z"
+    },
+    {
+      "test": "attendance",
+      "name": "出勤系統測試",
+      "success": true,
+      "result": {
+        "pageAccessed": true,
+        "hasAttendanceContent": false,
+        "url": "http://localhost:3007/attendance"
+      },
+      "timestamp": "2025-08-13T19:31:47.170Z"
+    },
+    {
+      "test": "revenue",
+      "name": "營收管理測試",
+      "success": true,
+      "result": {
+        "pageAccessed": true,
+        "hasRevenueContent": false,
+        "url": "http://localhost:3007/revenue"
+      },
+      "timestamp": "2025-08-13T19:31:52.423Z"
+    },
+    {
+      "test": "dashboard",
+      "name": "儀表板測試",
+      "success": true,
+      "result": {
+        "pageAccessed": true,
+        "hasDashboardContent": false,
+        "url": "http://localhost:3007/dashboard"
+      },
+      "timestamp": "2025-08-13T19:31:57.431Z"
+    },
+    {
+      "test": "api",
+      "name": "API端點測試",
+      "success": true,
+      "result": {
+        "endpointTests": [
+          {
+            "endpoint": "/api/health",
+            "status": 200,
+            "accessible": true
+          },
+          {
+            "endpoint": "/api/employees",
+            "status": 401,
+            "accessible": true
+          },
+          {
+            "endpoint": "/api/attendance",
+            "status": 401,
+            "accessible": true
+          },
+          {
+            "endpoint": "/api/revenue",
+            "status": 401,
+            "accessible": true
+          }
+        ],
+        "accessibleEndpoints": 4,
+        "totalEndpoints": 4
+      },
+      "timestamp": "2025-08-13T19:31:57.443Z"
+    },
+    {
+      "test": "responsive",
+      "name": "響應式設計測試",
+      "success": true,
+      "result": {
+        "responsiveTests": [
+          {
+            "viewport": "Desktop",
+            "dimensions": "1920x1080",
+            "screenshot": "D:\\0813\\gclaude-enterprise-system\\production-screenshots\\local-production-responsive-desktop-1755113518166.png"
+          },
+          {
+            "viewport": "Tablet",
+            "dimensions": "768x1024",
+            "screenshot": "D:\\0813\\gclaude-enterprise-system\\production-screenshots\\local-production-responsive-tablet-1755113518989.png"
+          },
+          {
+            "viewport": "Mobile",
+            "dimensions": "375x667",
+            "screenshot": "D:\\0813\\gclaude-enterprise-system\\production-screenshots\\local-production-responsive-mobile-1755113519655.png"
+          }
+        ],
+        "testedViewports": 3
+      },
+      "timestamp": "2025-08-13T19:31:59.753Z"
+    }
+  ],
+  "screenshots": [
+    {
+      "section": "homepage",
+      "path": "D:\\0813\\gclaude-enterprise-system\\production-screenshots\\local-production-homepage-1755113492131.png",
+      "timestamp": 1755113492131
+    },
+    {
+      "section": "login-form",
+      "path": "D:\\0813\\gclaude-enterprise-system\\production-screenshots\\local-production-login-form-1755113493175.png",
+      "timestamp": 1755113493175
+    },
+    {
+      "section": "login-success",
+      "path": "D:\\0813\\gclaude-enterprise-system\\production-screenshots\\local-production-login-success-1755113496545.png",
+      "timestamp": 1755113496545
+    },
+    {
+      "section": "employees",
+      "path": "D:\\0813\\gclaude-enterprise-system\\production-screenshots\\local-production-employees-1755113501841.png",
+      "timestamp": 1755113501841
+    },
+    {
+      "section": "attendance",
+      "path": "D:\\0813\\gclaude-enterprise-system\\production-screenshots\\local-production-attendance-1755113507052.png",
+      "timestamp": 1755113507052
+    },
+    {
+      "section": "revenue",
+      "path": "D:\\0813\\gclaude-enterprise-system\\production-screenshots\\local-production-revenue-1755113512294.png",
+      "timestamp": 1755113512294
+    },
+    {
+      "section": "dashboard",
+      "path": "D:\\0813\\gclaude-enterprise-system\\production-screenshots\\local-production-dashboard-1755113517224.png",
+      "timestamp": 1755113517224
+    },
+    {
+      "section": "responsive-desktop",
+      "path": "D:\\0813\\gclaude-enterprise-system\\production-screenshots\\local-production-responsive-desktop-1755113518166.png",
+      "timestamp": 1755113518166
+    },
+    {
+      "section": "responsive-tablet",
+      "path": "D:\\0813\\gclaude-enterprise-system\\production-screenshots\\local-production-responsive-tablet-1755113518989.png",
+      "timestamp": 1755113518989
+    },
+    {
+      "section": "responsive-mobile",
+      "path": "D:\\0813\\gclaude-enterprise-system\\production-screenshots\\local-production-responsive-mobile-1755113519655.png",
+      "timestamp": 1755113519655
+    }
+  ],
+  "recommendations": [
+    "考慮部署到雲端平台以提供外部訪問",
+    "建立持續整合/持續部署(CI/CD)流程",
+    "加強錯誤處理和用戶體驗"
+  ]
+}

@@ -1,1 +1,1 @@
-web: node enterprise-server.js
+web: npm start
