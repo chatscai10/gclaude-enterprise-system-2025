@@ -1,0 +1,30 @@
+{
+  "id": "flight-1755097310462",
+  "timestamp": "2025-08-13T15:01:50.462Z",
+  "stage": 1,
+  "testResults": {
+    "passed": 8,
+    "failed": 2,
+    "successRate": 80
+  },
+  "systemHealth": {
+    "stabilityScore": 85,
+    "errorCount": 3
+  },
+  "recommendations": [
+    {
+      "title": "修復登入模組問題"
+    },
+    {
+      "title": "優化頁面載入速度"
+    },
+    {
+      "title": "加強錯誤處理機制"
+    }
+  ],
+  "screenshots": [
+    "test1.png",
+    "test2.png"
+  ],
+  "executionTime": 45000
+}

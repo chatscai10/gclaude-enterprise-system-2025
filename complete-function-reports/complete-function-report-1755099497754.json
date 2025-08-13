@@ -1,0 +1,427 @@
+{
+  "startTime": 1755099467286,
+  "apiTests": [
+    {
+      "name": "系統健康檢查",
+      "url": "/api/health",
+      "status": "passed",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "responseData": {
+        "status": "healthy",
+        "service": "GClaude Enterprise Management System",
+        "version": "2.0.0",
+        "timestamp": "2025-08-13T15:37:47.650Z",
+        "uptime": 111,
+        "environment": "development",
+        "features": {
+          "authentication": true,
+          "employeeManagement": true,
+          "attendanceSystem": true,
+          "revenueTracking": true,
+          "inventoryManagement": true,
+          "schedulingSystem": true,
+          "promotionVoting": true,
+          "maintenanceRequests": true,
+          "telegramIntegration": true,
+          "browserVerification": true,
+          "realTimeNotifications": true,
+          "databaseConnection": true
+        },
+        "database": {
+          "connected": true,
+          "type": "SQLite",
+          "location": "./data/enterprise.db"
+        }
+      },
+      "timestamp": "2025-08-13T15:37:47.654Z"
+    },
+    {
+      "name": "用戶登入API",
+      "url": "/api/auth/login",
+      "status": "passed",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "responseData": {
+        "success": true,
+        "message": "登入成功",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXVpZCI6IjMxMTdjNWVhLTA2MmEtNDliNi05YWNlLTY1ODc3MzY3ODdlMCIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTUwOTk0NjcsImV4cCI6MTc1NTE4NTg2N30.GirJNpqCE7QPa4W0BDlnRC2i_IUEmWSPXGYzzMhjItk",
+        "user": {
+          "id": 1,
+          "uuid": "3117c5ea-062a-49b6-9ace-6587736787e0",
+          "username": "admin",
+          "name": "系統管理員",
+          "role": "admin",
+          "email": "admin@gclaude.com",
+          "phone": "02-12345678"
+        }
+      },
+      "timestamp": "2025-08-13T15:37:47.732Z"
+    },
+    {
+      "name": "獲取用戶資料",
+      "url": "/api/auth/profile",
+      "status": "passed",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "responseData": {
+        "success": true,
+        "data": {
+          "id": 1,
+          "uuid": "3117c5ea-062a-49b6-9ace-6587736787e0",
+          "username": "admin",
+          "name": "系統管理員",
+          "role": "admin",
+          "email": "admin@gclaude.com",
+          "phone": "02-12345678",
+          "birth_date": "1980-01-01",
+          "gender": "男",
+          "address": "台北市信義區松智路1號",
+          "hire_date": "2020-01-01",
+          "department_id": 1
+        }
+      },
+      "timestamp": "2025-08-13T15:37:47.738Z"
+    },
+    {
+      "name": "員工統計API",
+      "url": "/api/employees/stats/overview",
+      "status": "passed",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "responseData": {
+        "success": true,
+        "data": {
+          "total": 4,
+          "active": 4,
+          "recentHires": 0,
+          "averageSalary": 54500,
+          "byDepartment": {
+            "技術部": 1,
+            "服務部": 1,
+            "營運部": 1,
+            "管理部": 1
+          },
+          "byPosition": {
+            "系統管理員": 1,
+            "員工": 1,
+            "實習生": 1,
+            "店長": 1
+          }
+        }
+      },
+      "timestamp": "2025-08-13T15:37:47.746Z"
+    },
+    {
+      "name": "儀表板統計",
+      "url": "/api/dashboard/stats",
+      "status": "passed",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "responseData": {
+        "success": true,
+        "data": {
+          "employees": 4,
+          "todayAttendance": 0,
+          "monthlyRevenue": 204124,
+          "lowStockProducts": 0,
+          "pendingMaintenance": 1,
+          "systemHealth": 100,
+          "lastUpdated": "2025-08-13T15:37:47.748Z"
+        }
+      },
+      "timestamp": "2025-08-13T15:37:47.749Z"
+    },
+    {
+      "name": "最近活動記錄",
+      "url": "/api/dashboard/recent-activities",
+      "status": "passed",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "responseData": {
+        "success": true,
+        "data": [
+          {
+            "id": 1,
+            "action": "user_login",
+            "user_name": "系統管理員",
+            "user_role": "admin",
+            "target_type": null,
+            "created_at": "2025-08-13 15:37:47",
+            "icon": "bi-person-check",
+            "description": "系統管理員 登入系統"
+          }
+        ]
+      },
+      "timestamp": "2025-08-13T15:37:47.750Z"
+    },
+    {
+      "name": "商品列表API",
+      "url": "/api/products",
+      "status": "passed",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "responseData": {
+        "success": true,
+        "data": [
+          {
+            "id": 5,
+            "uuid": "7b9f74e7-6fa2-4769-9428-9d40093b8673",
+            "code": "P005",
+            "name": "原子筆",
+            "category": "辦公用品",
+            "description": null,
+            "unit": "個",
+            "current_stock": 120,
+            "min_stock": 25,
+            "max_stock": 1000,
+            "unit_cost": 8.5,
+            "selling_price": 15,
+            "supplier": "辦公用品供應商",
+            "is_active": 1,
+            "created_at": "2025-08-13 15:35:58",
+            "updated_at": "2025-08-13 15:35:58"
+          },
+          {
+            "id": 2,
+            "uuid": "8c22af87-a5c4-49a3-8cf4-d6ee596bf68b",
+            "code": "P002",
+            "name": "垃圾袋",
+            "category": "清潔用品",
+            "description": null,
+            "unit": "個",
+            "current_stock": 80,
+            "min_stock": 15,
+            "max_stock": 1000,
+            "unit_cost": 45,
+            "selling_price": 65,
+            "supplier": "清潔用品供應商",
+            "is_active": 1,
+            "created_at": "2025-08-13 15:35:58",
+            "updated_at": "2025-08-13 15:35:58"
+          },
+          {
+            "id": 3,
+            "uuid": "6eace7bb-b341-43df-b0fe-e81225ca8440",
+            "code": "P003",
+            "name": "洗手液",
+            "category": "個人護理",
+            "description": null,
+            "unit": "個",
+            "current_stock": 45,
+            "min_stock": 10,
+            "max_stock": 1000,
+            "unit_cost": 120,
+            "selling_price": 180,
+            "supplier": "個護產品供應商",
+            "is_active": 1,
+            "created_at": "2025-08-13 15:35:58",
+            "updated_at": "2025-08-13 15:35:58"
+          },
+          {
+            "id": 1,
+            "uuid": "2087315e-b2bf-40f6-85cc-5811c4b507d0",
+            "code": "P001",
+            "name": "紙巾包",
+            "category": "清潔用品",
+            "description": null,
+            "unit": "個",
+            "current_stock": 150,
+            "min_stock": 20,
+            "max_stock": 1000,
+            "unit_cost": 25.5,
+            "selling_price": 35,
+            "supplier": "清潔用品供應商",
+            "is_active": 1,
+            "created_at": "2025-08-13 15:35:58",
+            "updated_at": "2025-08-13 15:35:58"
+          },
+          {
+            "id": 4,
+            "uuid": "933dd35c-61eb-4b07-a1b1-acb03d3856fa",
+            "code": "P004",
+            "name": "辦公紙",
+            "category": "辦公用品",
+            "description": null,
+            "unit": "個",
+            "current_stock": 200,
+            "min_stock": 30,
+            "max_stock": 1000,
+            "unit_cost": 15.5,
+            "selling_price": 25,
+            "supplier": "辦公用品供應商",
+            "is_active": 1,
+            "created_at": "2025-08-13 15:35:58",
+            "updated_at": "2025-08-13 15:35:58"
+          }
+        ],
+        "pagination": {
+          "page": 1,
+          "limit": 10,
+          "total": 5,
+          "pages": 1
+        }
+      },
+      "timestamp": "2025-08-13T15:37:47.753Z"
+    }
+  ],
+  "buttonTests": [
+    {
+      "section": "dashboard",
+      "name": "GPS打卡按鈕",
+      "selector": ".action-btn[data-action=\"attendance\"]",
+      "status": "passed",
+      "clickable": true,
+      "timestamp": "2025-08-13T15:37:55.744Z"
+    },
+    {
+      "section": "dashboard",
+      "name": "新增員工按鈕",
+      "selector": ".action-btn[data-action=\"addEmployee\"]",
+      "status": "failed",
+      "error": "Node is either not clickable or not an Element",
+      "timestamp": "2025-08-13T15:37:55.753Z"
+    },
+    {
+      "section": "dashboard",
+      "name": "庫存管理按鈕",
+      "selector": ".action-btn[data-action=\"inventory\"]",
+      "status": "failed",
+      "error": "Node is either not clickable or not an Element",
+      "timestamp": "2025-08-13T15:37:55.774Z"
+    },
+    {
+      "section": "dashboard",
+      "name": "營收記錄按鈕",
+      "selector": ".action-btn[data-action=\"revenue\"]",
+      "status": "failed",
+      "error": "Node is either not clickable or not an Element",
+      "timestamp": "2025-08-13T15:37:55.791Z"
+    },
+    {
+      "section": "employees",
+      "name": "新增員工模態框按鈕",
+      "selector": "button[data-bs-target=\"#addEmployeeModal\"]",
+      "status": "passed",
+      "clickable": true,
+      "timestamp": "2025-08-13T15:37:58.357Z"
+    },
+    {
+      "section": "employees",
+      "name": "員工表單提交按鈕",
+      "selector": "#addEmployeeForm button[type=\"submit\"]",
+      "status": "failed",
+      "error": "按鈕元素未找到",
+      "timestamp": "2025-08-13T15:37:58.359Z"
+    },
+    {
+      "section": "attendance",
+      "name": "GPS打卡按鈕",
+      "selector": "#gpsCheckInBtn",
+      "status": "failed",
+      "error": "Node is either not clickable or not an Element",
+      "timestamp": "2025-08-13T15:38:00.410Z"
+    },
+    {
+      "section": "attendance",
+      "name": "查看出勤記錄",
+      "selector": ".btn[data-action=\"view-attendance\"]",
+      "status": "failed",
+      "error": "按鈕元素未找到",
+      "timestamp": "2025-08-13T15:38:00.412Z"
+    },
+    {
+      "section": "revenue",
+      "name": "新增營收記錄按鈕",
+      "selector": "button[data-bs-target=\"#addRevenueModal\"]",
+      "status": "passed",
+      "clickable": true,
+      "timestamp": "2025-08-13T15:38:02.954Z"
+    },
+    {
+      "section": "revenue",
+      "name": "營收表單提交按鈕",
+      "selector": "#addRevenueForm button[type=\"submit\"]",
+      "status": "failed",
+      "error": "按鈕元素未找到",
+      "timestamp": "2025-08-13T15:38:02.956Z"
+    },
+    {
+      "section": "inventory",
+      "name": "叫貨申請按鈕",
+      "selector": "button[data-bs-target=\"#orderModal\"]",
+      "status": "failed",
+      "error": "Node is either not clickable or not an Element",
+      "timestamp": "2025-08-13T15:38:04.998Z"
+    },
+    {
+      "section": "inventory",
+      "name": "新增商品按鈕",
+      "selector": "button[data-bs-target=\"#addProductModal\"]",
+      "status": "failed",
+      "error": "按鈕元素未找到",
+      "timestamp": "2025-08-13T15:38:05.000Z"
+    },
+    {
+      "section": "inventory",
+      "name": "叫貨表單提交",
+      "selector": "#orderForm button[type=\"submit\"]",
+      "status": "failed",
+      "error": "按鈕元素未找到",
+      "timestamp": "2025-08-13T15:38:05.001Z"
+    },
+    {
+      "section": "maintenance",
+      "name": "新增維修申請按鈕",
+      "selector": "button[data-bs-target=\"#maintenanceModal\"]",
+      "status": "passed",
+      "clickable": true,
+      "timestamp": "2025-08-13T15:38:07.561Z"
+    },
+    {
+      "section": "maintenance",
+      "name": "維修表單提交按鈕",
+      "selector": "#maintenanceForm button[type=\"submit\"]",
+      "status": "failed",
+      "error": "按鈕元素未找到",
+      "timestamp": "2025-08-13T15:38:07.563Z"
+    }
+  ],
+  "integrationTests": [
+    {
+      "name": "員工新增完整流程",
+      "status": "failed",
+      "error": "Node is either not clickable or not an Element",
+      "timestamp": "2025-08-13T15:38:09.601Z"
+    },
+    {
+      "name": "GPS打卡功能測試",
+      "status": "passed",
+      "result": {
+        "success": true,
+        "message": "GPS打卡功能響應正常"
+      },
+      "timestamp": "2025-08-13T15:38:14.668Z"
+    },
+    {
+      "name": "維修申請提交測試",
+      "status": "passed",
+      "result": {
+        "success": true,
+        "message": "維修申請流程完成"
+      },
+      "timestamp": "2025-08-13T15:38:17.754Z"
+    }
+  ],
+  "summary": {
+    "totalTests": 25,
+    "passedTests": 13,
+    "failedTests": 12,
+    "duration": 30468,
+    "passRate": "52.0"
+  },
+  "endTime": 1755099497754,
+  "duration": 30468,
+  "passRate": "52.0",
+  "generatedAt": "2025-08-13T15:38:17.754Z"
+}

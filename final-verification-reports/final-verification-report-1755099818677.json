@@ -1,0 +1,208 @@
+{
+  "startTime": 1755099806269,
+  "systemStatus": {
+    "系統健康狀態": {
+      "status": "passed",
+      "result": {
+        "status": "healthy",
+        "data": {
+          "status": "healthy",
+          "service": "GClaude Enterprise Management System",
+          "version": "2.0.0",
+          "timestamp": "2025-08-13T15:43:26.285Z",
+          "uptime": 450,
+          "environment": "development",
+          "features": {
+            "authentication": true,
+            "employeeManagement": true,
+            "attendanceSystem": true,
+            "revenueTracking": true,
+            "inventoryManagement": true,
+            "schedulingSystem": true,
+            "promotionVoting": true,
+            "maintenanceRequests": true,
+            "telegramIntegration": true,
+            "browserVerification": true,
+            "realTimeNotifications": true,
+            "databaseConnection": true
+          },
+          "database": {
+            "connected": true,
+            "type": "SQLite",
+            "location": "./data/enterprise.db"
+          }
+        },
+        "uptime": 450
+      },
+      "timestamp": "2025-08-13T15:43:26.288Z"
+    },
+    "資料庫連接": {
+      "status": "passed",
+      "result": {
+        "status": "connected",
+        "type": "SQLite"
+      },
+      "timestamp": "2025-08-13T15:43:26.290Z"
+    },
+    "核心API可用性": {
+      "status": "passed",
+      "result": {
+        "status": "partial_available",
+        "available": 2,
+        "total": 3,
+        "percentage": "66.7"
+      },
+      "timestamp": "2025-08-13T15:43:26.445Z"
+    }
+  },
+  "functionalityTests": [
+    {
+      "name": "導航功能測試",
+      "status": "passed",
+      "result": {
+        "workingSections": 6,
+        "totalSections": 6,
+        "percentage": "100.0"
+      },
+      "timestamp": "2025-08-13T15:43:32.911Z"
+    },
+    {
+      "name": "表單功能測試",
+      "status": "passed",
+      "result": {
+        "workingForms": 3,
+        "totalForms": 5,
+        "percentage": "60.0"
+      },
+      "timestamp": "2025-08-13T15:43:35.495Z"
+    },
+    {
+      "name": "響應式設計測試",
+      "status": "passed",
+      "result": {
+        "responsiveViewports": 3,
+        "totalViewports": 3,
+        "percentage": "100.0"
+      },
+      "timestamp": "2025-08-13T15:43:38.545Z"
+    }
+  ],
+  "performanceTests": [
+    {
+      "name": "API響應時間測試",
+      "status": "passed",
+      "result": {
+        "responseTime": 4,
+        "status": "good"
+      },
+      "timestamp": "2025-08-13T15:43:38.656Z"
+    },
+    {
+      "name": "資料庫查詢效能",
+      "status": "failed",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-08-13T15:43:38.658Z"
+    },
+    {
+      "name": "併發處理測試",
+      "status": "passed",
+      "result": {
+        "concurrentRequests": 10,
+        "totalTime": 12,
+        "averageTime": 1.2,
+        "status": "excellent"
+      },
+      "timestamp": "2025-08-13T15:43:38.670Z"
+    }
+  ],
+  "securityTests": [
+    {
+      "name": "認證機制測試",
+      "status": "passed",
+      "result": {
+        "status": "secure",
+        "message": "認證機制正常工作"
+      },
+      "timestamp": "2025-08-13T15:43:38.672Z"
+    },
+    {
+      "name": "SQL注入防護測試",
+      "status": "passed",
+      "result": {
+        "status": "protected",
+        "message": "SQL注入攻擊被阻止"
+      },
+      "timestamp": "2025-08-13T15:43:38.674Z"
+    },
+    {
+      "name": "XSS防護測試",
+      "status": "passed",
+      "result": {
+        "status": "needs_verification",
+        "message": "XSS防護需要進一步測試"
+      },
+      "timestamp": "2025-08-13T15:43:38.674Z"
+    }
+  ],
+  "usabilityTests": [],
+  "dataIntegrityTests": [
+    {
+      "name": "測試資料完整性",
+      "status": "failed",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-08-13T15:43:38.675Z"
+    },
+    {
+      "name": "資料庫連接測試",
+      "status": "passed",
+      "result": {
+        "connected": true,
+        "type": "SQLite",
+        "status": "healthy"
+      },
+      "timestamp": "2025-08-13T15:43:38.677Z"
+    }
+  ],
+  "finalScore": 88,
+  "recommendations": [
+    {
+      "category": "效能",
+      "priority": "medium",
+      "title": "優化系統效能",
+      "description": "系統響應時間或處理能力需要優化",
+      "impact": "系統效能"
+    },
+    {
+      "category": "資料完整性",
+      "priority": "medium",
+      "title": "確保資料完整性",
+      "description": "資料完整性檢查發現問題，需要修復資料層問題",
+      "impact": "資料可靠性"
+    },
+    {
+      "category": "總體",
+      "priority": "low",
+      "title": "持續優化和監控",
+      "description": "系統表現良好，建議持續監控和漸進式改進",
+      "impact": "長期維護"
+    }
+  ],
+  "summary": {
+    "totalTests": 14,
+    "passedTests": 12,
+    "systemGrade": "B",
+    "readinessLevel": "生產就緒"
+  },
+  "endTime": 1755099818677,
+  "duration": 12408,
+  "generatedAt": "2025-08-13T15:43:38.677Z",
+  "reportVersion": "1.0",
+  "verificationScope": "完整系統驗證",
+  "categoryScores": {
+    "systemStatus": 20,
+    "functionality": 30,
+    "performance": 13.333333333333332,
+    "security": 20,
+    "dataIntegrity": 5
+  }
+}

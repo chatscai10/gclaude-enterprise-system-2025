@@ -86,8 +86,9 @@ class GClaudeDeployment {
         // 檢查必要檔案
         const requiredFiles = [
             'package.json',
-            'server.js',
-            '.env.example'
+            'enterprise-server.js',
+            'database.js',
+            'routes/complete-api.js'
         ];
 
         for (const file of requiredFiles) {
@@ -115,7 +116,7 @@ class GClaudeDeployment {
                 builder: "nixpacks"
             },
             deploy: {
-                startCommand: "npm start",
+                startCommand: "node enterprise-server.js",
                 healthcheckPath: "/api/health",
                 healthcheckTimeout: 60,
                 restartPolicyType: "ON_FAILURE"
@@ -132,7 +133,7 @@ services:
     name: gclaude-enterprise-system
     env: node
     buildCommand: npm install
-    startCommand: npm start
+    startCommand: node enterprise-server.js
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
@@ -147,14 +148,14 @@ services:
             name: "gclaude-enterprise-system",
             builds: [
                 {
-                    src: "server.js",
+                    src: "enterprise-server.js",
                     use: "@vercel/node"
                 }
             ],
             routes: [
                 {
                     src: "/(.*)",
-                    dest: "/server.js"
+                    dest: "/enterprise-server.js"
                 }
             ],
             env: {

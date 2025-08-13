@@ -1,0 +1,918 @@
+{
+  "startTime": 1755103091368,
+  "testResults": [],
+  "roleTests": {
+    "admin": {
+      "userType": "admin",
+      "role": "系統管理員",
+      "tests": {
+        "login": {
+          "success": true,
+          "message": "登入成功"
+        },
+        "navigation": [
+          {
+            "section": "employees",
+            "success": false
+          },
+          {
+            "section": "attendance",
+            "success": false
+          },
+          {
+            "section": "revenue",
+            "success": false
+          },
+          {
+            "section": "inventory",
+            "success": false
+          },
+          {
+            "section": "scheduling",
+            "success": false
+          },
+          {
+            "section": "promotion",
+            "success": false
+          },
+          {
+            "section": "maintenance",
+            "success": false
+          },
+          {
+            "section": "reports",
+            "success": false
+          },
+          {
+            "section": "settings",
+            "success": false
+          }
+        ],
+        "gpsCheckIn": {
+          "success": false,
+          "error": "Node is either not clickable or not an Element"
+        },
+        "employeeForm": {
+          "success": false,
+          "error": "Node is either not clickable or not an Element"
+        },
+        "revenueForm": {
+          "success": false,
+          "error": "Node is either not clickable or not an Element"
+        },
+        "maintenanceForm": {
+          "success": false,
+          "error": "Node is either not clickable or not an Element"
+        },
+        "console": {
+          "success": true
+        }
+      }
+    },
+    "manager": {
+      "userType": "manager",
+      "role": "店長",
+      "tests": {
+        "login": {
+          "success": true,
+          "message": "登入成功"
+        },
+        "navigation": [
+          {
+            "section": "employees",
+            "success": false
+          },
+          {
+            "section": "attendance",
+            "success": false
+          },
+          {
+            "section": "revenue",
+            "success": false
+          },
+          {
+            "section": "inventory",
+            "success": false
+          },
+          {
+            "section": "scheduling",
+            "success": false
+          },
+          {
+            "section": "promotion",
+            "success": false
+          },
+          {
+            "section": "maintenance",
+            "success": false
+          },
+          {
+            "section": "reports",
+            "success": false
+          },
+          {
+            "section": "settings",
+            "success": false
+          }
+        ],
+        "gpsCheckIn": {
+          "success": false,
+          "error": "Node is either not clickable or not an Element"
+        },
+        "employeeForm": {
+          "success": false,
+          "error": "Node is either not clickable or not an Element"
+        },
+        "revenueForm": {
+          "success": false,
+          "error": "Node is either not clickable or not an Element"
+        },
+        "maintenanceForm": {
+          "success": false,
+          "error": "Node is either not clickable or not an Element"
+        },
+        "console": {
+          "success": true
+        }
+      }
+    },
+    "employee": {
+      "userType": "employee",
+      "role": "員工",
+      "tests": {
+        "login": {
+          "success": true,
+          "message": "登入成功"
+        },
+        "navigation": [
+          {
+            "section": "employees",
+            "success": false
+          },
+          {
+            "section": "attendance",
+            "success": false
+          },
+          {
+            "section": "revenue",
+            "success": false
+          },
+          {
+            "section": "inventory",
+            "success": false
+          },
+          {
+            "section": "scheduling",
+            "success": false
+          },
+          {
+            "section": "promotion",
+            "success": false
+          },
+          {
+            "section": "maintenance",
+            "success": false
+          },
+          {
+            "section": "reports",
+            "success": false
+          },
+          {
+            "section": "settings",
+            "success": false
+          }
+        ],
+        "gpsCheckIn": {
+          "success": false,
+          "error": "Node is either not clickable or not an Element"
+        },
+        "maintenanceForm": {
+          "success": false,
+          "error": "Node is either not clickable or not an Element"
+        },
+        "console": {
+          "success": true
+        }
+      }
+    },
+    "intern": {
+      "userType": "intern",
+      "role": "實習生",
+      "tests": {
+        "login": {
+          "success": true,
+          "message": "登入成功"
+        },
+        "navigation": [
+          {
+            "section": "employees",
+            "success": false
+          },
+          {
+            "section": "attendance",
+            "success": false
+          },
+          {
+            "section": "revenue",
+            "success": false
+          },
+          {
+            "section": "inventory",
+            "success": false
+          },
+          {
+            "section": "scheduling",
+            "success": false
+          },
+          {
+            "section": "promotion",
+            "success": false
+          },
+          {
+            "section": "maintenance",
+            "success": false
+          },
+          {
+            "section": "reports",
+            "success": false
+          },
+          {
+            "section": "settings",
+            "success": false
+          }
+        ],
+        "gpsCheckIn": {
+          "success": false,
+          "error": "Node is either not clickable or not an Element"
+        },
+        "maintenanceForm": {
+          "success": false,
+          "error": "Node is either not clickable or not an Element"
+        },
+        "console": {
+          "success": true
+        }
+      }
+    }
+  },
+  "overallScore": 14,
+  "detailedLog": [
+    {
+      "timestamp": "2025-08-13T16:38:11.595Z",
+      "message": "🔄 開始執行全角色綜合測試...",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:11.596Z",
+      "message": "\n🎭 開始測試角色: 系統管理員 (admin)",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:11.703Z",
+      "message": "開始測試 系統管理員 (admin) 登入功能",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:12.714Z",
+      "message": "導航到登入頁面完成",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:12.758Z",
+      "message": "輸入帳號密碼: admin",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:12.787Z",
+      "message": "點擊登入按鈕",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:14.806Z",
+      "message": "登入後停留在: http://localhost:3007/admin",
+      "type": "success"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:14.807Z",
+      "message": "測試 admin 的導航系統",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:14.841Z",
+      "message": "點擊導航: 員工管理",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:15.347Z",
+      "message": "❌ 員工管理 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:15.367Z",
+      "message": "點擊導航: 出勤管理",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:15.883Z",
+      "message": "❌ 出勤管理 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:15.901Z",
+      "message": "點擊導航: 營收分析",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:16.410Z",
+      "message": "❌ 營收分析 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:16.434Z",
+      "message": "點擊導航: 庫存管理",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:16.949Z",
+      "message": "❌ 庫存管理 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:16.968Z",
+      "message": "點擊導航: 智慧排程",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:17.484Z",
+      "message": "❌ 智慧排程 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:17.500Z",
+      "message": "點擊導航: 升遷投票",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:18.007Z",
+      "message": "❌ 升遷投票 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:18.034Z",
+      "message": "點擊導航: 維修申請",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:18.547Z",
+      "message": "❌ 維修申請 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:18.567Z",
+      "message": "點擊導航: 報表系統",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:19.083Z",
+      "message": "❌ 報表系統 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:19.102Z",
+      "message": "點擊導航: 系統設定",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:19.608Z",
+      "message": "❌ 系統設定 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:19.609Z",
+      "message": "測試GPS打卡功能",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:20.664Z",
+      "message": "GPS打卡測試失敗: Node is either not clickable or not an Element",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:20.664Z",
+      "message": "測試 employee 表單提交功能",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:21.714Z",
+      "message": "employee 表單測試失敗: Node is either not clickable or not an Element",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:21.714Z",
+      "message": "測試 revenue 表單提交功能",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:22.763Z",
+      "message": "revenue 表單測試失敗: Node is either not clickable or not an Element",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:22.763Z",
+      "message": "測試 maintenance 表單提交功能",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:23.815Z",
+      "message": "maintenance 表單測試失敗: Node is either not clickable or not an Element",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:23.816Z",
+      "message": "✅ admin 角色測試完成",
+      "type": "success"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:23.827Z",
+      "message": "\n🎭 開始測試角色: 店長 (manager)",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:23.857Z",
+      "message": "開始測試 店長 (manager) 登入功能",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:24.858Z",
+      "message": "導航到登入頁面完成",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:24.900Z",
+      "message": "輸入帳號密碼: manager",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:24.918Z",
+      "message": "點擊登入按鈕",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:26.920Z",
+      "message": "登入成功，導向儀表板",
+      "type": "success"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:26.920Z",
+      "message": "測試 manager 的導航系統",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:26.953Z",
+      "message": "點擊導航: 員工管理",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:27.462Z",
+      "message": "❌ 員工管理 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:27.483Z",
+      "message": "點擊導航: 出勤管理",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:27.986Z",
+      "message": "❌ 出勤管理 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:28.000Z",
+      "message": "點擊導航: 營收分析",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:28.506Z",
+      "message": "❌ 營收分析 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:28.534Z",
+      "message": "點擊導航: 庫存管理",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:29.044Z",
+      "message": "❌ 庫存管理 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:29.067Z",
+      "message": "點擊導航: 智慧排程",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:29.582Z",
+      "message": "❌ 智慧排程 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:29.600Z",
+      "message": "點擊導航: 升遷投票",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:30.106Z",
+      "message": "❌ 升遷投票 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:30.133Z",
+      "message": "點擊導航: 維修申請",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:30.646Z",
+      "message": "❌ 維修申請 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:30.666Z",
+      "message": "點擊導航: 報表系統",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:31.184Z",
+      "message": "❌ 報表系統 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:31.200Z",
+      "message": "點擊導航: 系統設定",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:31.708Z",
+      "message": "❌ 系統設定 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:31.708Z",
+      "message": "測試GPS打卡功能",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:32.765Z",
+      "message": "GPS打卡測試失敗: Node is either not clickable or not an Element",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:32.765Z",
+      "message": "測試 employee 表單提交功能",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:33.813Z",
+      "message": "employee 表單測試失敗: Node is either not clickable or not an Element",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:33.813Z",
+      "message": "測試 revenue 表單提交功能",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:34.863Z",
+      "message": "revenue 表單測試失敗: Node is either not clickable or not an Element",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:34.863Z",
+      "message": "測試 maintenance 表單提交功能",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:35.914Z",
+      "message": "maintenance 表單測試失敗: Node is either not clickable or not an Element",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:35.914Z",
+      "message": "✅ manager 角色測試完成",
+      "type": "success"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:35.924Z",
+      "message": "\n🎭 開始測試角色: 員工 (employee)",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:35.954Z",
+      "message": "開始測試 員工 (employee) 登入功能",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:36.945Z",
+      "message": "導航到登入頁面完成",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:36.990Z",
+      "message": "輸入帳號密碼: employee",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:37.018Z",
+      "message": "點擊登入按鈕",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:39.023Z",
+      "message": "登入成功，導向儀表板",
+      "type": "success"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:39.023Z",
+      "message": "測試 employee 的導航系統",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:39.053Z",
+      "message": "點擊導航: 員工管理",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:39.565Z",
+      "message": "❌ 員工管理 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:39.584Z",
+      "message": "點擊導航: 出勤管理",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:40.087Z",
+      "message": "❌ 出勤管理 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:40.117Z",
+      "message": "點擊導航: 營收分析",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:40.631Z",
+      "message": "❌ 營收分析 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:40.650Z",
+      "message": "點擊導航: 庫存管理",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:41.154Z",
+      "message": "❌ 庫存管理 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:41.184Z",
+      "message": "點擊導航: 智慧排程",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:41.688Z",
+      "message": "❌ 智慧排程 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:41.718Z",
+      "message": "點擊導航: 升遷投票",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:42.230Z",
+      "message": "❌ 升遷投票 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:42.250Z",
+      "message": "點擊導航: 維修申請",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:42.765Z",
+      "message": "❌ 維修申請 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:42.784Z",
+      "message": "點擊導航: 報表系統",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:43.289Z",
+      "message": "❌ 報表系統 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:43.317Z",
+      "message": "點擊導航: 系統設定",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:43.827Z",
+      "message": "❌ 系統設定 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:43.827Z",
+      "message": "測試GPS打卡功能",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:44.880Z",
+      "message": "GPS打卡測試失敗: Node is either not clickable or not an Element",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:44.880Z",
+      "message": "測試 maintenance 表單提交功能",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:45.913Z",
+      "message": "maintenance 表單測試失敗: Node is either not clickable or not an Element",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:45.913Z",
+      "message": "✅ employee 角色測試完成",
+      "type": "success"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:45.921Z",
+      "message": "\n🎭 開始測試角色: 實習生 (intern)",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:45.950Z",
+      "message": "開始測試 實習生 (intern) 登入功能",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:46.631Z",
+      "message": "導航到登入頁面完成",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:46.674Z",
+      "message": "輸入帳號密碼: intern",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:46.700Z",
+      "message": "點擊登入按鈕",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:48.708Z",
+      "message": "登入成功，導向儀表板",
+      "type": "success"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:48.708Z",
+      "message": "測試 intern 的導航系統",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:48.736Z",
+      "message": "點擊導航: 員工管理",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:49.247Z",
+      "message": "❌ 員工管理 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:49.265Z",
+      "message": "點擊導航: 出勤管理",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:49.769Z",
+      "message": "❌ 出勤管理 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:49.782Z",
+      "message": "點擊導航: 營收分析",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:50.296Z",
+      "message": "❌ 營收分析 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:50.316Z",
+      "message": "點擊導航: 庫存管理",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:50.831Z",
+      "message": "❌ 庫存管理 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:50.854Z",
+      "message": "點擊導航: 智慧排程",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:51.356Z",
+      "message": "❌ 智慧排程 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:51.382Z",
+      "message": "點擊導航: 升遷投票",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:51.899Z",
+      "message": "❌ 升遷投票 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:51.916Z",
+      "message": "點擊導航: 維修申請",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:52.424Z",
+      "message": "❌ 維修申請 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:52.449Z",
+      "message": "點擊導航: 報表系統",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:52.963Z",
+      "message": "❌ 報表系統 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:52.983Z",
+      "message": "點擊導航: 系統設定",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:53.498Z",
+      "message": "❌ 系統設定 頁面切換失敗",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:53.498Z",
+      "message": "測試GPS打卡功能",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:54.546Z",
+      "message": "GPS打卡測試失敗: Node is either not clickable or not an Element",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:54.547Z",
+      "message": "測試 maintenance 表單提交功能",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:55.596Z",
+      "message": "maintenance 表單測試失敗: Node is either not clickable or not an Element",
+      "type": "error"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:55.596Z",
+      "message": "✅ intern 角色測試完成",
+      "type": "success"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:55.606Z",
+      "message": "📊 總體測試結果: 8/56 (14%)",
+      "type": "info"
+    },
+    {
+      "timestamp": "2025-08-13T16:38:55.623Z",
+      "message": "📝 測試報告已保存: D:\\0813\\gclaude-enterprise-system\\comprehensive-role-test-report.md",
+      "type": "info"
+    }
+  ],
+  "totalTests": 56,
+  "passedTests": 8
+}

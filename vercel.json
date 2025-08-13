@@ -1,84 +1,19 @@
 {
   "version": 2,
   "name": "gclaude-enterprise-system",
-  "description": "GClaude相容企業員工管理系統",
-  "alias": ["gclaude-enterprise"],
-  
   "builds": [
     {
-      "src": "server.js",
-      "use": "@vercel/node",
-      "config": {
-        "maxLambdaSize": "50mb"
-      }
-    },
-    {
-      "src": "public/**",
-      "use": "@vercel/static"
+      "src": "enterprise-server.js",
+      "use": "@vercel/node"
     }
   ],
-  
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/server.js"
-    },
-    {
-      "src": "/public/(.*)",
-      "dest": "/public/$1"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/server.js"
+      "dest": "/enterprise-server.js"
     }
   ],
-  
   "env": {
-    "NODE_ENV": "production",
-    "GCLAUDE_COMPATIBLE": "true",
-    "GCLAUDE_MONITORING": "true",
-    "LOG_LEVEL": "info"
-  },
-  
-  "regions": ["iad1"],
-  
-  "functions": {
-    "server.js": {
-      "maxDuration": 30,
-      "memory": 1024
-    }
-  },
-  
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        },
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, PUT, DELETE, OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type, Authorization"
-        }
-      ]
-    },
-    {
-      "source": "/public/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=86400"
-        }
-      ]
-    }
-  ]
+    "NODE_ENV": "production"
+  }
 }
