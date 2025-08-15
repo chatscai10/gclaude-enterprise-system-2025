@@ -136,6 +136,46 @@
                         </div>
                     </div>
 
+                    <!-- 第二排快捷功能 -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card bg-warning text-dark h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-calendar-alt fa-2x mb-2"></i>
+                                    <h5>員工排班</h5>
+                                    <button class="btn btn-dark btn-sm" onclick="window.location.href='/schedule.html'">前往排班</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card bg-success text-white h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-map-marker-alt fa-2x mb-2"></i>
+                                    <h5>打卡系統</h5>
+                                    <button class="btn btn-light btn-sm" onclick="showSection('attendance')">打卡記錄</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card bg-danger text-white h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-wrench fa-2x mb-2"></i>
+                                    <h5>維修保養</h5>
+                                    <button class="btn btn-light btn-sm" onclick="showSection('maintenance')">報修設備</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card text-white h-100" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-bell fa-2x mb-2"></i>
+                                    <h5>通知中心</h5>
+                                    <button class="btn btn-light btn-sm" onclick="showSection('notifications')">查看通知</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- 今日統計 -->
                     <div class="row">
                         <div class="col-md-4 mb-3">

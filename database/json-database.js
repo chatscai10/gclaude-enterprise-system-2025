@@ -26,7 +26,9 @@ class JsonDatabase {
             order_items: 'order_items.json',
             positions: 'positions.json',
             promotions: 'promotions.json',
-            promotion_votes: 'promotion_votes.json'
+            promotion_votes: 'promotion_votes.json',
+            schedules: 'schedules.json',
+            schedule_settings: 'schedule_settings.json'
         };
         
         this.initializeData();
@@ -300,8 +302,41 @@ class JsonDatabase {
                 }
             ]);
 
+            // 初始化排班設定表
+            await this.initializeTable('schedule_settings', [{
+                id: 1,
+                schedule_month: '2025-09',
+                max_leave_days_per_person: 8,
+                max_leave_people_per_day: 2,
+                max_weekend_leave_days: 3,
+                max_same_store_leave_per_day: 1,
+                max_backup_leave_per_day: 1,
+                max_parttime_leave_per_day: 1,
+                operation_time_minutes: 5,
+                system_open_date: '2025-08-16',
+                system_open_time: '02:00',
+                system_close_date: '2025-08-21',
+                system_close_time: '02:00',
+                current_status: 'closed',
+                current_user: null,
+                current_start_time: null,
+                current_end_time: null,
+                store_holidays: {
+                    "1": ["2025-09-15", "2025-09-30"],
+                    "2": ["2025-09-10", "2025-09-25"],
+                    "3": ["2025-09-05", "2025-09-20"]
+                },
+                store_forbidden_days: {
+                    "1": ["2025-09-01", "2025-09-14"],
+                    "2": ["2025-09-07", "2025-09-21"],
+                    "3": ["2025-09-03", "2025-09-28"]
+                },
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            }]);
+
             // 初始化其他空白資料表
-            const emptyTables = ['attendance', 'revenue', 'maintenance', 'leave_requests', 'inventory_logs', 'orders', 'order_items', 'promotions', 'promotion_votes'];
+            const emptyTables = ['attendance', 'revenue', 'maintenance', 'leave_requests', 'inventory_logs', 'orders', 'order_items', 'promotions', 'promotion_votes', 'schedules'];
             for (const table of emptyTables) {
                 await this.initializeTable(table, []);
             }
@@ -1116,6 +1151,309 @@ class JsonDatabase {
             message: isApproved ? '升遷成功！' : '升遷失敗',
             finalApprovalRate: status.currentApprovalRate
         };
+    }
+
+    // ==================== 排班系統操作 ====================
+    
+    async getScheduleSettings() {
+        const settings = await this.readTable('schedule_settings');
+        return settings[0] || null;
+    }
+
+    async updateScheduleSettings(newSettings) {
+        const settings = await this.readTable('schedule_settings');
+        if (settings.length > 0) {
+            settings[0] = {
+                ...settings[0],
+                ...newSettings,
+                updated_at: new Date().toISOString()
+            };
+        } else {
+            settings.push({
+                id: 1,
+                ...newSettings,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            });
+        }
+        await this.writeTable('schedule_settings', settings);
+        return settings[0];
+    }
+
+    async canAccessScheduleSystem(employeeId) {
+        const settings = await this.getScheduleSettings();
+        if (!settings) {
+            return { canAccess: false, reason: '排班設定不存在' };
+        }
+
+        const now = new Date();
+        const openDateTime = new Date(`${settings.system_open_date}T${settings.system_open_time}:00`);
+        const closeDateTime = new Date(`${settings.system_close_date}T${settings.system_close_time}:00`);
+
+        // 檢查是否在開放時間內
+        if (now < openDateTime) {
+            const timeDiff = openDateTime - now;
+            const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+            return { 
+                canAccess: false, 
+                reason: `排班系統將於 ${daysLeft} 天後開啟`,
+                openDate: openDateTime.toISOString()
+            };
+        }
+
+        if (now > closeDateTime) {
+            return { 
+                canAccess: false, 
+                reason: '排班系統已關閉',
+                nextOpenDate: this.getNextScheduleOpenDate(settings)
+            };
+        }
+
+        // 檢查是否有其他人正在使用
+        if (settings.current_status === 'in_use' && settings.current_user !== employeeId) {
+            const userEndTime = new Date(settings.current_end_time);
+            if (now < userEndTime) {
+                const employee = await this.getEmployeeById(settings.current_user);
+                return { 
+                    canAccess: false, 
+                    reason: `${employee?.name || '其他員工'} 正在使用排班系統`,
+                    endTime: userEndTime.toISOString()
+                };
+            }
+        }
+
+        // 檢查員工是否已經排過班
+        const employeeSchedule = await this.getEmployeeSchedule(employeeId, settings.schedule_month);
+        if (employeeSchedule && employeeSchedule.status === 'completed') {
+            return { 
+                canAccess: false, 
+                reason: '您已完成本月排班' 
+            };
+        }
+
+        return { canAccess: true, settings };
+    }
+
+    getNextScheduleOpenDate(settings) {
+        // 計算下個月的開放日期
+        const currentMonth = new Date(settings.schedule_month);
+        const nextMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
+        const nextOpenDate = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 16);
+        return nextOpenDate.toISOString();
+    }
+
+    async enterScheduleSystem(employeeId) {
+        const canAccessResult = await this.canAccessScheduleSystem(employeeId);
+        if (!canAccessResult.canAccess) {
+            throw new Error(canAccessResult.reason);
+        }
+
+        const settings = canAccessResult.settings;
+        const now = new Date();
+        const endTime = new Date(now.getTime() + settings.operation_time_minutes * 60 * 1000);
+
+        // 更新系統狀態
+        await this.updateScheduleSettings({
+            current_status: 'in_use',
+            current_user: employeeId,
+            current_start_time: now.toISOString(),
+            current_end_time: endTime.toISOString()
+        });
+
+        return {
+            success: true,
+            endTime: endTime.toISOString(),
+            operationMinutes: settings.operation_time_minutes
+        };
+    }
+
+    async exitScheduleSystem(employeeId) {
+        const settings = await this.getScheduleSettings();
+        if (settings && settings.current_user === employeeId) {
+            await this.updateScheduleSettings({
+                current_status: 'open',
+                current_user: null,
+                current_start_time: null,
+                current_end_time: null
+            });
+            return { success: true };
+        }
+        return { success: false, reason: '無權限退出系統' };
+    }
+
+    async getEmployeeSchedule(employeeId, month) {
+        const schedules = await this.readTable('schedules');
+        return schedules.find(s => s.employee_id === employeeId && s.schedule_month === month);
+    }
+
+    async saveEmployeeSchedule(employeeId, scheduleData) {
+        const settings = await this.getScheduleSettings();
+        if (!settings || settings.current_user !== employeeId) {
+            throw new Error('無權限保存排班');
+        }
+
+        // 驗證排班規則
+        const validation = await this.validateSchedule(employeeId, scheduleData, settings);
+        if (!validation.isValid) {
+            throw new Error(validation.errors.join('\n'));
+        }
+
+        const schedules = await this.readTable('schedules');
+        const existingIndex = schedules.findIndex(s => 
+            s.employee_id === employeeId && 
+            s.schedule_month === settings.schedule_month
+        );
+
+        const newSchedule = {
+            id: existingIndex >= 0 ? schedules[existingIndex].id : Date.now(),
+            employee_id: employeeId,
+            employee_name: (await this.getEmployeeById(employeeId)).name,
+            schedule_month: settings.schedule_month,
+            leave_dates: scheduleData.leaveDates,
+            total_leave_days: scheduleData.leaveDates.length,
+            status: 'completed',
+            created_at: existingIndex >= 0 ? schedules[existingIndex].created_at : new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+
+        if (existingIndex >= 0) {
+            schedules[existingIndex] = newSchedule;
+        } else {
+            schedules.push(newSchedule);
+        }
+
+        await this.writeTable('schedules', schedules);
+
+        // 完成排班後自動退出系統
+        await this.exitScheduleSystem(employeeId);
+
+        return { success: true, schedule: newSchedule };
+    }
+
+    async validateSchedule(employeeId, scheduleData, settings) {
+        const errors = [];
+        const { leaveDates } = scheduleData;
+
+        // 1. 檢查總休假天數
+        if (leaveDates.length > settings.max_leave_days_per_person) {
+            errors.push(`休假天數超過限制，最多 ${settings.max_leave_days_per_person} 天`);
+        }
+
+        // 2. 檢查週末休假天數
+        const weekendDays = leaveDates.filter(date => {
+            const dayOfWeek = new Date(date).getDay();
+            return dayOfWeek === 5 || dayOfWeek === 6 || dayOfWeek === 0; // 五六日
+        });
+        if (weekendDays.length > settings.max_weekend_leave_days) {
+            errors.push(`週末休假天數超過限制，最多 ${settings.max_weekend_leave_days} 天`);
+        }
+
+        // 3. 檢查禁休日
+        const employee = await this.getEmployeeById(employeeId);
+        const storeId = employee.store_id.toString();
+        const forbiddenDays = settings.store_forbidden_days[storeId] || [];
+        const violatedForbiddenDays = leaveDates.filter(date => forbiddenDays.includes(date));
+        if (violatedForbiddenDays.length > 0) {
+            errors.push(`包含禁休日：${violatedForbiddenDays.join(', ')}`);
+        }
+
+        // 4. 檢查公休日（公休日會自動計入休假額度）
+        const holidays = settings.store_holidays[storeId] || [];
+        const holidayDays = leaveDates.filter(date => holidays.includes(date));
+        if (holidayDays.length > 0) {
+            // 公休日算在休假額度內，只是提醒
+            errors.push(`包含公休日：${holidayDays.join(', ')}（計入休假額度）`);
+        }
+
+        // 5. 檢查每日休假人數限制
+        const allSchedules = await this.readTable('schedules');
+        const monthSchedules = allSchedules.filter(s => 
+            s.schedule_month === settings.schedule_month && 
+            s.employee_id !== employeeId
+        );
+
+        for (const date of leaveDates) {
+            const sameDayLeaves = monthSchedules.filter(s => 
+                s.leave_dates.includes(date)
+            ).length;
+
+            if (sameDayLeaves >= settings.max_leave_people_per_day) {
+                errors.push(`${date} 休假人數已滿（${sameDayLeaves}/${settings.max_leave_people_per_day}）`);
+            }
+
+            // 檢查同分店每日休假限制
+            const sameStoreLeaves = monthSchedules.filter(s => {
+                const emp = this.getEmployeeById(s.employee_id);
+                return emp && emp.store_id === employee.store_id && s.leave_dates.includes(date);
+            }).length;
+
+            if (sameStoreLeaves >= settings.max_same_store_leave_per_day) {
+                errors.push(`${date} 同分店休假人數已滿`);
+            }
+        }
+
+        return {
+            isValid: errors.length === 0,
+            errors
+        };
+    }
+
+    async getMonthSchedules(month) {
+        const schedules = await this.readTable('schedules');
+        return schedules.filter(s => s.schedule_month === month);
+    }
+
+    async deleteEmployeeSchedule(employeeId, month) {
+        const schedules = await this.readTable('schedules');
+        const filteredSchedules = schedules.filter(s => 
+            !(s.employee_id === employeeId && s.schedule_month === month)
+        );
+        await this.writeTable('schedules', filteredSchedules);
+        return { success: true };
+    }
+
+    // 退出排班系統
+    async exitScheduleSystem(employeeId) {
+        const settings = await this.readTable('schedule_settings');
+        if (settings.length === 0) return;
+        
+        settings[0].current_user_id = null;
+        settings[0].session_start_time = null;
+        
+        await this.writeTable('schedule_settings', settings);
+    }
+
+    // 獲取用戶排班紀錄
+    async getUserScheduleRecords(employeeId) {
+        const schedules = await this.readTable('schedules');
+        const userSchedules = schedules
+            .filter(s => s.employee_id === employeeId)
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        
+        return userSchedules.map(schedule => ({
+            ...schedule,
+            leave_dates: JSON.parse(schedule.leave_dates_json || '[]')
+        }));
+    }
+
+    // 作廢排班紀錄
+    async voidScheduleRecord(scheduleId, employeeId) {
+        const schedules = await this.readTable('schedules');
+        const schedule = schedules.find(s => s.id === scheduleId && s.employee_id === employeeId);
+        
+        if (!schedule) {
+            throw new Error('找不到排班紀錄或無權限操作');
+        }
+        
+        if (schedule.status === 'voided') {
+            throw new Error('排班紀錄已經作廢');
+        }
+        
+        schedule.status = 'voided';
+        schedule.voided_at = new Date().toISOString();
+        
+        await this.writeTable('schedules', schedules);
+        return { success: true };
     }
 
     // ==================== 儀表板統計 ====================

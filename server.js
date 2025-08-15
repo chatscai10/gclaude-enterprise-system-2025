@@ -873,6 +873,242 @@ app.post('/api/admin/promotion/:id/complete', authenticateToken, requireAdmin, a
     }
 });
 
+// ==================== 排班系統API ====================
+
+// 獲取排班設定和狀態
+app.get('/api/schedule/settings', authenticateToken, async (req, res) => {
+    try {
+        const settings = await db.getScheduleSettings();
+        const canAccess = await db.canAccessScheduleSystem(req.user.employee_id);
+        
+        res.json({
+            success: true,
+            data: {
+                settings,
+                canAccess
+            },
+            message: '排班設定獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取排班設定失敗: ' + error.message
+        });
+    }
+});
+
+// 進入排班系統
+app.post('/api/schedule/enter', authenticateToken, async (req, res) => {
+    try {
+        const result = await db.enterScheduleSystem(req.user.employee_id);
+        
+        res.json({
+            success: true,
+            data: result,
+            message: '成功進入排班系統'
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: '進入排班系統失敗: ' + error.message
+        });
+    }
+});
+
+// 退出排班系統
+app.post('/api/schedule/exit', authenticateToken, async (req, res) => {
+    try {
+        const result = await db.exitScheduleSystem(req.user.employee_id);
+        
+        res.json({
+            success: true,
+            data: result,
+            message: result.success ? '已退出排班系統' : result.reason
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '退出排班系統失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取我的排班記錄
+app.get('/api/schedule/my-schedule', authenticateToken, async (req, res) => {
+    try {
+        const settings = await db.getScheduleSettings();
+        const schedule = await db.getEmployeeSchedule(req.user.employee_id, settings.schedule_month);
+        
+        res.json({
+            success: true,
+            data: {
+                schedule,
+                settings
+            },
+            message: '排班記錄獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取排班記錄失敗: ' + error.message
+        });
+    }
+});
+
+// 保存排班
+app.post('/api/schedule/save', authenticateToken, async (req, res) => {
+    try {
+        const { leaveDates } = req.body;
+        
+        if (!Array.isArray(leaveDates)) {
+            return res.status(400).json({
+                success: false,
+                message: '休假日期格式錯誤'
+            });
+        }
+
+        const result = await db.saveEmployeeSchedule(req.user.employee_id, { leaveDates });
+        
+        res.json({
+            success: true,
+            data: result,
+            message: '排班保存成功'
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: '排班保存失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取月份排班統計
+app.get('/api/schedule/month-stats', authenticateToken, async (req, res) => {
+    try {
+        const { month } = req.query;
+        const settings = await db.getScheduleSettings();
+        const targetMonth = month || settings.schedule_month;
+        
+        const schedules = await db.getMonthSchedules(targetMonth);
+        
+        // 統計每日休假人數
+        const dailyStats = {};
+        schedules.forEach(schedule => {
+            schedule.leave_dates.forEach(date => {
+                if (!dailyStats[date]) {
+                    dailyStats[date] = 0;
+                }
+                dailyStats[date]++;
+            });
+        });
+        
+        res.json({
+            success: true,
+            data: {
+                schedules,
+                dailyStats,
+                totalEmployees: schedules.length,
+                settings
+            },
+            message: '月份排班統計獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取月份排班統計失敗: ' + error.message
+        });
+    }
+});
+
+// 作廢我的排班（只能作廢自己的）
+app.delete('/api/schedule/my-schedule', authenticateToken, async (req, res) => {
+    try {
+        const settings = await db.getScheduleSettings();
+        const result = await db.deleteEmployeeSchedule(req.user.employee_id, settings.schedule_month);
+        
+        res.json({
+            success: true,
+            data: result,
+            message: '排班記錄已作廢'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '作廢排班記錄失敗: ' + error.message
+        });
+    }
+});
+
+// 管理員用：更新排班設定
+app.put('/api/admin/schedule/settings', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const result = await db.updateScheduleSettings(req.body);
+        
+        res.json({
+            success: true,
+            data: result,
+            message: '排班設定更新成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '更新排班設定失敗: ' + error.message
+        });
+    }
+});
+
+// 退出排班系統
+app.post('/api/schedule/exit', authenticateToken, async (req, res) => {
+    try {
+        await db.exitScheduleSystem(req.user.employee_id);
+        
+        res.json({
+            success: true,
+            message: '已退出排班系統'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '退出排班系統失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取我的排班紀錄
+app.get('/api/schedule/my-records', authenticateToken, async (req, res) => {
+    try {
+        const records = await db.getUserScheduleRecords(req.user.employee_id);
+        
+        res.json({
+            success: true,
+            data: records
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取排班紀錄失敗: ' + error.message
+        });
+    }
+});
+
+// 作廢排班紀錄
+app.post('/api/schedule/:id/void', authenticateToken, async (req, res) => {
+    try {
+        const scheduleId = parseInt(req.params.id);
+        await db.voidScheduleRecord(scheduleId, req.user.employee_id);
+        
+        res.json({
+            success: true,
+            message: '排班紀錄已作廢'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '作廢排班紀錄失敗: ' + error.message
+        });
+    }
+});
+
 // ==================== 其他APIs ====================
 
 // 員工班表API

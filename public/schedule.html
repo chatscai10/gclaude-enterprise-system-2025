@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>員工排班系統 - GClaude企業管理系統</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .schedule-rules {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .rule-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 4px solid #28a745;
+        }
+        .calendar-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .calendar-day {
+            width: 14.28%;
+            min-height: 60px;
+            border: 2px solid #dee2e6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            position: relative;
+        }
+        .calendar-day:hover {
+            background: #f8f9fa;
+            border-color: #007bff;
+            transform: translateY(-2px);
+        }
+        .calendar-day.weekend {
+            background: #ffe6e6;
+        }
+        .calendar-day.holiday {
+            background: #e6f3ff;
+            border-color: #007bff;
+        }
+        .calendar-day.forbidden {
+            background: #ffcccc;
+            border-color: #dc3545;
+            cursor: not-allowed;
+        }
+        .calendar-day.selected {
+            background: #28a745 !important;
+            color: white;
+            border-color: #28a745;
+            font-weight: bold;
+        }
+        .calendar-day.over-limit {
+            background: #ffcccc;
+            border-color: #dc3545;
+        }
+        .calendar-header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .status-badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .status-open {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        .status-closed {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            color: white;
+        }
+        .status-busy {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            color: white;
+        }
+        .enter-system-btn {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 25px;
+            border: none;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        .enter-system-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        }
+        .enter-system-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .schedule-record {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #007bff;
+        }
+        .day-number {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .day-status {
+            font-size: 0.8em;
+            margin-top: 5px;
+        }
+        .countdown-timer {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .statistics-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/employee">
+                <i class="fas fa-calendar-alt me-2"></i>員工排班系統
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/employee">
+                    <i class="fas fa-arrow-left me-1"></i>返回主頁
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-4">
+        <!-- 頁面標題 -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="text-center">
+                    <i class="fas fa-calendar-check text-success me-2"></i>員工排班系統
+                </h2>
+                <p class="text-muted text-center">月曆點擊操作，智慧規則檢查</p>
+            </div>
+        </div>
+
+        <!-- 系統狀態與倒計時 -->
+        <div id="systemStatus" class="text-center mb-4">
+            <!-- 系統狀態將動態載入 -->
+        </div>
+
+        <!-- 排班參數規則 -->
+        <div class="schedule-rules">
+            <h5 class="mb-3">
+                <i class="fas fa-cogs me-2"></i>排班參數規則
+            </h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="rule-item">
+                        <strong>排班月份：</strong><span id="scheduleMonth">下個月</span>
+                    </div>
+                    <div class="rule-item">
+                        <strong>每人休假上限：</strong><span id="monthlyLimit">8</span> 天
+                    </div>
+                    <div class="rule-item">
+                        <strong>每日休假總上限：</strong><span id="dailyTotalLimit">2</span> 人
+                    </div>
+                    <div class="rule-item">
+                        <strong>假日休假上限：</strong><span id="weekendLimit">3</span> 天 (五六日)
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="rule-item">
+                        <strong>同店每日休假上限：</strong><span id="sameStoreLimit">1</span> 人
+                    </div>
+                    <div class="rule-item">
+                        <strong>待命每日休假上限：</strong><span id="standbyLimit">1</span> 人
+                    </div>
+                    <div class="rule-item">
+                        <strong>兼職每日休假上限：</strong><span id="partTimeLimit">1</span> 人
+                    </div>
+                    <div class="rule-item">
+                        <strong>排班操作時間限制：</strong>5 分鐘
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3">
+                <div class="rule-item">
+                    <strong>排班系統開放時間：</strong>每月16號 02:00 ~ 21號 02:00
+                </div>
+            </div>
+        </div>
+
+        <!-- 分店禁休與公休日期 -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-danger text-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-ban me-2"></i>本月禁休日期
+                        </h6>
+                    </div>
+                    <div class="card-body" id="forbiddenDates">
+                        <div class="text-muted text-center py-2">載入中...</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-calendar-day me-2"></i>本月公休日期
+                        </h6>
+                    </div>
+                    <div class="card-body" id="holidayDates">
+                        <div class="text-muted text-center py-2">載入中...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 進入系統按鈕 -->
+        <div class="text-center mb-4">
+            <button id="enterSystemBtn" class="btn enter-system-btn" onclick="enterScheduleSystem()">
+                <i class="fas fa-sign-in-alt me-2"></i>進入系統
+            </button>
+            <div id="systemMessage" class="mt-3"></div>
+        </div>
+
+        <!-- 月曆排班介面 (初始隱藏) -->
+        <div id="calendarInterface" class="d-none">
+            <div class="calendar-header">
+                <h4 id="calendarTitle">
+                    <i class="fas fa-calendar-alt me-2"></i>2024年01月 排班月曆
+                </h4>
+                <div id="userStats" class="mt-2">
+                    <!-- 用戶統計信息 -->
+                </div>
+            </div>
+
+            <div class="calendar-container">
+                <!-- 星期標題 -->
+                <div class="d-flex mb-3">
+                    <div class="calendar-day text-center fw-bold text-muted border-0 bg-transparent cursor-default">日</div>
+                    <div class="calendar-day text-center fw-bold text-muted border-0 bg-transparent cursor-default">一</div>
+                    <div class="calendar-day text-center fw-bold text-muted border-0 bg-transparent cursor-default">二</div>
+                    <div class="calendar-day text-center fw-bold text-muted border-0 bg-transparent cursor-default">三</div>
+                    <div class="calendar-day text-center fw-bold text-muted border-0 bg-transparent cursor-default">四</div>
+                    <div class="calendar-day text-center fw-bold text-muted border-0 bg-transparent cursor-default">五</div>
+                    <div class="calendar-day text-center fw-bold text-muted border-0 bg-transparent cursor-default">六</div>
+                </div>
+
+                <!-- 月曆日期 -->
+                <div id="calendarDays" class="d-flex flex-wrap">
+                    <!-- 日期將動態生成 -->
+                </div>
+            </div>
+
+            <!-- 操作按鈕 -->
+            <div class="text-center mt-4">
+                <button class="btn btn-success me-2" onclick="saveSchedule()">
+                    <i class="fas fa-save me-2"></i>儲存排班
+                </button>
+                <button class="btn btn-secondary me-2" onclick="resetSchedule()">
+                    <i class="fas fa-undo me-2"></i>重置選擇
+                </button>
+                <button class="btn btn-danger" onclick="exitScheduleSystem()">
+                    <i class="fas fa-sign-out-alt me-2"></i>離開系統
+                </button>
+            </div>
+
+            <!-- 操作時間倒計時 -->
+            <div id="operationTimer" class="countdown-timer mt-4">
+                <h6><i class="fas fa-stopwatch me-2"></i>操作時間倒計時</h6>
+                <div id="timerDisplay" class="h4">05:00</div>
+            </div>
+        </div>
+
+        <!-- 我的排班紀錄 -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list-alt me-2"></i>我的排班紀錄
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="scheduleRecords">
+                    <div class="text-muted text-center py-3">
+                        <i class="fas fa-calendar-times fa-2x mb-2"></i>
+                        <p class="small">載入中...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 本月統計 -->
+        <div class="statistics-card mt-4">
+            <h5 class="mb-3">
+                <i class="fas fa-chart-bar me-2"></i>本月統計
+            </h5>
+            <div id="monthlyStats" class="row">
+                <!-- 統計數據將動態載入 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 確認對話框 -->
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-question-circle me-2"></i>確認操作
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="confirmModalBody">
+                    <!-- 確認內容將動態載入 -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="confirmActionBtn">確認</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let systemInUse = false;
+        let selectedDates = [];
+        let scheduleSettings = {};
+        let currentMonth = '';
+        let operationTimer = null;
+        let timeLeft = 300; // 5分鐘 = 300秒
+
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadScheduleSettings();
+            loadScheduleRecords();
+            loadMonthlyStats();
+        });
+
+        // 驗證登入狀態
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/';
+                return;
+            }
+        }
+
+        // 載入排班設定和系統狀態
+        async function loadScheduleSettings() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/schedule/settings', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    scheduleSettings = result.data.settings;
+                    renderSystemStatus(result.data);
+                    renderScheduleRules(scheduleSettings);
+                } else {
+                    showAlert('載入排班設定失敗：' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('載入排班設定時發生錯誤：' + error.message, 'danger');
+            }
+        }
+
+        // 渲染系統狀態
+        function renderSystemStatus(data) {
+            const statusContainer = document.getElementById('systemStatus');
+            const enterBtn = document.getElementById('enterSystemBtn');
+            const messageContainer = document.getElementById('systemMessage');
+            
+            let statusClass = '';
+            let statusText = '';
+            let btnText = '進入系統';
+            let btnDisabled = false;
+            let message = '';
+            
+            if (!data.isOpen) {
+                statusClass = 'status-closed';
+                statusText = '系統關閉';
+                btnText = '系統關閉';
+                btnDisabled = true;
+                message = `排班系統開放時間：每月16號 02:00 ~ 21號 02:00`;
+            } else if (data.hasActiveUser && !data.isCurrentUser) {
+                statusClass = 'status-busy';
+                statusText = '系統使用中';
+                btnText = '系統使用中';
+                btnDisabled = true;
+                message = `有其他員工正在使用排班系統，請稍後再試`;
+            } else if (data.isCurrentUser) {
+                statusClass = 'status-open';
+                statusText = '系統使用中 (您)';
+                btnText = '繼續使用';
+                btnDisabled = false;
+                message = `您正在使用排班系統`;
+            } else {
+                statusClass = 'status-open';
+                statusText = '系統開放中';
+                btnText = '進入系統';
+                btnDisabled = false;
+                message = `排班系統開放中，可以進行排班操作`;
+            }
+            
+            statusContainer.innerHTML = `
+                <div class="status-badge ${statusClass}">
+                    <i class="fas fa-circle me-2"></i>${statusText}
+                </div>
+            `;
+            
+            enterBtn.textContent = btnText;
+            enterBtn.disabled = btnDisabled;
+            messageContainer.innerHTML = `<p class="text-muted">${message}</p>`;
+        }
+
+        // 渲染排班規則
+        function renderScheduleRules(settings) {
+            if (!settings) return;
+            
+            document.getElementById('scheduleMonth').textContent = settings.schedule_month || '下個月';
+            document.getElementById('monthlyLimit').textContent = settings.monthly_leave_limit || 8;
+            document.getElementById('dailyTotalLimit').textContent = settings.daily_total_limit || 2;
+            document.getElementById('weekendLimit').textContent = settings.weekend_limit || 3;
+            document.getElementById('sameStoreLimit').textContent = settings.same_store_limit || 1;
+            document.getElementById('standbyLimit').textContent = settings.standby_limit || 1;
+            document.getElementById('partTimeLimit').textContent = settings.part_time_limit || 1;
+            
+            // 渲染禁休日期
+            const forbiddenContainer = document.getElementById('forbiddenDates');
+            if (settings.forbidden_dates && settings.forbidden_dates.length > 0) {
+                forbiddenContainer.innerHTML = settings.forbidden_dates.map(date => `
+                    <span class="badge bg-danger me-1 mb-1">${date}</span>
+                `).join('');
+            } else {
+                forbiddenContainer.innerHTML = '<span class="text-muted">無禁休日期</span>';
+            }
+            
+            // 渲染公休日期
+            const holidayContainer = document.getElementById('holidayDates');
+            if (settings.holiday_dates && settings.holiday_dates.length > 0) {
+                holidayContainer.innerHTML = settings.holiday_dates.map(date => `
+                    <span class="badge bg-info me-1 mb-1">${date}</span>
+                `).join('');
+            } else {
+                holidayContainer.innerHTML = '<span class="text-muted">無公休日期</span>';
+            }
+        }
+
+        // 進入排班系統
+        async function enterScheduleSystem() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/schedule/enter', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    systemInUse = true;
+                    showCalendarInterface();
+                    startOperationTimer();
+                    showAlert('成功進入排班系統', 'success');
+                } else {
+                    showAlert('進入排班系統失敗：' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('進入排班系統時發生錯誤：' + error.message, 'danger');
+            }
+        }
+
+        // 顯示月曆介面
+        function showCalendarInterface() {
+            document.getElementById('calendarInterface').classList.remove('d-none');
+            generateCalendar();
+            document.getElementById('enterSystemBtn').style.display = 'none';
+        }
+
+        // 生成月曆
+        function generateCalendar() {
+            const now = new Date();
+            const targetDate = new Date(now.getFullYear(), now.getMonth() + 1, 1); // 下個月
+            const year = targetDate.getFullYear();
+            const month = targetDate.getMonth();
+            
+            currentMonth = `${year}-${String(month + 1).padStart(2, '0')}`;
+            
+            document.getElementById('calendarTitle').innerHTML = `
+                <i class="fas fa-calendar-alt me-2"></i>${year}年${String(month + 1).padStart(2, '0')}月 排班月曆
+            `;
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+            
+            const calendarDays = document.getElementById('calendarDays');
+            calendarDays.innerHTML = '';
+            
+            for (let i = 0; i < 42; i++) {
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + i);
+                
+                const dayElement = createDayElement(currentDate, month);
+                calendarDays.appendChild(dayElement);
+            }
+            
+            updateUserStats();
+        }
+
+        // 創建日期元素
+        function createDayElement(date, targetMonth) {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day';
+            
+            const dayNumber = date.getDate();
+            const isCurrentMonth = date.getMonth() === targetMonth;
+            const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
+            
+            if (!isCurrentMonth) {
+                dayElement.style.opacity = '0.3';
+                dayElement.style.pointerEvents = 'none';
+            } else {
+                dayElement.dataset.date = dateString;
+                dayElement.onclick = () => toggleDateSelection(dateString);
+                
+                // 檢查是否為週末
+                const dayOfWeek = date.getDay();
+                if (dayOfWeek === 0 || dayOfWeek === 5 || dayOfWeek === 6) {
+                    dayElement.classList.add('weekend');
+                }
+                
+                // 檢查是否為禁休日
+                if (scheduleSettings.forbidden_dates && scheduleSettings.forbidden_dates.includes(dateString)) {
+                    dayElement.classList.add('forbidden');
+                    dayElement.onclick = null;
+                }
+                
+                // 檢查是否為公休日
+                if (scheduleSettings.holiday_dates && scheduleSettings.holiday_dates.includes(dateString)) {
+                    dayElement.classList.add('holiday');
+                }
+            }
+            
+            dayElement.innerHTML = `
+                <div class="day-number">${dayNumber}</div>
+                <div class="day-status"></div>
+            `;
+            
+            return dayElement;
+        }
+
+        // 切換日期選擇
+        function toggleDateSelection(dateString) {
+            const dayElement = document.querySelector(`[data-date="${dateString}"]`);
+            if (dayElement.classList.contains('forbidden')) return;
+            
+            if (selectedDates.includes(dateString)) {
+                // 取消選擇
+                selectedDates = selectedDates.filter(d => d !== dateString);
+                dayElement.classList.remove('selected');
+            } else {
+                // 檢查規則限制
+                if (checkDateSelection(dateString)) {
+                    selectedDates.push(dateString);
+                    dayElement.classList.add('selected');
+                } else {
+                    return; // 規則檢查失敗，不允許選擇
+                }
+            }
+            
+            updateUserStats();
+        }
+
+        // 檢查日期選擇規則
+        function checkDateSelection(dateString) {
+            const settings = scheduleSettings;
+            
+            // 檢查每月休假上限
+            if (selectedDates.length >= (settings.monthly_leave_limit || 8)) {
+                showAlert(`每月休假上限為 ${settings.monthly_leave_limit || 8} 天`, 'warning');
+                return false;
+            }
+            
+            // 檢查假日休假上限（週五、週六、週日）
+            const date = new Date(dateString);
+            const dayOfWeek = date.getDay();
+            const isWeekend = dayOfWeek === 0 || dayOfWeek === 5 || dayOfWeek === 6;
+            
+            if (isWeekend) {
+                const weekendCount = selectedDates.filter(d => {
+                    const checkDate = new Date(d);
+                    const checkDayOfWeek = checkDate.getDay();
+                    return checkDayOfWeek === 0 || checkDayOfWeek === 5 || checkDayOfWeek === 6;
+                }).length;
+                
+                if (weekendCount >= (settings.weekend_limit || 3)) {
+                    showAlert(`假日休假上限為 ${settings.weekend_limit || 3} 天 (週五、週六、週日)`, 'warning');
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // 更新用戶統計
+        function updateUserStats() {
+            const totalSelected = selectedDates.length;
+            const monthlyLimit = scheduleSettings.monthly_leave_limit || 8;
+            const weekendSelected = selectedDates.filter(d => {
+                const date = new Date(d);
+                const dayOfWeek = date.getDay();
+                return dayOfWeek === 0 || dayOfWeek === 5 || dayOfWeek === 6;
+            }).length;
+            const weekendLimit = scheduleSettings.weekend_limit || 3;
+            
+            document.getElementById('userStats').innerHTML = `
+                已選擇：${totalSelected}/${monthlyLimit} 天 | 
+                假日：${weekendSelected}/${weekendLimit} 天
+            `;
+        }
+
+        // 開始操作倒計時
+        function startOperationTimer() {
+            timeLeft = 300; // 5分鐘
+            operationTimer = setInterval(updateTimer, 1000);
+        }
+
+        // 更新倒計時
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            
+            document.getElementById('timerDisplay').textContent = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(operationTimer);
+                forceExitSystem();
+            } else {
+                timeLeft--;
+            }
+        }
+
+        // 強制退出系統
+        function forceExitSystem() {
+            showAlert('操作時間超過限制，系統自動退出', 'warning');
+            exitScheduleSystem();
+        }
+
+        // 儲存排班
+        async function saveSchedule() {
+            if (selectedDates.length === 0) {
+                showAlert('請先選擇休假日期', 'warning');
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/schedule/save', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        month: currentMonth,
+                        leave_dates: selectedDates
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('排班儲存成功！', 'success');
+                    exitScheduleSystem();
+                    loadScheduleRecords();
+                } else {
+                    showAlert('儲存排班失敗：' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('儲存排班時發生錯誤：' + error.message, 'danger');
+            }
+        }
+
+        // 重置選擇
+        function resetSchedule() {
+            selectedDates = [];
+            document.querySelectorAll('.calendar-day.selected').forEach(day => {
+                day.classList.remove('selected');
+            });
+            updateUserStats();
+            showAlert('已重置所有選擇', 'info');
+        }
+
+        // 退出排班系統
+        async function exitScheduleSystem() {
+            if (operationTimer) {
+                clearInterval(operationTimer);
+            }
+            
+            systemInUse = false;
+            document.getElementById('calendarInterface').classList.add('d-none');
+            document.getElementById('enterSystemBtn').style.display = 'block';
+            
+            // 通知後端退出系統
+            try {
+                const token = localStorage.getItem('token');
+                await fetch('/api/schedule/exit', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+            } catch (error) {
+                console.error('退出系統時發生錯誤:', error);
+            }
+            
+            loadScheduleSettings(); // 重新載入系統狀態
+        }
+
+        // 載入排班紀錄
+        async function loadScheduleRecords() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/schedule/my-records', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    renderScheduleRecords(result.data);
+                } else {
+                    showAlert('載入排班紀錄失敗：' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('載入排班紀錄時發生錯誤：' + error.message, 'danger');
+            }
+        }
+
+        // 渲染排班紀錄
+        function renderScheduleRecords(records) {
+            const container = document.getElementById('scheduleRecords');
+            
+            if (records.length === 0) {
+                container.innerHTML = `
+                    <div class="text-muted text-center py-4">
+                        <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                        <p>尚無排班紀錄</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = records.map(record => `
+                <div class="schedule-record">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">${record.month} 排班</h6>
+                            <p class="mb-1 text-muted small">
+                                休假日期：${record.leave_dates.join(', ')}
+                            </p>
+                            <p class="mb-0 text-muted small">
+                                建立時間：${new Date(record.created_at).toLocaleString()}
+                            </p>
+                        </div>
+                        <div>
+                            <span class="badge bg-${record.status === 'active' ? 'success' : 'secondary'}">
+                                ${record.status === 'active' ? '生效中' : '已作廢'}
+                            </span>
+                            ${record.status === 'active' ? `
+                                <button class="btn btn-sm btn-outline-danger ms-2" 
+                                        onclick="voidSchedule(${record.id})">
+                                    <i class="fas fa-times"></i> 作廢
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 作廢排班
+        async function voidSchedule(scheduleId) {
+            const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+            document.getElementById('confirmModalBody').innerHTML = `
+                <p>確定要作廢這筆排班紀錄嗎？</p>
+                <p class="text-muted small">此操作無法復原</p>
+            `;
+            
+            document.getElementById('confirmActionBtn').onclick = async function() {
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`/api/schedule/${scheduleId}/void`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showAlert('排班紀錄已作廢', 'success');
+                        loadScheduleRecords();
+                        modal.hide();
+                    } else {
+                        showAlert('作廢失敗：' + result.message, 'danger');
+                    }
+                } catch (error) {
+                    showAlert('作廢時發生錯誤：' + error.message, 'danger');
+                }
+            };
+            
+            modal.show();
+        }
+
+        // 載入月統計
+        async function loadMonthlyStats() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/schedule/month-stats', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    renderMonthlyStats(result.data);
+                } else {
+                    showAlert('載入月統計失敗：' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('載入月統計時發生錯誤：' + error.message, 'danger');
+            }
+        }
+
+        // 渲染月統計
+        function renderMonthlyStats(stats) {
+            const container = document.getElementById('monthlyStats');
+            
+            container.innerHTML = `
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <h4>${stats.current_month_leaves || 0}</h4>
+                        <small>本月已請假天數</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <h4>${stats.weekend_leaves || 0}</h4>
+                        <small>假日請假天數</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <h4>${stats.remaining_leaves || 0}</h4>
+                        <small>剩餘可請假天數</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <h4>${stats.total_employees || 0}</h4>
+                        <small>部門總人數</small>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 通用警告顯示函數
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.createElement('div');
+            alertContainer.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertContainer.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+            alertContainer.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(alertContainer);
+            
+            setTimeout(() => {
+                if (alertContainer.parentNode) {
+                    alertContainer.remove();
+                }
+            }, 5000);
+        }
+
+        // 頁面關閉或刷新時自動退出系統
+        window.addEventListener('beforeunload', function(e) {
+            if (systemInUse) {
+                exitScheduleSystem();
+            }
+        });
+    </script>
+</body>
+</html>
