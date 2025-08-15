@@ -277,6 +277,158 @@ app.get('/api/maintenance', (req, res) => {
     });
 });
 
+// ==================== 員工相關API ====================
+
+// 今日出勤狀態
+app.get('/api/attendance/today', (req, res) => {
+    res.json({
+        success: true,
+        data: {
+            date: '2025-08-15',
+            checkIn: '09:15:23',
+            checkOut: null,
+            status: 'checked_in',
+            workHours: '3小時45分鐘',
+            break: '30分鐘',
+            location: '台北總公司'
+        },
+        message: '今日出勤狀態獲取成功'
+    });
+});
+
+// 出勤歷史記錄
+app.get('/api/attendance/history', (req, res) => {
+    const limit = req.query.limit || 10;
+    res.json({
+        success: true,
+        data: [
+            {
+                date: '2025-08-14',
+                checkIn: '09:00:15',
+                checkOut: '18:05:30',
+                workHours: '8小時30分鐘',
+                status: 'completed'
+            },
+            {
+                date: '2025-08-13',
+                checkIn: '09:10:45',
+                checkOut: '18:00:00',
+                workHours: '8小時15分鐘',
+                status: 'completed'
+            },
+            {
+                date: '2025-08-12',
+                checkIn: '08:55:20',
+                checkOut: '18:10:15',
+                workHours: '8小時45分鐘',
+                status: 'completed'
+            }
+        ],
+        message: '出勤歷史獲取成功'
+    });
+});
+
+// 上班打卡
+app.post('/api/attendance/clock-in', (req, res) => {
+    const now = new Date();
+    res.json({
+        success: true,
+        data: {
+            timestamp: now.toISOString(),
+            time: now.toLocaleTimeString('zh-TW'),
+            location: '台北總公司',
+            status: 'success'
+        },
+        message: '上班打卡成功！'
+    });
+});
+
+// 下班打卡
+app.post('/api/attendance/clock-out', (req, res) => {
+    const now = new Date();
+    res.json({
+        success: true,
+        data: {
+            timestamp: now.toISOString(),
+            time: now.toLocaleTimeString('zh-TW'),
+            location: '台北總公司',
+            workHours: '8小時15分鐘',
+            status: 'success'
+        },
+        message: '下班打卡成功！今日工作辛苦了！'
+    });
+});
+
+// ==================== 認證相關API ====================
+
+// Token驗證
+app.post('/api/auth/verify', (req, res) => {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
+    
+    if (token === 'demo-jwt-token') {
+        res.json({
+            success: true,
+            data: {
+                user: {
+                    id: 1,
+                    username: 'admin',
+                    role: 'admin',
+                    name: '系統管理員'
+                }
+            },
+            message: 'Token有效'
+        });
+    } else {
+        res.status(401).json({
+            success: false,
+            message: 'Token無效或已過期'
+        });
+    }
+});
+
+// 使用者個人資料
+app.get('/api/auth/profile', (req, res) => {
+    res.json({
+        success: true,
+        data: {
+            id: 1,
+            username: 'admin',
+            name: '系統管理員',
+            email: 'admin@gclaude.com',
+            role: 'admin',
+            department: '資訊部',
+            position: '系統管理員',
+            joinDate: '2024-01-01',
+            phone: '02-1234-5678'
+        },
+        message: '個人資料獲取成功'
+    });
+});
+
+// 員工統計總覽
+app.get('/api/employees/stats/overview', (req, res) => {
+    res.json({
+        success: true,
+        data: {
+            totalEmployees: 45,
+            activeToday: 38,
+            onLeave: 3,
+            remote: 4,
+            departments: [
+                { name: '業務部', count: 15 },
+                { name: '技術部', count: 12 },
+                { name: '行政部', count: 8 },
+                { name: '財務部', count: 6 },
+                { name: '人資部', count: 4 }
+            ],
+            attendanceRate: 84.4,
+            avgWorkHours: 8.2
+        },
+        message: '員工統計總覽獲取成功'
+    });
+});
+
 // ==================== 前端頁面路由 ====================
 
 // 主頁面
