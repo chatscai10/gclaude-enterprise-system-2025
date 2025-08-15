@@ -736,6 +736,143 @@ app.get('/api/admin/orders', authenticateToken, requireAdmin, async (req, res) =
     }
 });
 
+// ==================== 升遷投票系統API ====================
+
+// 獲取職位階級列表
+app.get('/api/positions', authenticateToken, async (req, res) => {
+    try {
+        const positions = await db.getAllPositions();
+        
+        res.json({
+            success: true,
+            data: positions,
+            message: '職位階級獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取職位階級失敗: ' + error.message
+        });
+    }
+});
+
+// 檢查員工是否可以發起升遷
+app.get('/api/promotion/check-eligibility', authenticateToken, async (req, res) => {
+    try {
+        const result = await db.canEmployeeStartPromotion(req.user.employee_id);
+        
+        res.json({
+            success: true,
+            data: result,
+            message: result.canStart ? '可以發起升遷投票' : result.reason
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '檢查升遷資格失敗: ' + error.message
+        });
+    }
+});
+
+// 發起升遷投票
+app.post('/api/promotion/start', authenticateToken, async (req, res) => {
+    try {
+        const result = await db.startPromotion(req.user.employee_id);
+        
+        res.json({
+            success: true,
+            data: result,
+            message: result.message
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: '發起升遷投票失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取目前活躍的升遷投票
+app.get('/api/promotion/active', authenticateToken, async (req, res) => {
+    try {
+        const activePromotions = await db.getActivePromotions();
+        
+        res.json({
+            success: true,
+            data: activePromotions,
+            message: '活躍升遷投票獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取活躍升遷投票失敗: ' + error.message
+        });
+    }
+});
+
+// 投票
+app.post('/api/promotion/:id/vote', authenticateToken, async (req, res) => {
+    try {
+        const { vote } = req.body;
+        
+        if (!['agree', 'disagree'].includes(vote)) {
+            return res.status(400).json({
+                success: false,
+                message: '投票選項無效'
+            });
+        }
+
+        const result = await db.castVote(req.params.id, req.user.employee_id, vote);
+        
+        res.json({
+            success: true,
+            data: result,
+            message: result.message
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: '投票失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取投票狀態
+app.get('/api/promotion/:id/status', authenticateToken, async (req, res) => {
+    try {
+        const status = await db.getPromotionVotingStatus(req.params.id);
+        
+        res.json({
+            success: true,
+            data: status,
+            message: '投票狀態獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取投票狀態失敗: ' + error.message
+        });
+    }
+});
+
+// 管理員用：完成投票（開票）
+app.post('/api/admin/promotion/:id/complete', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const result = await db.completePromotion(req.params.id);
+        
+        res.json({
+            success: true,
+            data: result,
+            message: result.message
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: '完成投票失敗: ' + error.message
+        });
+    }
+});
+
 // ==================== 其他APIs ====================
 
 // 員工班表API

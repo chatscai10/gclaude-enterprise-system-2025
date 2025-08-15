@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>升遷投票系統 - GClaude企業管理系統</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .promotion-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid #007bff;
+        }
+        .promotion-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .position-level {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .voting-progress {
+            background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .vote-btn {
+            transition: all 0.3s ease;
+            border-radius: 25px;
+            padding: 10px 25px;
+            font-weight: bold;
+        }
+        .vote-btn.agree {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none;
+            color: white;
+        }
+        .vote-btn.disagree {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            border: none;
+            color: white;
+        }
+        .vote-btn.selected {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .countdown-timer {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .position-hierarchy {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/employee">
+                <i class="fas fa-vote-yea me-2"></i>升遷投票系統
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/employee">
+                    <i class="fas fa-arrow-left me-1"></i>返回主頁
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-4">
+        <!-- 頁面標題 -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="text-center">
+                    <i class="fas fa-trophy text-warning me-2"></i>升遷投票系統
+                </h2>
+                <p class="text-muted text-center">匿名投票，公平晉升，共創美好職場</p>
+            </div>
+        </div>
+
+        <!-- 職位階級說明 -->
+        <div class="position-hierarchy">
+            <h5 class="mb-3">
+                <i class="fas fa-layer-group me-2"></i>職位階級制度
+            </h5>
+            <div id="positionHierarchy" class="row">
+                <!-- 階級資訊將動態載入 -->
+            </div>
+        </div>
+
+        <!-- 我的升遷資格 -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-user-check me-2"></i>我的升遷資格
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="eligibilityStatus">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">載入中...</span>
+                        </div>
+                        <p class="mt-2">檢查升遷資格中...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 活躍的升遷投票 -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-vote-yea me-2"></i>目前投票
+                    <span id="activeVoteCount" class="badge bg-light text-dark ms-2">0</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="activePromotions">
+                    <div class="text-muted text-center py-4">
+                        <i class="fas fa-ballot-check fa-3x mb-3"></i>
+                        <p>目前沒有進行中的升遷投票</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 升遷歷史 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i>升遷歷史
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="promotionHistory">
+                    <div class="text-muted text-center py-3">
+                        <i class="fas fa-clock fa-2x mb-2"></i>
+                        <p class="small">載入中...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 投票確認模態框 -->
+    <div class="modal fade" id="voteConfirmModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-vote-yea me-2"></i>確認投票
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="voteConfirmContent"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="confirmVoteBtn">確認投票</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentPromotionId = null;
+        let currentVote = null;
+
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadPositionHierarchy();
+            loadEligibilityStatus();
+            loadActivePromotions();
+            
+            // 綁定投票確認事件
+            document.getElementById('confirmVoteBtn').addEventListener('click', submitVote);
+            
+            // 定期更新活躍投票狀態
+            setInterval(loadActivePromotions, 30000); // 每30秒更新一次
+        });
+
+        // 驗證登入狀態
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/';
+                return;
+            }
+        }
+
+        // 載入職位階級制度
+        async function loadPositionHierarchy() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/positions', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    renderPositionHierarchy(result.data);
+                } else {
+                    showAlert('載入職位階級失敗：' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('載入職位階級時發生錯誤：' + error.message, 'danger');
+            }
+        }
+
+        // 渲染職位階級制度
+        function renderPositionHierarchy(positions) {
+            const container = document.getElementById('positionHierarchy');
+            
+            const sortedPositions = positions.sort((a, b) => a.level - b.level);
+            
+            container.innerHTML = sortedPositions.map(position => `
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <div class="position-level mb-2">
+                                Lv.${position.level} ${position.name}
+                            </div>
+                            <div class="small text-muted mb-2">
+                                <i class="fas fa-money-bill-wave"></i> 薪資：$${position.salary.toLocaleString()}
+                            </div>
+                            <div class="small text-muted mb-2">
+                                <i class="fas fa-calendar-alt"></i> 任職：${position.required_days}天
+                            </div>
+                            <div class="small text-muted mb-2">
+                                <i class="fas fa-percentage"></i> 通過率：${(position.approval_rate * 100).toFixed(0)}%
+                            </div>
+                            <div class="small text-muted">
+                                <i class="fas fa-users"></i> 名額：${position.quota}人
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 載入我的升遷資格
+        async function loadEligibilityStatus() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/promotion/check-eligibility', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    renderEligibilityStatus(result.data);
+                } else {
+                    showAlert('檢查升遷資格失敗：' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('檢查升遷資格時發生錯誤：' + error.message, 'danger');
+            }
+        }
+
+        // 渲染升遷資格狀態
+        function renderEligibilityStatus(data) {
+            const container = document.getElementById('eligibilityStatus');
+            
+            if (data.canStart) {
+                container.innerHTML = `
+                    <div class="alert alert-success">
+                        <h6><i class="fas fa-check-circle me-2"></i>恭喜！您符合升遷資格</h6>
+                        <p class="mb-2">
+                            <strong>目前職位：</strong>${data.currentPosition.name} 
+                            (任職 ${data.daysInPosition} 天)
+                        </p>
+                        <p class="mb-3">
+                            <strong>目標職位：</strong>${data.nextPosition.name}
+                        </p>
+                        <button class="btn btn-success" onclick="startPromotion()">
+                            <i class="fas fa-rocket me-2"></i>發起升遷投票
+                        </button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-clock me-2"></i>暫時無法升遷</h6>
+                        <p class="mb-0">${data.reason}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // 發起升遷投票
+        async function startPromotion() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/promotion/start', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('升遷投票發起成功！', 'success');
+                    loadEligibilityStatus();
+                    loadActivePromotions();
+                } else {
+                    showAlert('發起升遷投票失敗：' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('發起升遷投票時發生錯誤：' + error.message, 'danger');
+            }
+        }
+
+        // 載入活躍的升遷投票
+        async function loadActivePromotions() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/promotion/active', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    renderActivePromotions(result.data);
+                    document.getElementById('activeVoteCount').textContent = result.data.length;
+                } else {
+                    showAlert('載入活躍投票失敗：' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('載入活躍投票時發生錯誤：' + error.message, 'danger');
+            }
+        }
+
+        // 渲染活躍的升遷投票
+        function renderActivePromotions(promotions) {
+            const container = document.getElementById('activePromotions');
+            
+            if (promotions.length === 0) {
+                container.innerHTML = `
+                    <div class="text-muted text-center py-4">
+                        <i class="fas fa-ballot-check fa-3x mb-3"></i>
+                        <p>目前沒有進行中的升遷投票</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 為每個投票載入詳細狀態
+            container.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary"></div></div>';
+            
+            Promise.all(promotions.map(promotion => loadPromotionStatus(promotion.id)))
+                .then(statuses => {
+                    container.innerHTML = statuses.map((status, index) => {
+                        const promotion = promotions[index];
+                        return renderPromotionCard(promotion, status);
+                    }).join('');
+                });
+        }
+
+        // 載入投票狀態
+        async function loadPromotionStatus(promotionId) {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/promotion/${promotionId}/status`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            const result = await response.json();
+            return result.success ? result.data : null;
+        }
+
+        // 渲染升遷投票卡片
+        function renderPromotionCard(promotion, status) {
+            if (!status) return '';
+            
+            const endDate = new Date(promotion.voting_end_date);
+            const now = new Date();
+            const timeLeft = endDate - now;
+            const daysLeft = Math.ceil(timeLeft / (1000 * 60 * 60 * 24));
+            
+            const progressPercentage = (status.currentApprovalRate * 100).toFixed(1);
+            const requiredPercentage = (status.requiredRate * 100).toFixed(0);
+            
+            // 找到目前用戶的投票
+            const userVote = status.votes.find(v => v.voter_employee_id === parseInt(localStorage.getItem('user_data') ? JSON.parse(localStorage.getItem('user_data')).employee_id : 0));
+            
+            return `
+                <div class="promotion-card card mb-4">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">
+                                <i class="fas fa-user-tie me-2"></i>${promotion.employee_name}
+                            </h6>
+                            <span class="badge bg-primary">${promotion.current_position_name} → ${promotion.target_position_name}</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="countdown-timer mb-3">
+                            <i class="fas fa-clock me-2"></i>
+                            投票倒計時：${daysLeft > 0 ? daysLeft + ' 天' : '即將結束'}
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="text-center">
+                                    <h4 class="text-success">${status.agreeVotes}</h4>
+                                    <small class="text-muted">同意票</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-center">
+                                    <h4 class="text-danger">${status.totalVotes - status.agreeVotes}</h4>
+                                    <small class="text-muted">反對票</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <small>支持率</small>
+                                <small>${progressPercentage}% / ${requiredPercentage}%</small>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar voting-progress" style="width: ${progressPercentage}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <p class="small text-muted mb-3">
+                                任職 ${promotion.days_in_position} 天 | 
+                                需要 ${requiredPercentage}% 支持率 | 
+                                ${status.totalVotes} 人投票
+                            </p>
+                            
+                            <div class="btn-group" role="group">
+                                <button class="btn vote-btn agree ${userVote && userVote.vote === 'agree' ? 'selected' : ''}" 
+                                        onclick="showVoteConfirm(${promotion.id}, 'agree', '${promotion.employee_name}')">
+                                    <i class="fas fa-thumbs-up me-1"></i>同意
+                                </button>
+                                <button class="btn vote-btn disagree ${userVote && userVote.vote === 'disagree' ? 'selected' : ''}" 
+                                        onclick="showVoteConfirm(${promotion.id}, 'disagree', '${promotion.employee_name}')">
+                                    <i class="fas fa-thumbs-down me-1"></i>反對
+                                </button>
+                            </div>
+                            
+                            ${userVote && userVote.vote_date ? `
+                                <div class="small text-muted mt-2">
+                                    已投票 | 今日剩餘修改次數：${3 - userVote.daily_changes_count}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 顯示投票確認對話框
+        function showVoteConfirm(promotionId, vote, employeeName) {
+            currentPromotionId = promotionId;
+            currentVote = vote;
+            
+            const voteText = vote === 'agree' ? '同意' : '反對';
+            const voteIcon = vote === 'agree' ? 'thumbs-up text-success' : 'thumbs-down text-danger';
+            
+            document.getElementById('voteConfirmContent').innerHTML = `
+                <div class="text-center">
+                    <i class="fas fa-${voteIcon} fa-3x mb-3"></i>
+                    <h5>確認投票選擇</h5>
+                    <p>您即將對 <strong>${employeeName}</strong> 的升遷投票：</p>
+                    <div class="alert alert-${vote === 'agree' ? 'success' : 'danger'}">
+                        <strong>${voteText}</strong> 其升遷申請
+                    </div>
+                    <p class="small text-muted">
+                        投票為匿名制，每日可修改3次
+                    </p>
+                </div>
+            `;
+            
+            new bootstrap.Modal(document.getElementById('voteConfirmModal')).show();
+        }
+
+        // 提交投票
+        async function submitVote() {
+            if (!currentPromotionId || !currentVote) return;
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/api/promotion/${currentPromotionId}/vote`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        vote: currentVote
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('投票成功！', 'success');
+                    loadActivePromotions(); // 重新載入投票狀態
+                    bootstrap.Modal.getInstance(document.getElementById('voteConfirmModal')).hide();
+                } else {
+                    showAlert('投票失敗：' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('投票時發生錯誤：' + error.message, 'danger');
+            }
+        }
+
+        // 通用警告顯示函數
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.createElement('div');
+            alertContainer.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertContainer.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+            alertContainer.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(alertContainer);
+            
+            setTimeout(() => {
+                if (alertContainer.parentNode) {
+                    alertContainer.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

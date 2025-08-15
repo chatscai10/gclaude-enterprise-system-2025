@@ -23,7 +23,10 @@ class JsonDatabase {
             products: 'products.json',
             inventory_logs: 'inventory_logs.json',
             orders: 'orders.json',
-            order_items: 'order_items.json'
+            order_items: 'order_items.json',
+            positions: 'positions.json',
+            promotions: 'promotions.json',
+            promotion_votes: 'promotion_votes.json'
         };
         
         this.initializeData();
@@ -86,6 +89,9 @@ class JsonDatabase {
                     join_date: '2024-01-01',
                     store_id: 1,
                     position: '系統管理員',
+                    position_id: null,
+                    position_start_date: '2024-01-01',
+                    line_user_id: null,
                     status: '在職',
                     is_active: true,
                     created_at: new Date().toISOString()
@@ -105,6 +111,9 @@ class JsonDatabase {
                     join_date: '2024-06-01',
                     store_id: 1,
                     position: '實習生',
+                    position_id: 1,
+                    position_start_date: '2024-06-01',
+                    line_user_id: null,
                     status: '在職',
                     is_active: true,
                     created_at: new Date().toISOString()
@@ -139,6 +148,10 @@ class JsonDatabase {
                     unit_price: 450,
                     unit: '包',
                     description: '阿里山高山咖啡豆',
+                    delivery_threshold: 1000,
+                    frequent_order_days: 1,
+                    rare_order_days: 7,
+                    supplier_contact: '02-12345678',
                     is_active: true,
                     created_at: new Date().toISOString()
                 },
@@ -153,6 +166,10 @@ class JsonDatabase {
                     unit_price: 12,
                     unit: '個',
                     description: '16oz環保紙杯',
+                    delivery_threshold: 500,
+                    frequent_order_days: 2,
+                    rare_order_days: 14,
+                    supplier_contact: '03-98765432',
                     is_active: true,
                     created_at: new Date().toISOString()
                 },
@@ -167,6 +184,10 @@ class JsonDatabase {
                     unit_price: 85,
                     unit: '瓶',
                     description: '1000ml有機全脂牛奶',
+                    delivery_threshold: 800,
+                    frequent_order_days: 1,
+                    rare_order_days: 3,
+                    supplier_contact: '04-87654321',
                     is_active: true,
                     created_at: new Date().toISOString()
                 },
@@ -181,13 +202,106 @@ class JsonDatabase {
                     unit_price: 2,
                     unit: '包',
                     description: '5g白砂糖包',
+                    delivery_threshold: 200,
+                    frequent_order_days: 3,
+                    rare_order_days: 21,
+                    supplier_contact: '07-76543210',
+                    is_active: true,
+                    created_at: new Date().toISOString()
+                }
+            ]);
+
+            // 初始化職位階級資料表
+            await this.initializeTable('positions', [
+                {
+                    id: 1,
+                    name: '實習生',
+                    level: 1,
+                    salary: 28000,
+                    bonus_rate: 0.05,
+                    quota: 10,
+                    required_days: 0,
+                    failure_buffer_days: 30,
+                    approval_rate: 0.6,
+                    voting_duration_days: 5,
+                    late_limit_minutes: 60,
+                    punishment: '口頭警告',
+                    description: '新進員工，學習基礎技能',
+                    is_active: true,
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 2,
+                    name: '正職員工',
+                    level: 2,
+                    salary: 32000,
+                    bonus_rate: 0.08,
+                    quota: 8,
+                    required_days: 90,
+                    failure_buffer_days: 60,
+                    approval_rate: 0.65,
+                    voting_duration_days: 5,
+                    late_limit_minutes: 45,
+                    punishment: '記小過',
+                    description: '熟悉基本作業流程',
+                    is_active: true,
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 3,
+                    name: '資深員工',
+                    level: 3,
+                    salary: 36000,
+                    bonus_rate: 0.12,
+                    quota: 6,
+                    required_days: 180,
+                    failure_buffer_days: 90,
+                    approval_rate: 0.7,
+                    voting_duration_days: 5,
+                    late_limit_minutes: 30,
+                    punishment: '記大過',
+                    description: '能獨立處理複雜問題',
+                    is_active: true,
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 4,
+                    name: '組長',
+                    level: 4,
+                    salary: 42000,
+                    bonus_rate: 0.15,
+                    quota: 4,
+                    required_days: 365,
+                    failure_buffer_days: 120,
+                    approval_rate: 0.75,
+                    voting_duration_days: 7,
+                    late_limit_minutes: 20,
+                    punishment: '調職處分',
+                    description: '帶領小組完成任務',
+                    is_active: true,
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 5,
+                    name: '主任',
+                    level: 5,
+                    salary: 48000,
+                    bonus_rate: 0.18,
+                    quota: 2,
+                    required_days: 540,
+                    failure_buffer_days: 180,
+                    approval_rate: 0.8,
+                    voting_duration_days: 7,
+                    late_limit_minutes: 15,
+                    punishment: '降職處分',
+                    description: '負責部門管理',
                     is_active: true,
                     created_at: new Date().toISOString()
                 }
             ]);
 
             // 初始化其他空白資料表
-            const emptyTables = ['attendance', 'revenue', 'maintenance', 'leave_requests', 'inventory_logs', 'orders', 'order_items'];
+            const emptyTables = ['attendance', 'revenue', 'maintenance', 'leave_requests', 'inventory_logs', 'orders', 'order_items', 'promotions', 'promotion_votes'];
             for (const table of emptyTables) {
                 await this.initializeTable(table, []);
             }
@@ -520,30 +634,82 @@ class JsonDatabase {
         
         const orderId = Date.now();
         
-        // 創建訂單主檔
-        const newOrder = {
-            id: orderId,
-            employee_id: employeeId,
-            store_id: storeId,
-            order_date: new Date().toISOString().split('T')[0],
-            status: 'pending',
-            total_amount: 0,
-            notes: notes,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-        };
-        
+        // 1. 按供應商分組檢查配送額度
+        const supplierGroups = {};
         let totalAmount = 0;
         
-        // 創建訂單明細並檢查庫存
+        // 先計算總金額並按供應商分組
         for (const item of orderItems) {
             const product = await this.getProductById(item.product_id);
             if (!product) {
                 throw new Error(`商品ID ${item.product_id} 不存在`);
             }
             
+            // 檢查庫存
+            if (product.current_stock < item.quantity) {
+                throw new Error(`商品 ${product.name} 庫存不足，目前庫存：${product.current_stock}，需要：${item.quantity}`);
+            }
+            
             const itemTotal = item.quantity * product.unit_price;
             totalAmount += itemTotal;
+            
+            // 按供應商分組
+            if (!supplierGroups[product.supplier]) {
+                supplierGroups[product.supplier] = {
+                    total: 0,
+                    items: [],
+                    delivery_threshold: product.delivery_threshold
+                };
+            }
+            
+            supplierGroups[product.supplier].total += itemTotal;
+            supplierGroups[product.supplier].items.push({
+                ...item,
+                product_name: product.name,
+                unit_price: product.unit_price,
+                total_price: itemTotal
+            });
+        }
+        
+        // 2. 檢查各供應商配送額度
+        const deliveryFailures = [];
+        for (const [supplier, group] of Object.entries(supplierGroups)) {
+            if (group.total < group.delivery_threshold) {
+                const shortfall = group.delivery_threshold - group.total;
+                deliveryFailures.push({
+                    supplier,
+                    current: group.total,
+                    required: group.delivery_threshold,
+                    shortfall
+                });
+            }
+        }
+        
+        if (deliveryFailures.length > 0) {
+            const failureMessage = deliveryFailures.map(f => 
+                `${f.supplier}: 需要 $${f.required}，目前 $${f.current}，差額 $${f.shortfall}`
+            ).join('\n');
+            throw new Error(`配送額度不足：\n${failureMessage}`);
+        }
+        
+        // 3. 創建訂單主檔
+        const newOrder = {
+            id: orderId,
+            employee_id: employeeId,
+            store_id: storeId,
+            order_date: new Date().toISOString().split('T')[0],
+            status: 'pending',
+            total_amount: totalAmount,
+            notes: notes,
+            supplier_breakdown: supplierGroups,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+        
+        // 4. 創建訂單明細並扣減庫存
+        for (const item of orderItems) {
+            const product = await this.getProductById(item.product_id);
+            const itemTotal = item.quantity * product.unit_price;
             
             // 新增訂單明細
             orderItemsTable.push({
@@ -551,6 +717,7 @@ class JsonDatabase {
                 order_id: orderId,
                 product_id: item.product_id,
                 product_name: product.name,
+                supplier: product.supplier,
                 quantity: item.quantity,
                 unit_price: product.unit_price,
                 total_price: itemTotal,
@@ -559,10 +726,6 @@ class JsonDatabase {
             
             // 自動扣減庫存
             const newStock = product.current_stock - item.quantity;
-            if (newStock < 0) {
-                throw new Error(`商品 ${product.name} 庫存不足，目前庫存：${product.current_stock}，需要：${item.quantity}`);
-            }
-            
             await this.updateProductStock(
                 item.product_id, 
                 newStock, 
@@ -572,17 +735,21 @@ class JsonDatabase {
             );
         }
         
-        newOrder.total_amount = totalAmount;
         orders.push(newOrder);
         
         await this.writeTable('orders', orders);
         await this.writeTable('order_items', orderItemsTable);
         
+        // 5. 檢查異常訂購並生成警告
+        const anomalies = await this.detectOrderingAnomalies(employeeId, 30);
+        
         return { 
             orderId, 
             totalAmount,
+            supplierBreakdown: supplierGroups,
             message: '叫貨訂單創建成功',
-            lowStockWarnings: await this.checkLowStockProducts()
+            lowStockWarnings: await this.checkLowStockProducts(),
+            orderingAnomalies: anomalies
         };
     }
 
@@ -689,6 +856,266 @@ class JsonDatabase {
         }
         
         return anomalies;
+    }
+
+    // ==================== 升遷投票系統操作 ====================
+    
+    async getAllPositions() {
+        return await this.readTable('positions');
+    }
+
+    async getPositionById(positionId) {
+        const positions = await this.readTable('positions');
+        return positions.find(p => p.id === parseInt(positionId));
+    }
+
+    async getActivePromotions() {
+        const promotions = await this.readTable('promotions');
+        const now = new Date();
+        return promotions.filter(p => 
+            p.status === 'active' && 
+            new Date(p.voting_end_date) > now
+        );
+    }
+
+    async canEmployeeStartPromotion(employeeId) {
+        const employee = await this.getEmployeeById(employeeId);
+        if (!employee || !employee.position_id) {
+            return { canStart: false, reason: '員工資料不完整' };
+        }
+
+        const currentPosition = await this.getPositionById(employee.position_id);
+        if (!currentPosition) {
+            return { canStart: false, reason: '找不到目前職位資料' };
+        }
+
+        // 檢查是否有下一個階級
+        const positions = await this.getAllPositions();
+        const nextPosition = positions.find(p => p.level === currentPosition.level + 1 && p.is_active);
+        if (!nextPosition) {
+            return { canStart: false, reason: '已達最高職位' };
+        }
+
+        // 檢查在目前職位的天數
+        const positionStartDate = new Date(employee.position_start_date);
+        const now = new Date();
+        const daysInPosition = Math.floor((now - positionStartDate) / (1000 * 60 * 60 * 24));
+        
+        if (daysInPosition < nextPosition.required_days) {
+            const remainingDays = nextPosition.required_days - daysInPosition;
+            return { 
+                canStart: false, 
+                reason: `需在${currentPosition.name}職位任職${nextPosition.required_days}天，還需${remainingDays}天` 
+            };
+        }
+
+        // 檢查是否在緩衝期內
+        const promotions = await this.readTable('promotions');
+        const lastFailedPromotion = promotions
+            .filter(p => p.employee_id === employeeId && p.status === 'failed')
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+
+        if (lastFailedPromotion) {
+            const failedDate = new Date(lastFailedPromotion.created_at);
+            const bufferEnd = new Date(failedDate.getTime() + nextPosition.failure_buffer_days * 24 * 60 * 60 * 1000);
+            
+            if (now < bufferEnd) {
+                const remainingBufferDays = Math.ceil((bufferEnd - now) / (1000 * 60 * 60 * 24));
+                return { 
+                    canStart: false, 
+                    reason: `在緩衝期內，還需等待${remainingBufferDays}天` 
+                };
+            }
+        }
+
+        // 檢查名額是否已滿
+        const currentActivePromotions = await this.getActivePromotions();
+        const promotionsToSamePosition = currentActivePromotions.filter(p => p.target_position_id === nextPosition.id);
+        
+        if (promotionsToSamePosition.length >= nextPosition.quota) {
+            return { 
+                canStart: false, 
+                reason: `${nextPosition.name}職位名額已滿` 
+            };
+        }
+
+        return { 
+            canStart: true, 
+            currentPosition,
+            nextPosition,
+            daysInPosition 
+        };
+    }
+
+    async startPromotion(employeeId) {
+        const canStartResult = await this.canEmployeeStartPromotion(employeeId);
+        if (!canStartResult.canStart) {
+            throw new Error(canStartResult.reason);
+        }
+
+        const { currentPosition, nextPosition, daysInPosition } = canStartResult;
+        const employee = await this.getEmployeeById(employeeId);
+        
+        const promotions = await this.readTable('promotions');
+        const promotionVotes = await this.readTable('promotion_votes');
+        
+        const promotionId = Date.now();
+        const now = new Date();
+        const votingEndDate = new Date(now.getTime() + nextPosition.voting_duration_days * 24 * 60 * 60 * 1000);
+
+        // 創建升遷申請
+        const newPromotion = {
+            id: promotionId,
+            employee_id: employeeId,
+            employee_name: employee.name,
+            current_position_id: currentPosition.id,
+            current_position_name: currentPosition.name,
+            target_position_id: nextPosition.id,
+            target_position_name: nextPosition.name,
+            days_in_position: daysInPosition,
+            voting_start_date: now.toISOString(),
+            voting_end_date: votingEndDate.toISOString(),
+            required_approval_rate: nextPosition.approval_rate,
+            status: 'active',
+            created_at: now.toISOString()
+        };
+
+        promotions.push(newPromotion);
+
+        // 為所有在職員工創建投票記錄（預設反對）
+        const allEmployees = await this.getAllEmployees();
+        const activeEmployees = allEmployees.filter(emp => emp.is_active && emp.status === '在職');
+
+        for (const emp of activeEmployees) {
+            promotionVotes.push({
+                id: Date.now() + Math.random(),
+                promotion_id: promotionId,
+                voter_employee_id: emp.id,
+                voter_name: emp.name,
+                vote: 'disagree',
+                vote_date: null,
+                daily_changes_count: 0,
+                created_at: now.toISOString()
+            });
+        }
+
+        await this.writeTable('promotions', promotions);
+        await this.writeTable('promotion_votes', promotionVotes);
+
+        return {
+            promotionId,
+            message: '升遷投票已發起',
+            votingEndDate: votingEndDate.toISOString(),
+            totalVoters: activeEmployees.length
+        };
+    }
+
+    async getEmployeeById(employeeId) {
+        const employees = await this.readTable('employees');
+        return employees.find(emp => emp.id === parseInt(employeeId));
+    }
+
+    async castVote(promotionId, voterEmployeeId, vote) {
+        const promotionVotes = await this.readTable('promotion_votes');
+        const voteIndex = promotionVotes.findIndex(v => 
+            v.promotion_id === parseInt(promotionId) && 
+            v.voter_employee_id === parseInt(voterEmployeeId)
+        );
+
+        if (voteIndex === -1) {
+            throw new Error('投票記錄不存在');
+        }
+
+        const voteRecord = promotionVotes[voteIndex];
+        const today = new Date().toISOString().split('T')[0];
+        const lastVoteDate = voteRecord.vote_date ? voteRecord.vote_date.split('T')[0] : null;
+
+        // 檢查今日修改次數限制
+        if (lastVoteDate === today && voteRecord.daily_changes_count >= 3) {
+            throw new Error('今日投票修改次數已達上限');
+        }
+
+        // 更新投票
+        promotionVotes[voteIndex] = {
+            ...voteRecord,
+            vote: vote,
+            vote_date: new Date().toISOString(),
+            daily_changes_count: lastVoteDate === today ? voteRecord.daily_changes_count + 1 : 1
+        };
+
+        await this.writeTable('promotion_votes', promotionVotes);
+        return { success: true, message: '投票已更新' };
+    }
+
+    async getPromotionVotingStatus(promotionId) {
+        const promotions = await this.readTable('promotions');
+        const promotionVotes = await this.readTable('promotion_votes');
+        
+        const promotion = promotions.find(p => p.id === parseInt(promotionId));
+        if (!promotion) {
+            throw new Error('升遷申請不存在');
+        }
+
+        const votes = promotionVotes.filter(v => v.promotion_id === parseInt(promotionId));
+        const agreeVotes = votes.filter(v => v.vote === 'agree').length;
+        const totalVotes = votes.length;
+        const currentApprovalRate = totalVotes > 0 ? agreeVotes / totalVotes : 0;
+
+        return {
+            promotion,
+            votes,
+            agreeVotes,
+            totalVotes,
+            currentApprovalRate,
+            requiredRate: promotion.required_approval_rate,
+            isApproved: currentApprovalRate >= promotion.required_approval_rate,
+            votingEnded: new Date() > new Date(promotion.voting_end_date)
+        };
+    }
+
+    async completePromotion(promotionId) {
+        const status = await this.getPromotionVotingStatus(promotionId);
+        const { promotion, isApproved, votingEnded } = status;
+
+        if (!votingEnded) {
+            throw new Error('投票期間尚未結束');
+        }
+
+        const promotions = await this.readTable('promotions');
+        const promotionIndex = promotions.findIndex(p => p.id === parseInt(promotionId));
+        
+        if (promotionIndex === -1) {
+            throw new Error('升遷申請不存在');
+        }
+
+        // 更新升遷狀態
+        promotions[promotionIndex].status = isApproved ? 'approved' : 'failed';
+        promotions[promotionIndex].completed_at = new Date().toISOString();
+
+        if (isApproved) {
+            // 升遷成功，更新員工職位
+            const employees = await this.readTable('employees');
+            const employeeIndex = employees.findIndex(emp => emp.id === promotion.employee_id);
+            
+            if (employeeIndex !== -1) {
+                const nextDay = new Date();
+                nextDay.setDate(nextDay.getDate() + 1);
+                
+                employees[employeeIndex].position = promotion.target_position_name;
+                employees[employeeIndex].position_id = promotion.target_position_id;
+                employees[employeeIndex].position_start_date = nextDay.toISOString().split('T')[0];
+                
+                await this.writeTable('employees', employees);
+            }
+        }
+
+        await this.writeTable('promotions', promotions);
+
+        return {
+            success: isApproved,
+            message: isApproved ? '升遷成功！' : '升遷失敗',
+            finalApprovalRate: status.currentApprovalRate
+        };
     }
 
     // ==================== 儀表板統計 ====================
