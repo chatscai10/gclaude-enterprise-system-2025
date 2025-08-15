@@ -176,37 +176,802 @@
                 <!-- 其他內容區塊... -->
                 <div id="attendance-section" class="content-section d-none">
                     <h2><i class="fas fa-clock me-2"></i>出勤管理</h2>
-                    <p>出勤管理功能開發中...</p>
+                    
+                    <!-- 出勤統計卡片 -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-user-check fa-2x mb-2"></i>
+                                    <h4 id="present-count">38</h4>
+                                    <p>今日出勤</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-user-clock fa-2x mb-2"></i>
+                                    <h4 id="late-count">3</h4>
+                                    <p>遲到人數</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-danger text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-user-times fa-2x mb-2"></i>
+                                    <h4 id="absent-count">2</h4>
+                                    <p>缺勤人數</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-home fa-2x mb-2"></i>
+                                    <h4 id="remote-count">4</h4>
+                                    <p>居家辦公</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 出勤記錄表格 -->
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5><i class="fas fa-list me-2"></i>今日出勤記錄</h5>
+                            <button class="btn btn-primary btn-sm" onclick="exportAttendance()">
+                                <i class="fas fa-download me-1"></i>匯出記錄
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>員工姓名</th>
+                                            <th>部門</th>
+                                            <th>上班打卡</th>
+                                            <th>下班打卡</th>
+                                            <th>工作時數</th>
+                                            <th>狀態</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="attendance-table">
+                                        <tr>
+                                            <td>張三</td>
+                                            <td>營運部</td>
+                                            <td>09:00:15</td>
+                                            <td>18:05:30</td>
+                                            <td>8小時30分</td>
+                                            <td><span class="badge bg-success">正常</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>李四</td>
+                                            <td>業務部</td>
+                                            <td>09:15:45</td>
+                                            <td>-</td>
+                                            <td>進行中</td>
+                                            <td><span class="badge bg-warning">遲到</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>王五</td>
+                                            <td>技術部</td>
+                                            <td>08:55:20</td>
+                                            <td>18:10:15</td>
+                                            <td>8小時45分</td>
+                                            <td><span class="badge bg-success">正常</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="revenue-section" class="content-section d-none">
                     <h2><i class="fas fa-chart-line me-2"></i>營收分析</h2>
-                    <p>營收分析功能開發中...</p>
+                    
+                    <!-- 營收統計卡片 -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-dollar-sign fa-2x mb-2"></i>
+                                    <h4>NT$ 2,450,000</h4>
+                                    <p>本月營收</p>
+                                    <small><i class="fas fa-arrow-up"></i> +7.5% vs 上月</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-chart-trend-up fa-2x mb-2"></i>
+                                    <h4>NT$ 87,000</h4>
+                                    <p>今日營收</p>
+                                    <small><i class="fas fa-arrow-up"></i> +12% vs 昨日</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-shopping-cart fa-2x mb-2"></i>
+                                    <h4>145</h4>
+                                    <p>今日訂單</p>
+                                    <small><i class="fas fa-arrow-up"></i> +8% vs 昨日</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-percentage fa-2x mb-2"></i>
+                                    <h4>15.2%</h4>
+                                    <p>利潤率</p>
+                                    <small><i class="fas fa-arrow-up"></i> +2.1% vs 上月</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 圖表區域 -->
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-chart-line me-2"></i>過去7天營收趨勢</h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="revenueChart" height="100"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-pie-chart me-2"></i>營收來源分析</h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="categoryChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 營收明細表格 -->
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5><i class="fas fa-list me-2"></i>今日營收明細</h5>
+                            <div>
+                                <button class="btn btn-success btn-sm me-2" onclick="addRevenue()">
+                                    <i class="fas fa-plus me-1"></i>新增營收
+                                </button>
+                                <button class="btn btn-primary btn-sm" onclick="exportRevenue()">
+                                    <i class="fas fa-download me-1"></i>匯出報表
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>時間</th>
+                                            <th>類別</th>
+                                            <th>項目</th>
+                                            <th>金額</th>
+                                            <th>負責人</th>
+                                            <th>備註</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="revenue-table">
+                                        <tr>
+                                            <td>14:30</td>
+                                            <td><span class="badge bg-primary">產品銷售</span></td>
+                                            <td>A級產品套組</td>
+                                            <td class="text-success fw-bold">NT$ 15,000</td>
+                                            <td>張三</td>
+                                            <td>新客戶訂單</td>
+                                        </tr>
+                                        <tr>
+                                            <td>13:15</td>
+                                            <td><span class="badge bg-info">服務收入</span></td>
+                                            <td>技術諮詢</td>
+                                            <td class="text-success fw-bold">NT$ 8,000</td>
+                                            <td>李四</td>
+                                            <td>3小時諮詢</td>
+                                        </tr>
+                                        <tr>
+                                            <td>11:45</td>
+                                            <td><span class="badge bg-success">維護費用</span></td>
+                                            <td>系統維護</td>
+                                            <td class="text-success fw-bold">NT$ 5,500</td>
+                                            <td>王五</td>
+                                            <td>月度維護</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="inventory-section" class="content-section d-none">
                     <h2><i class="fas fa-boxes me-2"></i>庫存管理</h2>
-                    <p>庫存管理功能開發中...</p>
+                    
+                    <!-- 庫存統計卡片 -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-box fa-2x mb-2"></i>
+                                    <h4>1,245</h4>
+                                    <p>總庫存量</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                                    <h4>892</h4>
+                                    <p>正常庫存</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                                    <h4>23</h4>
+                                    <p>庫存不足</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-danger text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-times-circle fa-2x mb-2"></i>
+                                    <h4>8</h4>
+                                    <p>缺貨項目</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 庫存列表 -->
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5><i class="fas fa-list me-2"></i>庫存清單</h5>
+                            <div>
+                                <button class="btn btn-success btn-sm me-2" onclick="addInventory()">
+                                    <i class="fas fa-plus me-1"></i>新增商品
+                                </button>
+                                <button class="btn btn-primary btn-sm" onclick="exportInventory()">
+                                    <i class="fas fa-download me-1"></i>匯出清單
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>商品編號</th>
+                                            <th>商品名稱</th>
+                                            <th>類別</th>
+                                            <th>目前庫存</th>
+                                            <th>安全庫存</th>
+                                            <th>單價</th>
+                                            <th>狀態</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>P001</td>
+                                            <td>A級產品套組</td>
+                                            <td>主力產品</td>
+                                            <td>156</td>
+                                            <td>50</td>
+                                            <td>NT$ 15,000</td>
+                                            <td><span class="badge bg-success">正常</span></td>
+                                            <td><button class="btn btn-sm btn-outline-primary">編輯</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>P002</td>
+                                            <td>B級服務包</td>
+                                            <td>服務</td>
+                                            <td>12</td>
+                                            <td>20</td>
+                                            <td>NT$ 8,000</td>
+                                            <td><span class="badge bg-warning">不足</span></td>
+                                            <td><button class="btn btn-sm btn-outline-primary">編輯</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>P003</td>
+                                            <td>維護工具</td>
+                                            <td>工具</td>
+                                            <td>0</td>
+                                            <td>10</td>
+                                            <td>NT$ 2,500</td>
+                                            <td><span class="badge bg-danger">缺貨</span></td>
+                                            <td><button class="btn btn-sm btn-outline-primary">編輯</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="maintenance-section" class="content-section d-none">
-                    <h2><i class="fas fa-tools me-2"></i>維修申請</h2>
-                    <p>維修申請功能開發中...</p>
+                    <h2><i class="fas fa-tools me-2"></i>維修申請管理</h2>
+                    
+                    <!-- 維修統計卡片 -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-clock fa-2x mb-2"></i>
+                                    <h4>5</h4>
+                                    <p>待處理</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-wrench fa-2x mb-2"></i>
+                                    <h4>3</h4>
+                                    <p>處理中</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-check fa-2x mb-2"></i>
+                                    <h4>12</h4>
+                                    <p>已完成</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-tools fa-2x mb-2"></i>
+                                    <h4>20</h4>
+                                    <p>本月總計</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 維修申請列表 -->
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5><i class="fas fa-list me-2"></i>維修申請列表</h5>
+                            <button class="btn btn-primary btn-sm" onclick="exportMaintenance()">
+                                <i class="fas fa-download me-1"></i>匯出報表
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>申請編號</th>
+                                            <th>申請人</th>
+                                            <th>項目</th>
+                                            <th>優先級</th>
+                                            <th>狀態</th>
+                                            <th>申請時間</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>M001</td>
+                                            <td>李四</td>
+                                            <td>辦公室空調維修</td>
+                                            <td><span class="badge bg-danger">高</span></td>
+                                            <td><span class="badge bg-warning">待處理</span></td>
+                                            <td>2025-08-15 09:15</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-success me-1" onclick="acceptMaintenance(1)">接受</button>
+                                                <button class="btn btn-sm btn-outline-primary">查看</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>M002</td>
+                                            <td>王五</td>
+                                            <td>影印機卡紙</td>
+                                            <td><span class="badge bg-warning">中</span></td>
+                                            <td><span class="badge bg-info">處理中</span></td>
+                                            <td>2025-08-14 14:30</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary me-1" onclick="completeMaintenance(2)">完成</button>
+                                                <button class="btn btn-sm btn-outline-primary">查看</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="promotions-section" class="content-section d-none">
-                    <h2><i class="fas fa-vote-yea me-2"></i>升遷投票</h2>
-                    <p>升遷投票功能開發中...</p>
+                    <h2><i class="fas fa-vote-yea me-2"></i>升遷投票系統</h2>
+                    
+                    <!-- 投票統計卡片 -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-vote-yea fa-2x mb-2"></i>
+                                    <h4>3</h4>
+                                    <p>進行中投票</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-users fa-2x mb-2"></i>
+                                    <h4>8</h4>
+                                    <p>候選人</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-crown fa-2x mb-2"></i>
+                                    <h4>2</h4>
+                                    <p>本月升遷</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-percentage fa-2x mb-2"></i>
+                                    <h4>75%</h4>
+                                    <p>投票參與率</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 投票列表 -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5><i class="fas fa-ballot me-2"></i>目前投票</h5>
+                            <button class="btn btn-success btn-sm" onclick="createPromotion()">
+                                <i class="fas fa-plus me-1"></i>新增投票
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border-primary">
+                                        <div class="card-header bg-primary text-white">
+                                            <h6>技術部主管投票</h6>
+                                            <small>截止時間: 2025-08-20</small>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-2">
+                                                <strong>候選人:</strong> 王五 vs 陳六
+                                            </div>
+                                            <div class="progress mb-2">
+                                                <div class="progress-bar bg-success" style="width: 60%">王五 (60%)</div>
+                                                <div class="progress-bar bg-info" style="width: 40%">陳六 (40%)</div>
+                                            </div>
+                                            <small>已投票: 15/20 人</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border-info">
+                                        <div class="card-header bg-info text-white">
+                                            <h6>業務部副理投票</h6>
+                                            <small>截止時間: 2025-08-18</small>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-2">
+                                                <strong>候選人:</strong> 劉七
+                                            </div>
+                                            <div class="progress mb-2">
+                                                <div class="progress-bar bg-success" style="width: 85%">劉七 (85%)</div>
+                                            </div>
+                                            <small>已投票: 12/12 人</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 投票歷史 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-history me-2"></i>投票歷史</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>投票項目</th>
+                                            <th>獲選人</th>
+                                            <th>新職位</th>
+                                            <th>投票結果</th>
+                                            <th>完成時間</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>行政部組長投票</td>
+                                            <td>張三</td>
+                                            <td>行政部組長</td>
+                                            <td>16/18 (89%)</td>
+                                            <td>2025-08-10</td>
+                                        </tr>
+                                        <tr>
+                                            <td>財務部助理投票</td>
+                                            <td>黃八</td>
+                                            <td>財務部助理</td>
+                                            <td>8/10 (80%)</td>
+                                            <td>2025-08-05</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="reports-section" class="content-section d-none">
                     <h2><i class="fas fa-chart-bar me-2"></i>報表系統</h2>
-                    <p>報表系統功能開發中...</p>
+                    
+                    <!-- 報表類型卡片 -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-primary text-white h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-users fa-2x mb-2"></i>
+                                    <h5>員工報表</h5>
+                                    <button class="btn btn-light btn-sm" onclick="generateEmployeeReport()">產生報表</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-success text-white h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-dollar-sign fa-2x mb-2"></i>
+                                    <h5>營收報表</h5>
+                                    <button class="btn btn-light btn-sm" onclick="generateRevenueReport()">產生報表</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-info text-white h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-clock fa-2x mb-2"></i>
+                                    <h5>出勤報表</h5>
+                                    <button class="btn btn-light btn-sm" onclick="generateAttendanceReport()">產生報表</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-warning text-white h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-cogs fa-2x mb-2"></i>
+                                    <h5>系統報表</h5>
+                                    <button class="btn btn-light btn-sm" onclick="generateSystemReport()">產生報表</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 報表歷史 -->
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5><i class="fas fa-history me-2"></i>報表歷史</h5>
+                            <button class="btn btn-danger btn-sm" onclick="clearReportHistory()">
+                                <i class="fas fa-trash me-1"></i>清空歷史
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>報表名稱</th>
+                                            <th>類型</th>
+                                            <th>產生時間</th>
+                                            <th>檔案大小</th>
+                                            <th>狀態</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>2025-08月員工出勤報表</td>
+                                            <td><span class="badge bg-info">出勤</span></td>
+                                            <td>2025-08-15 10:30</td>
+                                            <td>2.3 MB</td>
+                                            <td><span class="badge bg-success">完成</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary me-1">
+                                                    <i class="fas fa-download"></i>下載
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>刪除
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2025-08-14日營收報表</td>
+                                            <td><span class="badge bg-success">營收</span></td>
+                                            <td>2025-08-14 18:45</td>
+                                            <td>1.8 MB</td>
+                                            <td><span class="badge bg-success">完成</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary me-1">
+                                                    <i class="fas fa-download"></i>下載
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>刪除
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>系統效能報表</td>
+                                            <td><span class="badge bg-warning">系統</span></td>
+                                            <td>2025-08-13 16:20</td>
+                                            <td>892 KB</td>
+                                            <td><span class="badge bg-warning">處理中</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-secondary" disabled>
+                                                    <i class="fas fa-clock"></i>處理中
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="settings-section" class="content-section d-none">
                     <h2><i class="fas fa-cog me-2"></i>系統設定</h2>
-                    <p>系統設定功能開發中...</p>
+                    
+                    <!-- 設定分類 -->
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-user-cog me-2"></i>使用者設定</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="mb-3">
+                                            <label class="form-label">系統名稱</label>
+                                            <input type="text" class="form-control" value="GClaude 企業管理系統">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">管理員信箱</label>
+                                            <input type="email" class="form-control" value="admin@gclaude.com">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">時區設定</label>
+                                            <select class="form-select">
+                                                <option selected>Asia/Taipei (台北)</option>
+                                                <option>Asia/Shanghai (上海)</option>
+                                                <option>Asia/Hong_Kong (香港)</option>
+                                            </select>
+                                        </div>
+                                        <button type="button" class="btn btn-primary" onclick="saveUserSettings()">儲存設定</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-shield-alt me-2"></i>安全設定</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="twoFactor" checked>
+                                                <label class="form-check-label" for="twoFactor">啟用雙重認證</label>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="autoLogout" checked>
+                                                <label class="form-check-label" for="autoLogout">自動登出 (關轉 30 分鐘)</label>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="loginNotification" checked>
+                                                <label class="form-check-label" for="loginNotification">登入通知</label>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-primary" onclick="saveSecuritySettings()">儲存設定</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-bell me-2"></i>Telegram 通知設定</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="mb-3">
+                                            <label class="form-label">Bot Token</label>
+                                            <input type="password" class="form-control" placeholder="輸入 Telegram Bot Token">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">群組 ID</label>
+                                            <input type="text" class="form-control" placeholder="輸入群組 ID">
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="telegramNotify" checked>
+                                                <label class="form-check-label" for="telegramNotify">啟用 Telegram 通知</label>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-success me-2" onclick="testTelegram()">測試通知</button>
+                                        <button type="button" class="btn btn-primary" onclick="saveTelegramSettings()">儲存設定</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-database me-2"></i>系統維護</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">數據庫狀態</label>
+                                        <div class="alert alert-success" role="alert">
+                                            <i class="fas fa-check-circle me-2"></i>正常運行
+                                        </div>
+                                    </div>
+                                    <div class="d-grid gap-2">
+                                        <button type="button" class="btn btn-warning" onclick="backupDatabase()">
+                                            <i class="fas fa-download me-2"></i>備份數據庫
+                                        </button>
+                                        <button type="button" class="btn btn-info" onclick="optimizeDatabase()">
+                                            <i class="fas fa-magic me-2"></i>最佳化數據庫
+                                        </button>
+                                        <button type="button" class="btn btn-danger" onclick="resetSystem()">
+                                            <i class="fas fa-trash me-2"></i>重置系統
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -247,6 +1012,13 @@
             
             // 設定側邊欄活動狀態
             document.querySelector(`[onclick="showSection('${sectionName}')"]`).classList.add('active');
+            
+            // 特殊處理：營收分析頁面需要初始化圖表
+            if (sectionName === 'revenue') {
+                setTimeout(() => {
+                    initializeCharts();
+                }, 100);
+            }
             
             // 載入對應數據
             if (sectionName === 'dashboard') loadDashboard();
@@ -319,6 +1091,162 @@
             localStorage.removeItem('user_data');
             window.location.href = '/login.html';
         }
+
+        // ==================== 新功能函數 ====================
+        
+        // 出勤管理功能
+        function exportAttendance() {
+            alert('匯出出勤記錄功能開發中...');
+        }
+
+        // 營收分析功能
+        function addRevenue() {
+            alert('新增營收功能開發中...');
+        }
+
+        function exportRevenue() {
+            alert('匯出營收報表功能開發中...');
+        }
+
+        // 庫存管理功能
+        function addInventory() {
+            alert('新增商品功能開發中...');
+        }
+
+        function exportInventory() {
+            alert('匯出庫存清單功能開發中...');
+        }
+
+        // 維修申請管理
+        function acceptMaintenance(id) {
+            alert(`接受維修申請 ID: ${id} 功能開發中...`);
+        }
+
+        function completeMaintenance(id) {
+            alert(`完成維修申請 ID: ${id} 功能開發中...`);
+        }
+
+        function exportMaintenance() {
+            alert('匯出維修報表功能開發中...');
+        }
+
+        // 升遷投票功能
+        function createPromotion() {
+            alert('創建升遷投票功能開發中...');
+        }
+
+        // 報表系統功能
+        function generateEmployeeReport() {
+            alert('產生員工報表功能開發中...');
+        }
+
+        function generateRevenueReport() {
+            alert('產生營收報表功能開發中...');
+        }
+
+        function generateAttendanceReport() {
+            alert('產生出勤報表功能開發中...');
+        }
+
+        function generateSystemReport() {
+            alert('產生系統報表功能開發中...');
+        }
+
+        function clearReportHistory() {
+            if (confirm('確定要清空所有報表歷史嗎？')) {
+                alert('清空報表歷史功能開發中...');
+            }
+        }
+
+        // 系統設定功能
+        function saveUserSettings() {
+            alert('儲存使用者設定功能開發中...');
+        }
+
+        function saveSecuritySettings() {
+            alert('儲存安全設定功能開發中...');
+        }
+
+        function saveTelegramSettings() {
+            alert('儲存Telegram設定功能開發中...');
+        }
+
+        function testTelegram() {
+            alert('測試Telegram通知功能開發中...');
+        }
+
+        function backupDatabase() {
+            alert('備份數據庫功能開發中...');
+        }
+
+        function optimizeDatabase() {
+            alert('最佳化數據庫功能開發中...');
+        }
+
+        function resetSystem() {
+            if (confirm('警告：這將重置整個系統！確定要繼續嗎？')) {
+                alert('重置系統功能開發中...');
+            }
+        }
+
+        // 圖表初始化 (營收分析頁面)
+        function initializeCharts() {
+            // 營收趨勢圖表
+            const revenueCtx = document.getElementById('revenueChart');
+            if (revenueCtx) {
+                new Chart(revenueCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['08/09', '08/10', '08/11', '08/12', '08/13', '08/14', '08/15'],
+                        datasets: [{
+                            label: '營收 (NT$)',
+                            data: [75000, 82000, 91000, 88000, 95000, 87000, 89000],
+                            borderColor: 'rgb(75, 192, 192)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 營收來源圓餅圖
+            const categoryCtx = document.getElementById('categoryChart');
+            if (categoryCtx) {
+                new Chart(categoryCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['產品銷售', '服務收入', '其他'],
+                        datasets: [{
+                            data: [75.5, 16.3, 8.2],
+                            backgroundColor: [
+                                '#007bff',
+                                '#28a745',
+                                '#ffc107'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // ==================== 原有函數 ====================
 
         // 新增員工
         function addEmployee() {
