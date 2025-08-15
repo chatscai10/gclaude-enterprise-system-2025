@@ -181,6 +181,32 @@ class JsonDatabase {
         return users.find(user => user.username === username);
     }
 
+    // 根據系統邏輯要求：姓名當帳號，身分證當密碼
+    async getUserByNameAndIdCard(name, idCard) {
+        const employees = await this.readTable('employees');
+        const employee = employees.find(emp => emp.name === name && emp.id_card === idCard && emp.is_active);
+        
+        if (!employee) return null;
+        
+        // 轉換為用戶格式
+        return {
+            id: employee.id,
+            username: employee.name,
+            password: employee.id_card,
+            role: employee.position === '系統管理員' ? 'admin' : 'employee',
+            employee_id: employee.id,
+            store_id: employee.store_id,
+            employee_name: employee.name,
+            store_name: await this.getStoreName(employee.store_id)
+        };
+    }
+    
+    async getStoreName(storeId) {
+        const stores = await this.readTable('stores');
+        const store = stores.find(s => s.id === storeId);
+        return store ? store.name : '未知分店';
+    }
+
     // ==================== 員工相關操作 ====================
     
     async getAllEmployees() {

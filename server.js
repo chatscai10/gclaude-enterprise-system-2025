@@ -141,22 +141,18 @@ app.post('/api/auth/login', async (req, res) => {
     const { username, password } = req.body;
     
     try {
-        const user = await db.getUserByUsername(username);
+        // 首先嘗試系統邏輯要求：姓名當帳號，身分證當密碼
+        let user = await db.getUserByNameAndIdCard(username, password);
         
+        // 如果姓名+身分證登入失敗，回退到舊的username系統（向後相容）
         if (!user) {
-            return res.status(401).json({
-                success: false,
-                message: '帳號或密碼錯誤'
-            });
-        }
-
-        const isValidPassword = password === user.password;
-        
-        if (!isValidPassword) {
-            return res.status(401).json({
-                success: false,
-                message: '帳號或密碼錯誤'
-            });
+            user = await db.getUserByUsername(username);
+            if (!user || password !== user.password) {
+                return res.status(401).json({
+                    success: false,
+                    message: '帳號或密碼錯誤'
+                });
+            }
         }
 
         const token = jwt.sign(
