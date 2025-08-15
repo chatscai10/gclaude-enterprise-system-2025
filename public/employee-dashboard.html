@@ -26,8 +26,8 @@
                     <a href="#dashboard" class="list-group-item list-group-item-action active" onclick="showSection('dashboard')">
                         <i class="fas fa-home me-2"></i>我的首頁
                     </a>
-                    <a href="#attendance" class="list-group-item list-group-item-action" onclick="showSection('attendance')">
-                        <i class="fas fa-clock me-2"></i>打卡簽到
+                    <a href="/punch-clock.html" class="list-group-item list-group-item-action">
+                        <i class="fas fa-map-marker-alt me-2"></i>GPS打卡
                     </a>
                     <a href="#schedule" class="list-group-item list-group-item-action" onclick="showSection('schedule')">
                         <i class="fas fa-calendar me-2"></i>我的班表
@@ -61,18 +61,18 @@
                         <div class="col-md-6 col-lg-3 mb-3">
                             <div class="card bg-success text-white h-100">
                                 <div class="card-body text-center">
-                                    <i class="fas fa-sign-in-alt fa-2x mb-2"></i>
-                                    <h5>上班打卡</h5>
-                                    <button class="btn btn-light btn-sm" onclick="clockIn()">立即打卡</button>
+                                    <i class="fas fa-map-marker-alt fa-2x mb-2"></i>
+                                    <h5>GPS打卡</h5>
+                                    <a href="/punch-clock.html" class="btn btn-light btn-sm">前往打卡</a>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6 col-lg-3 mb-3">
-                            <div class="card bg-danger text-white h-100">
+                            <div class="card bg-info text-white h-100">
                                 <div class="card-body text-center">
-                                    <i class="fas fa-sign-out-alt fa-2x mb-2"></i>
-                                    <h5>下班打卡</h5>
-                                    <button class="btn btn-light btn-sm" onclick="clockOut()">立即打卡</button>
+                                    <i class="fas fa-clock fa-2x mb-2"></i>
+                                    <h5>出勤記錄</h5>
+                                    <button class="btn btn-light btn-sm" onclick="showSection('attendance')">查看記錄</button>
                                 </div>
                             </div>
                         </div>

@@ -426,6 +426,65 @@ ${promotionData.is_approved ?
         return await this.sendToEmployees(message);
     }
 
+    // ==================== 出勤打卡通知 ====================
+    async notifyAttendance(attendanceData, deviceAnomalies = []) {
+        const clockType = attendanceData.clock_type === 'in' ? '上班' : '下班';
+        const clockEmoji = attendanceData.clock_type === 'in' ? '🔄' : '✅';
+        const time = new Date(attendanceData.timestamp).toLocaleString('zh-TW');
+        
+        // 老闆群組訊息（詳細資訊）
+        let bossMessage = `
+${clockEmoji} <b>${clockType}打卡通知</b>
+
+👤 <b>員工:</b> ${attendanceData.employee_name}
+🏪 <b>分店:</b> ${attendanceData.store_name}
+🕐 <b>時間:</b> ${time}
+📍 <b>位置:</b> ${attendanceData.location}
+🎯 <b>精度:</b> ±${attendanceData.gps_accuracy}公尺
+📱 <b>設備:</b> ${attendanceData.device_info}
+        `.trim();
+
+        // 如果是下班打卡，加入工作時數
+        if (attendanceData.clock_type === 'out' && attendanceData.work_hours) {
+            bossMessage += `\n⏰ <b>工作時數:</b> ${attendanceData.work_hours}小時`;
+        }
+
+        // 員工群組訊息（簡化資訊）
+        let employeeMessage = `
+${clockEmoji} <b>${clockType}打卡通知</b>
+
+👤 <b>員工:</b> ${attendanceData.employee_name}
+🏪 <b>分店:</b> ${attendanceData.store_name}
+🕐 <b>時間:</b> ${time}
+        `.trim();
+
+        if (attendanceData.clock_type === 'out' && attendanceData.work_hours) {
+            employeeMessage += `\n⏰ <b>工作時數:</b> ${attendanceData.work_hours}小時`;
+        }
+
+        // 設備異常警告
+        if (deviceAnomalies && deviceAnomalies.length > 0) {
+            const alertEmojis = { 'warning': '⚠️', 'alert': '🚨' };
+            
+            bossMessage += '\n\n🔒 <b>安全提醒:</b>';
+            deviceAnomalies.forEach(anomaly => {
+                const emoji = alertEmojis[anomaly.severity] || '⚠️';
+                bossMessage += `\n${emoji} ${anomaly.message}: ${anomaly.details}`;
+            });
+            
+            // 只有嚴重異常才通知員工群組
+            const severeAnomalies = deviceAnomalies.filter(a => a.severity === 'alert');
+            if (severeAnomalies.length > 0) {
+                employeeMessage += '\n\n🔒 <b>安全提醒:</b>';
+                severeAnomalies.forEach(anomaly => {
+                    employeeMessage += `\n🚨 ${anomaly.message}`;
+                });
+            }
+        }
+
+        return await this.sendToBoth(bossMessage, employeeMessage);
+    }
+
     // ==================== 測試通知 ====================
     async testNotification() {
         const testMessage = `

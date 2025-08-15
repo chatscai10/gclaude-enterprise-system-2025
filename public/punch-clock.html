@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPS打卡系統 - GClaude 企業管理系統</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #2196F3 0%, #00BCD4 100%);
+            --primary-color: #2196F3;
+            --secondary-color: #00BCD4;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .punch-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .punch-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 1.5rem;
+        }
+
+        .header-card {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .header-card h1 {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .current-time {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #333;
+            margin: 1rem 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .current-date {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .location-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .location-status {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .location-icon {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+        }
+
+        .distance-info {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .punch-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .punch-btn {
+            border: none;
+            border-radius: 15px;
+            padding: 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .punch-btn:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.6s ease;
+        }
+
+        .punch-btn:active:before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .punch-btn-in {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        }
+
+        .punch-btn-in:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(40, 167, 69, 0.4);
+        }
+
+        .punch-btn-out {
+            background: linear-gradient(135deg, #fd7e14 0%, #e63946 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(253, 126, 20, 0.3);
+        }
+
+        .punch-btn-out:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(253, 126, 20, 0.4);
+        }
+
+        .punch-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .status-card {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-working {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .status-off {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+        }
+
+        .history-card {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s ease;
+        }
+
+        .history-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-time {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .history-type {
+            font-size: 0.85rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 15px;
+            font-weight: 500;
+        }
+
+        .type-in {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .type-out {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .error-alert {
+            display: none;
+            margin-bottom: 1rem;
+        }
+
+        .device-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .accuracy-indicator {
+            display: flex;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .accuracy-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .accuracy-high { background-color: #28a745; }
+        .accuracy-medium { background-color: #ffc107; }
+        .accuracy-low { background-color: #dc3545; }
+
+        @media (max-width: 576px) {
+            .punch-container {
+                padding: 0.5rem;
+            }
+            
+            .punch-card {
+                padding: 1.5rem;
+            }
+            
+            .current-time {
+                font-size: 2rem;
+            }
+            
+            .punch-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 動畫效果 */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .punch-active {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* 距離警告樣式 */
+        .distance-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .distance-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="punch-container">
+        <!-- 錯誤提示 -->
+        <div class="alert alert-danger error-alert" id="error-alert" role="alert">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span id="error-message">發生錯誤</span>
+        </div>
+
+        <!-- 標題卡片 -->
+        <div class="punch-card header-card fade-in">
+            <h1><i class="bi bi-geo-alt-fill"></i> GPS打卡系統</h1>
+            <div class="current-time" id="current-time">--:--:--</div>
+            <div class="current-date" id="current-date">載入中...</div>
+        </div>
+
+        <!-- GPS定位卡片 -->
+        <div class="location-card fade-in">
+            <div class="location-status">
+                <i class="bi bi-geo-alt location-icon" id="location-icon"></i>
+                <div style="flex: 1;">
+                    <div id="location-status">正在啟動GPS定位...</div>
+                    <div id="location-address" style="font-size: 0.9rem; opacity: 0.9;"></div>
+                </div>
+                <div class="text-end">
+                    <button class="btn btn-light btn-sm" onclick="refreshLocation()">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="distance-info" id="distance-info" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>與工作地點距離:</span>
+                    <span id="distance-text" style="font-weight: 600;">計算中...</span>
+                </div>
+                <div class="accuracy-indicator">
+                    <div class="accuracy-dot" id="accuracy-dot"></div>
+                    <span id="accuracy-text">定位精度: 計算中</span>
+                </div>
+            </div>
+
+            <!-- 距離警告 -->
+            <div id="distance-warning" style="display: none;"></div>
+        </div>
+
+        <!-- 打卡按鈕 -->
+        <div class="punch-card fade-in">
+            <div class="punch-buttons">
+                <button class="punch-btn punch-btn-in" id="punch-in-btn" onclick="punchIn()" disabled>
+                    <i class="bi bi-box-arrow-in-right"></i><br>
+                    上班打卡
+                </button>
+                <button class="punch-btn punch-btn-out" id="punch-out-btn" onclick="punchOut()" disabled>
+                    <i class="bi bi-box-arrow-left"></i><br>
+                    下班打卡
+                </button>
+            </div>
+            
+            <div class="loading-spinner" id="loading-spinner">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">處理中...</span>
+                </div>
+                <div class="mt-2">處理中，請稍候...</div>
+            </div>
+        </div>
+
+        <!-- 今日狀態 -->
+        <div class="punch-card status-card fade-in">
+            <h5><i class="bi bi-calendar-check"></i> 今日狀態</h5>
+            <div class="status-badge" id="work-status">未打卡</div>
+            <div id="work-hours"></div>
+            <div id="today-summary"></div>
+        </div>
+
+        <!-- 打卡歷史 -->
+        <div class="punch-card fade-in">
+            <h5 class="mb-3"><i class="bi bi-clock-history"></i> 最近記錄</h5>
+            <div class="history-card" id="attendance-history">
+                <div class="text-center py-3 text-muted">
+                    載入歷史記錄中...
+                </div>
+            </div>
+        </div>
+
+        <!-- 設備資訊 -->
+        <div class="punch-card device-info fade-in">
+            <h6><i class="bi bi-phone"></i> 設備與安全資訊</h6>
+            <div id="device-fingerprint">正在生成設備指紋...</div>
+            <div class="mt-2">
+                <small class="text-muted">
+                    🔒 為確保打卡安全性，系統會記錄設備資訊進行異常檢測
+                </small>
+            </div>
+        </div>
+
+        <!-- 返回按鈕 -->
+        <div class="text-center mt-3">
+            <a href="employee-dashboard.html" class="btn btn-outline-light">
+                <i class="bi bi-arrow-left"></i> 返回主頁
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ==================== 全域變數配置 ====================
+        let currentPosition = null;
+        let deviceFingerprint = null;
+        let watchId = null;
+        let todayAttendance = null;
+        let userStoreInfo = null;
+
+        // 公司位置設定 (實際應從後端API獲取)
+        const COMPANY_LOCATIONS = {
+            1: { 
+                lat: 24.9649, 
+                lng: 121.2177, 
+                name: "內壢忠孝店", 
+                radius: 100,
+                address: "桃園市中壢區忠孝路123號"
+            },
+            2: { 
+                lat: 24.9936, 
+                lng: 121.2958, 
+                name: "桃園龍安店", 
+                radius: 100,
+                address: "桃園市桃園區龍安街456號"
+            },
+            3: { 
+                lat: 24.9563, 
+                lng: 121.2162, 
+                name: "中壢龍崗店", 
+                radius: 100,
+                address: "桃園市中壢區龍崗路789號"
+            }
+        };
+
+        // ==================== 初始化系統 ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePunchSystem();
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+        });
+
+        // 初始化打卡系統
+        async function initializePunchSystem() {
+            try {
+                showLoadingStep('正在初始化系統...');
+                
+                // 1. 檢查登入狀態
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    throw new Error('請先登入');
+                }
+
+                // 2. 生成設備指紋
+                generateDeviceFingerprint();
+                
+                // 3. 獲取用戶分店資訊
+                await loadUserStoreInfo();
+                
+                // 4. 獲取今日出勤狀態
+                await loadTodayAttendance();
+                
+                // 5. 開始GPS定位
+                await startLocationTracking();
+                
+                // 6. 載入出勤歷史
+                await loadAttendanceHistory();
+                
+                showSuccess('系統初始化完成');
+                
+            } catch (error) {
+                console.error('初始化失敗:', error);
+                showError('系統初始化失敗: ' + error.message);
+            }
+        }
+
+        // ==================== 時間顯示 ====================
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('zh-TW', {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const dateString = now.toLocaleDateString('zh-TW', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long'
+            });
+            
+            document.getElementById('current-time').textContent = timeString;
+            document.getElementById('current-date').textContent = dateString;
+        }
+
+        // ==================== 設備指紋生成 ====================
+        function generateDeviceFingerprint() {
+            try {
+                // 生成Canvas指紋
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                ctx.textBaseline = 'top';
+                ctx.font = '14px Arial';
+                ctx.fillStyle = '#2196F3';
+                ctx.fillText('GClaude GPS Punch System', 2, 2);
+                
+                // 收集設備資訊
+                const fingerprint = {
+                    userAgent: navigator.userAgent,
+                    language: navigator.language,
+                    languages: navigator.languages ? navigator.languages.join(',') : 'unknown',
+                    platform: navigator.platform,
+                    screenResolution: `${screen.width}x${screen.height}`,
+                    colorDepth: screen.colorDepth,
+                    pixelDepth: screen.pixelDepth,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    timezoneOffset: new Date().getTimezoneOffset(),
+                    canvas: canvas.toDataURL(),
+                    hardwareConcurrency: navigator.hardwareConcurrency || 'unknown',
+                    deviceMemory: navigator.deviceMemory || 'unknown',
+                    connection: navigator.connection ? {
+                        effectiveType: navigator.connection.effectiveType,
+                        downlink: navigator.connection.downlink,
+                        rtt: navigator.connection.rtt
+                    } : 'unknown',
+                    timestamp: Date.now()
+                };
+                
+                // 生成Base64編碼的指紋
+                deviceFingerprint = btoa(JSON.stringify(fingerprint));
+                
+                // 顯示設備資訊
+                document.getElementById('device-fingerprint').innerHTML = `
+                    <div><strong>設備ID:</strong> <code>${deviceFingerprint.substring(0, 16)}...</code></div>
+                    <div><strong>平台:</strong> ${fingerprint.platform}</div>
+                    <div><strong>解析度:</strong> ${fingerprint.screenResolution}</div>
+                    <div><strong>時區:</strong> ${fingerprint.timezone}</div>
+                `;
+                
+                console.log('設備指紋生成完成');
+                
+            } catch (error) {
+                console.error('設備指紋生成失敗:', error);
+                deviceFingerprint = 'fallback_' + Date.now();
+            }
+        }
+
+        // ==================== 用戶資訊載入 ====================
+        async function loadUserStoreInfo() {
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/auth/verify', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('無法獲取用戶資訊');
+                }
+
+                const result = await response.json();
+                userStoreInfo = result.data.user;
+                
+                console.log('用戶資訊載入完成:', userStoreInfo);
+                
+            } catch (error) {
+                console.error('載入用戶資訊失敗:', error);
+                throw error;
+            }
+        }
+
+        // ==================== GPS定位功能 ====================
+        async function startLocationTracking() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error('您的瀏覽器不支援GPS定位功能'));
+                    return;
+                }
+
+                showLoadingStep('正在啟動GPS定位...');
+
+                const options = {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 30000
+                };
+
+                // 即時定位
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        onLocationSuccess(position);
+                        resolve();
+                    },
+                    (error) => {
+                        onLocationError(error);
+                        reject(error);
+                    },
+                    options
+                );
+
+                // 持續監控位置
+                watchId = navigator.geolocation.watchPosition(
+                    onLocationSuccess,
+                    onLocationError,
+                    options
+                );
+            });
+        }
+
+        // GPS定位成功回調
+        function onLocationSuccess(position) {
+            currentPosition = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+                accuracy: position.coords.accuracy,
+                timestamp: position.timestamp
+            };
+
+            console.log('GPS定位成功:', currentPosition);
+            
+            updateLocationDisplay();
+            checkDistanceToCompany();
+            updatePunchButtons();
+        }
+
+        // GPS定位失敗回調
+        function onLocationError(error) {
+            let message = '';
+            let icon = 'bi-exclamation-triangle';
+            
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    message = '請允許位置存取權限以使用打卡功能';
+                    icon = 'bi-shield-x';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    message = '無法取得位置資訊，請檢查GPS設定';
+                    icon = 'bi-geo-alt-slash';
+                    break;
+                case error.TIMEOUT:
+                    message = '定位請求逾時，請重新整理頁面';
+                    icon = 'bi-clock-history';
+                    break;
+                default:
+                    message = '定位發生未知錯誤';
+                    icon = 'bi-exclamation-triangle';
+                    break;
+            }
+            
+            document.getElementById('location-icon').className = `bi ${icon} location-icon text-warning`;
+            document.getElementById('location-status').innerHTML = 
+                `<i class="bi bi-exclamation-triangle"></i> ${message}`;
+            
+            showError(message);
+        }
+
+        // 重新整理位置
+        function refreshLocation() {
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+            }
+            
+            showLoadingStep('正在重新定位...');
+            setTimeout(() => {
+                startLocationTracking();
+            }, 1000);
+        }
+
+        // 更新位置顯示
+        function updateLocationDisplay() {
+            if (!currentPosition) return;
+
+            document.getElementById('location-icon').className = 'bi bi-geo-alt-fill location-icon text-success';
+            document.getElementById('location-status').innerHTML = 
+                `<i class="bi bi-check-circle"></i> GPS定位成功`;
+            
+            document.getElementById('location-address').textContent = 
+                `座標: ${currentPosition.lat.toFixed(6)}, ${currentPosition.lng.toFixed(6)}`;
+
+            // 顯示距離資訊
+            document.getElementById('distance-info').style.display = 'block';
+
+            // 設定精度指示器
+            const accuracyDot = document.getElementById('accuracy-dot');
+            const accuracyText = document.getElementById('accuracy-text');
+            
+            if (currentPosition.accuracy <= 10) {
+                accuracyDot.className = 'accuracy-dot accuracy-high';
+                accuracyText.textContent = `定位精度: 優秀 (±${currentPosition.accuracy.toFixed(0)}m)`;
+            } else if (currentPosition.accuracy <= 50) {
+                accuracyDot.className = 'accuracy-dot accuracy-medium';
+                accuracyText.textContent = `定位精度: 良好 (±${currentPosition.accuracy.toFixed(0)}m)`;
+            } else {
+                accuracyDot.className = 'accuracy-dot accuracy-low';
+                accuracyText.textContent = `定位精度: 較差 (±${currentPosition.accuracy.toFixed(0)}m)`;
+            }
+        }
+
+        // 檢查與公司距離
+        function checkDistanceToCompany() {
+            if (!currentPosition || !userStoreInfo) return;
+
+            const storeId = userStoreInfo.store_id || 1;
+            const companyLocation = COMPANY_LOCATIONS[storeId];
+            
+            if (!companyLocation) {
+                document.getElementById('distance-text').textContent = '無法確定工作地點位置';
+                return;
+            }
+
+            const distance = calculateDistance(
+                currentPosition.lat,
+                currentPosition.lng,
+                companyLocation.lat,
+                companyLocation.lng
+            );
+
+            // 更新距離顯示
+            document.getElementById('distance-text').innerHTML = 
+                `${distance.toFixed(0)}公尺 - ${companyLocation.name}`;
+
+            // 顯示距離警告
+            showDistanceWarning(distance, companyLocation);
+        }
+
+        // 顯示距離警告
+        function showDistanceWarning(distance, companyLocation) {
+            const warningElement = document.getElementById('distance-warning');
+            
+            if (distance <= companyLocation.radius) {
+                // 在允許範圍內
+                warningElement.style.display = 'none';
+            } else if (distance <= companyLocation.radius * 2) {
+                // 警告範圍
+                warningElement.className = 'distance-warning';
+                warningElement.innerHTML = `
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <strong>距離警告:</strong> 您距離工作地點較遠 (${distance.toFixed(0)}m)，
+                    建議在 ${companyLocation.radius}m 範圍內進行打卡。
+                `;
+                warningElement.style.display = 'block';
+            } else {
+                // 錯誤範圍
+                warningElement.className = 'distance-error';
+                warningElement.innerHTML = `
+                    <i class="bi bi-x-circle"></i>
+                    <strong>距離過遠:</strong> 您距離工作地點過遠 (${distance.toFixed(0)}m)，
+                    無法進行打卡。請移動至 ${companyLocation.name} 附近。
+                `;
+                warningElement.style.display = 'block';
+            }
+        }
+
+        // 計算兩點間距離 (使用Haversine公式)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; // 地球半徑 (公尺)
+            const φ1 = lat1 * Math.PI/180;
+            const φ2 = lat2 * Math.PI/180;
+            const Δφ = (lat2-lat1) * Math.PI/180;
+            const Δλ = (lon2-lon1) * Math.PI/180;
+
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                    Math.cos(φ1) * Math.cos(φ2) *
+                    Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+            return R * c;
+        }
+
+        // ==================== 出勤狀態管理 ====================
+        
+        // 載入今日出勤狀態
+        async function loadTodayAttendance() {
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/attendance/today', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('獲取今日出勤狀態失敗');
+                }
+
+                const result = await response.json();
+                todayAttendance = result.data;
+                
+                updateWorkStatus();
+                updatePunchButtons();
+                
+                console.log('今日出勤狀態載入完成:', todayAttendance);
+
+            } catch (error) {
+                console.error('載入今日出勤狀態失敗:', error);
+                showError(error.message);
+            }
+        }
+
+        // 更新工作狀態顯示
+        function updateWorkStatus() {
+            const statusBadge = document.getElementById('work-status');
+            const workHours = document.getElementById('work-hours');
+            const todaySummary = document.getElementById('today-summary');
+
+            if (!todayAttendance || (!todayAttendance.clock_in && !todayAttendance.clock_out)) {
+                statusBadge.textContent = '未打卡';
+                statusBadge.className = 'status-badge status-off';
+                workHours.textContent = '';
+                todaySummary.textContent = '今日尚未開始工作';
+                return;
+            }
+
+            if (todayAttendance.clock_in && !todayAttendance.clock_out) {
+                statusBadge.textContent = '工作中';
+                statusBadge.className = 'status-badge status-working';
+                
+                const clockIn = new Date(todayAttendance.clock_in);
+                const now = new Date();
+                const workTime = Math.floor((now - clockIn) / 1000 / 60); // 分鐘
+                
+                workHours.innerHTML = `🕒 已工作: ${Math.floor(workTime / 60)}小時${workTime % 60}分鐘`;
+                todaySummary.innerHTML = `📍 上班時間: ${clockIn.toLocaleTimeString('zh-TW')}`;
+                
+            } else if (todayAttendance.clock_in && todayAttendance.clock_out) {
+                statusBadge.textContent = '已下班';
+                statusBadge.className = 'status-badge status-off';
+                
+                const clockIn = new Date(todayAttendance.clock_in);
+                const clockOut = new Date(todayAttendance.clock_out);
+                const workTime = Math.floor((clockOut - clockIn) / 1000 / 60); // 分鐘
+                
+                workHours.innerHTML = `✅ 工作時數: ${Math.floor(workTime / 60)}小時${workTime % 60}分鐘`;
+                todaySummary.innerHTML = `
+                    📍 上班: ${clockIn.toLocaleTimeString('zh-TW')}<br>
+                    📍 下班: ${clockOut.toLocaleTimeString('zh-TW')}
+                `;
+            }
+        }
+
+        // 更新打卡按鈕狀態
+        function updatePunchButtons() {
+            const punchInBtn = document.getElementById('punch-in-btn');
+            const punchOutBtn = document.getElementById('punch-out-btn');
+
+            // 檢查GPS定位狀態
+            if (!currentPosition) {
+                punchInBtn.disabled = true;
+                punchOutBtn.disabled = true;
+                return;
+            }
+
+            // 檢查距離限制
+            if (userStoreInfo && currentPosition) {
+                const storeId = userStoreInfo.store_id || 1;
+                const companyLocation = COMPANY_LOCATIONS[storeId];
+                
+                if (companyLocation) {
+                    const distance = calculateDistance(
+                        currentPosition.lat,
+                        currentPosition.lng,
+                        companyLocation.lat,
+                        companyLocation.lng
+                    );
+                    
+                    // 距離過遠時禁用按鈕
+                    if (distance > companyLocation.radius * 2) {
+                        punchInBtn.disabled = true;
+                        punchOutBtn.disabled = true;
+                        return;
+                    }
+                }
+            }
+
+            // 根據今日出勤狀態調整按鈕
+            if (todayAttendance) {
+                if (todayAttendance.clock_in && !todayAttendance.clock_out) {
+                    // 已打上班卡，未打下班卡
+                    punchInBtn.disabled = true;
+                    punchOutBtn.disabled = false;
+                } else if (todayAttendance.clock_in && todayAttendance.clock_out) {
+                    // 已完成一日打卡
+                    punchInBtn.disabled = true;
+                    punchOutBtn.disabled = true;
+                } else {
+                    // 未打卡
+                    punchInBtn.disabled = false;
+                    punchOutBtn.disabled = true;
+                }
+            } else {
+                // 今日無記錄
+                punchInBtn.disabled = false;
+                punchOutBtn.disabled = true;
+            }
+        }
+
+        // ==================== 打卡操作 ====================
+
+        // 上班打卡
+        async function punchIn() {
+            if (!currentPosition) {
+                showError('請等待GPS定位完成');
+                return;
+            }
+
+            try {
+                showLoading(true);
+                
+                const locationString = `${currentPosition.lat.toFixed(6)}, ${currentPosition.lng.toFixed(6)}`;
+                
+                const data = {
+                    location: locationString,
+                    device_fingerprint: deviceFingerprint,
+                    accuracy: currentPosition.accuracy,
+                    gps_coords: {
+                        latitude: currentPosition.lat,
+                        longitude: currentPosition.lng,
+                        accuracy: currentPosition.accuracy,
+                        timestamp: currentPosition.timestamp
+                    }
+                };
+
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/attendance/clock-in', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.message || '打卡失敗');
+                }
+
+                // 打卡成功
+                showSuccess('🎉 上班打卡成功！');
+                
+                // 添加視覺反饋
+                document.getElementById('punch-in-btn').classList.add('punch-active');
+                setTimeout(() => {
+                    document.getElementById('punch-in-btn').classList.remove('punch-active');
+                }, 1000);
+
+                // 重新載入狀態
+                await loadTodayAttendance();
+                await loadAttendanceHistory();
+
+            } catch (error) {
+                console.error('上班打卡失敗:', error);
+                showError(error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 下班打卡
+        async function punchOut() {
+            if (!currentPosition) {
+                showError('請等待GPS定位完成');
+                return;
+            }
+
+            try {
+                showLoading(true);
+                
+                const locationString = `${currentPosition.lat.toFixed(6)}, ${currentPosition.lng.toFixed(6)}`;
+                
+                const data = {
+                    location: locationString,
+                    device_fingerprint: deviceFingerprint,
+                    accuracy: currentPosition.accuracy,
+                    gps_coords: {
+                        latitude: currentPosition.lat,
+                        longitude: currentPosition.lng,
+                        accuracy: currentPosition.accuracy,
+                        timestamp: currentPosition.timestamp
+                    }
+                };
+
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/attendance/clock-out', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.message || '打卡失敗');
+                }
+
+                // 打卡成功
+                showSuccess('🎉 下班打卡成功！今日工作辛苦了！');
+                
+                // 添加視覺反饋
+                document.getElementById('punch-out-btn').classList.add('punch-active');
+                setTimeout(() => {
+                    document.getElementById('punch-out-btn').classList.remove('punch-active');
+                }, 1000);
+
+                // 重新載入狀態
+                await loadTodayAttendance();
+                await loadAttendanceHistory();
+
+            } catch (error) {
+                console.error('下班打卡失敗:', error);
+                showError(error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // ==================== 出勤歷史 ====================
+
+        // 載入出勤歷史
+        async function loadAttendanceHistory() {
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/attendance/history?limit=5', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('獲取出勤歷史失敗');
+                }
+
+                const result = await response.json();
+                displayAttendanceHistory(result.data);
+
+            } catch (error) {
+                console.error('載入出勤歷史失敗:', error);
+                document.getElementById('attendance-history').innerHTML = 
+                    '<div class="text-center py-3 text-muted">載入歷史記錄失敗</div>';
+            }
+        }
+
+        // 顯示出勤歷史
+        function displayAttendanceHistory(records) {
+            const container = document.getElementById('attendance-history');
+            
+            if (!records || records.length === 0) {
+                container.innerHTML = '<div class="text-center py-3 text-muted">尚無出勤記錄</div>';
+                return;
+            }
+
+            const html = records.map(record => {
+                const date = new Date(record.date);
+                const clockIn = record.clock_in ? new Date(record.clock_in) : null;
+                const clockOut = record.clock_out ? new Date(record.clock_out) : null;
+                
+                let statusClass = 'type-in';
+                let statusText = '完整';
+                
+                if (record.status === 'incomplete') {
+                    statusClass = 'type-out';
+                    statusText = '未完成';
+                } else if (record.status === 'late') {
+                    statusClass = 'type-out';
+                    statusText = '遲到';
+                }
+                
+                return `
+                    <div class="history-item">
+                        <div>
+                            <div class="history-time">${date.toLocaleDateString('zh-TW')}</div>
+                            <div style="font-size: 0.8rem; color: #666;">
+                                ${clockIn ? `上班: ${clockIn.toLocaleTimeString('zh-TW')}` : '未打上班卡'}
+                                ${clockOut ? ` | 下班: ${clockOut.toLocaleTimeString('zh-TW')}` : ''}
+                            </div>
+                        </div>
+                        <div>
+                            <span class="history-type ${statusClass}">${statusText}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        }
+
+        // ==================== UI輔助函數 ====================
+
+        // 顯示載入狀態
+        function showLoading(show) {
+            const spinner = document.getElementById('loading-spinner');
+            const buttons = document.querySelectorAll('.punch-btn');
+            
+            if (show) {
+                spinner.style.display = 'block';
+                buttons.forEach(btn => btn.disabled = true);
+            } else {
+                spinner.style.display = 'none';
+                updatePunchButtons(); // 恢復按鈕狀態
+            }
+        }
+
+        // 顯示載入步驟
+        function showLoadingStep(message) {
+            document.getElementById('location-status').innerHTML = 
+                `<i class="bi bi-hourglass-split"></i> ${message}`;
+        }
+
+        // 顯示錯誤訊息
+        function showError(message) {
+            const errorAlert = document.getElementById('error-alert');
+            const errorMessage = document.getElementById('error-message');
+            
+            errorMessage.textContent = message;
+            errorAlert.style.display = 'block';
+            
+            setTimeout(() => {
+                errorAlert.style.display = 'none';
+            }, 5000);
+        }
+
+        // 顯示成功訊息
+        function showSuccess(message) {
+            const successAlert = document.createElement('div');
+            successAlert.className = 'alert alert-success fade-in';
+            successAlert.innerHTML = `<i class="bi bi-check-circle"></i> ${message}`;
+            
+            document.querySelector('.punch-container').insertBefore(
+                successAlert, 
+                document.querySelector('.punch-container').firstChild
+            );
+            
+            setTimeout(() => {
+                successAlert.remove();
+            }, 3000);
+        }
+
+        // ==================== 清理資源 ====================
+
+        // 頁面卸載時停止位置監控
+        window.addEventListener('beforeunload', function() {
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+            }
+        });
+
+        // 頁面隱藏時暫停位置監控
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                if (watchId) {
+                    navigator.geolocation.clearWatch(watchId);
+                    watchId = null;
+                }
+            } else {
+                if (!watchId) {
+                    startLocationTracking();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

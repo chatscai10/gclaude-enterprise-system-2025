@@ -338,15 +338,52 @@ app.get('/api/attendance/history', authenticateToken, async (req, res) => {
 
 app.post('/api/attendance/clock-in', authenticateToken, async (req, res) => {
     try {
-        const { location } = req.body;
-        await db.clockIn(req.user.employee_id, req.user.store_id, location || '系統位置');
+        const { location, device_fingerprint, accuracy, gps_coords } = req.body;
+        
+        // 打卡資料
+        const clockInData = {
+            employee_id: req.user.employee_id,
+            store_id: req.user.store_id,
+            location: location || '系統位置',
+            device_fingerprint: device_fingerprint || 'unknown',
+            gps_accuracy: accuracy || null,
+            latitude: gps_coords ? gps_coords.latitude : null,
+            longitude: gps_coords ? gps_coords.longitude : null,
+            ip_address: req.ip,
+            user_agent: req.get('User-Agent')
+        };
+        
+        const result = await db.clockInWithGPS(clockInData);
+        
+        // 發送Telegram通知
+        try {
+            const attendanceData = {
+                employee_name: req.user.name || '未知員工',
+                store_name: req.user.store_name || '未知分店',
+                clock_type: 'in',
+                timestamp: new Date().toISOString(),
+                location: location,
+                gps_accuracy: accuracy,
+                device_info: device_fingerprint ? device_fingerprint.substring(0, 16) + '...' : 'unknown'
+            };
+            
+            // 檢查設備異常
+            const deviceAnomalies = await db.checkDeviceAnomalies(req.user.employee_id, device_fingerprint);
+            
+            await telegramNotifier.notifyAttendance(attendanceData, deviceAnomalies);
+        } catch (notificationError) {
+            console.error('Telegram通知發送失敗:', notificationError);
+            // 不影響主要打卡流程
+        }
         
         res.json({
             success: true,
             data: {
+                id: result.id,
                 timestamp: new Date().toISOString(),
                 time: new Date().toLocaleTimeString('zh-TW'),
                 location: location || '系統位置',
+                accuracy: accuracy,
                 status: 'success'
             },
             message: '上班打卡成功！'
@@ -361,15 +398,53 @@ app.post('/api/attendance/clock-in', authenticateToken, async (req, res) => {
 
 app.post('/api/attendance/clock-out', authenticateToken, async (req, res) => {
     try {
-        const { location } = req.body;
-        await db.clockOut(req.user.employee_id, location || '系統位置');
+        const { location, device_fingerprint, accuracy, gps_coords } = req.body;
+        
+        // 打卡資料
+        const clockOutData = {
+            employee_id: req.user.employee_id,
+            location: location || '系統位置',
+            device_fingerprint: device_fingerprint || 'unknown',
+            gps_accuracy: accuracy || null,
+            latitude: gps_coords ? gps_coords.latitude : null,
+            longitude: gps_coords ? gps_coords.longitude : null,
+            ip_address: req.ip,
+            user_agent: req.get('User-Agent')
+        };
+        
+        const result = await db.clockOutWithGPS(clockOutData);
+        
+        // 發送Telegram通知
+        try {
+            const attendanceData = {
+                employee_name: req.user.name || '未知員工',
+                store_name: req.user.store_name || '未知分店',
+                clock_type: 'out',
+                timestamp: new Date().toISOString(),
+                location: location,
+                gps_accuracy: accuracy,
+                device_info: device_fingerprint ? device_fingerprint.substring(0, 16) + '...' : 'unknown',
+                work_hours: result.work_hours || null
+            };
+            
+            // 檢查設備異常
+            const deviceAnomalies = await db.checkDeviceAnomalies(req.user.employee_id, device_fingerprint);
+            
+            await telegramNotifier.notifyAttendance(attendanceData, deviceAnomalies);
+        } catch (notificationError) {
+            console.error('Telegram通知發送失敗:', notificationError);
+            // 不影響主要打卡流程
+        }
         
         res.json({
             success: true,
             data: {
+                id: result.id,
                 timestamp: new Date().toISOString(),
                 time: new Date().toLocaleTimeString('zh-TW'),
                 location: location || '系統位置',
+                accuracy: accuracy,
+                work_hours: result.work_hours,
                 status: 'success'
             },
             message: '下班打卡成功！今日工作辛苦了！'

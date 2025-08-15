@@ -515,6 +515,193 @@ class JsonDatabase {
         }
     }
 
+    // ==================== GPS打卡相關操作 ====================
+    
+    async clockInWithGPS(clockInData) {
+        const attendance = await this.readTable('attendance');
+        const today = new Date().toISOString().split('T')[0];
+        const now = new Date();
+        
+        // 檢查今日是否已有打卡記錄
+        const existingRecord = attendance.find(record => 
+            record.employee_id === clockInData.employee_id && 
+            record.date === today
+        );
+        
+        if (existingRecord && existingRecord.clock_in) {
+            throw new Error('今日已完成上班打卡');
+        }
+        
+        const newRecord = {
+            id: Date.now(),
+            employee_id: clockInData.employee_id,
+            store_id: clockInData.store_id,
+            date: today,
+            clock_in: now.toISOString(),
+            clock_in_time: now.toLocaleTimeString('zh-TW'),
+            clock_out: null,
+            clock_out_time: null,
+            location: clockInData.location,
+            latitude: clockInData.latitude,
+            longitude: clockInData.longitude,
+            gps_accuracy: clockInData.gps_accuracy,
+            device_fingerprint: clockInData.device_fingerprint,
+            ip_address: clockInData.ip_address,
+            user_agent: clockInData.user_agent,
+            status: 'checked_in',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+        
+        attendance.push(newRecord);
+        await this.writeTable('attendance', attendance);
+        
+        // 記錄設備指紋歷史
+        await this.recordDeviceFingerprint(clockInData.employee_id, clockInData.device_fingerprint, 'clock_in');
+        
+        return { id: newRecord.id };
+    }
+    
+    async clockOutWithGPS(clockOutData) {
+        const attendance = await this.readTable('attendance');
+        const today = new Date().toISOString().split('T')[0];
+        const now = new Date();
+        
+        const index = attendance.findIndex(record => 
+            record.employee_id === clockOutData.employee_id && 
+            record.date === today && 
+            record.clock_in && 
+            !record.clock_out
+        );
+        
+        if (index === -1) {
+            throw new Error('找不到今日上班打卡記錄，請先完成上班打卡');
+        }
+        
+        // 計算工作時數
+        const clockInTime = new Date(attendance[index].clock_in);
+        const workMinutes = Math.floor((now - clockInTime) / 1000 / 60);
+        const workHours = (workMinutes / 60).toFixed(2);
+        
+        attendance[index].clock_out = now.toISOString();
+        attendance[index].clock_out_time = now.toLocaleTimeString('zh-TW');
+        attendance[index].work_minutes = workMinutes;
+        attendance[index].work_hours = workHours;
+        attendance[index].out_location = clockOutData.location;
+        attendance[index].out_latitude = clockOutData.latitude;
+        attendance[index].out_longitude = clockOutData.longitude;
+        attendance[index].out_gps_accuracy = clockOutData.gps_accuracy;
+        attendance[index].out_device_fingerprint = clockOutData.device_fingerprint;
+        attendance[index].out_ip_address = clockOutData.ip_address;
+        attendance[index].out_user_agent = clockOutData.user_agent;
+        attendance[index].status = 'completed';
+        attendance[index].updated_at = new Date().toISOString();
+        
+        await this.writeTable('attendance', attendance);
+        
+        // 記錄設備指紋歷史
+        await this.recordDeviceFingerprint(clockOutData.employee_id, clockOutData.device_fingerprint, 'clock_out');
+        
+        return { 
+            id: attendance[index].id, 
+            work_hours: workHours,
+            work_minutes: workMinutes
+        };
+    }
+    
+    // 記錄設備指紋
+    async recordDeviceFingerprint(employeeId, deviceFingerprint, actionType) {
+        try {
+            let deviceHistory = [];
+            try {
+                deviceHistory = await this.readTable('device_fingerprints');
+            } catch (error) {
+                // 如果表不存在，初始化空陣列
+                deviceHistory = [];
+            }
+            
+            const newRecord = {
+                id: Date.now(),
+                employee_id: employeeId,
+                device_fingerprint: deviceFingerprint,
+                action_type: actionType, // 'clock_in' 或 'clock_out'
+                timestamp: new Date().toISOString(),
+                date: new Date().toISOString().split('T')[0]
+            };
+            
+            deviceHistory.push(newRecord);
+            await this.writeTable('device_fingerprints', deviceHistory);
+            
+        } catch (error) {
+            console.error('記錄設備指紋失敗:', error);
+            // 不影響主要打卡流程
+        }
+    }
+    
+    // 檢查設備異常
+    async checkDeviceAnomalies(employeeId, currentDeviceFingerprint) {
+        try {
+            const deviceHistory = await this.readTable('device_fingerprints');
+            const employeeDevices = deviceHistory.filter(record => record.employee_id === employeeId);
+            
+            if (employeeDevices.length === 0) {
+                return []; // 第一次打卡，無異常
+            }
+            
+            // 檢查最近7天的設備使用記錄
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+            
+            const recentDevices = employeeDevices.filter(record => 
+                new Date(record.timestamp) >= sevenDaysAgo
+            );
+            
+            const uniqueDevices = [...new Set(recentDevices.map(r => r.device_fingerprint))];
+            
+            const anomalies = [];
+            
+            // 異常1: 新設備檢測
+            if (!uniqueDevices.includes(currentDeviceFingerprint)) {
+                anomalies.push({
+                    type: 'new_device',
+                    severity: 'warning',
+                    message: '檢測到新設備打卡',
+                    details: `員工使用新設備進行打卡，設備ID: ${currentDeviceFingerprint.substring(0, 16)}...`
+                });
+            }
+            
+            // 異常2: 多設備使用檢測
+            if (uniqueDevices.length > 3) {
+                anomalies.push({
+                    type: 'multiple_devices',
+                    severity: 'alert',
+                    message: '多設備使用警告',
+                    details: `員工在7天內使用了 ${uniqueDevices.length} 個不同設備`
+                });
+            }
+            
+            // 異常3: 同日多次設備變更
+            const today = new Date().toISOString().split('T')[0];
+            const todayDevices = employeeDevices.filter(record => record.date === today);
+            const todayUniqueDevices = [...new Set(todayDevices.map(r => r.device_fingerprint))];
+            
+            if (todayUniqueDevices.length > 2) {
+                anomalies.push({
+                    type: 'device_switching',
+                    severity: 'alert',
+                    message: '當日設備切換異常',
+                    details: `員工今日已使用 ${todayUniqueDevices.length} 個不同設備打卡`
+                });
+            }
+            
+            return anomalies;
+            
+        } catch (error) {
+            console.error('設備異常檢查失敗:', error);
+            return [];
+        }
+    }
+
     // ==================== 營收相關操作 ====================
     
     async createRevenue(revenueData) {
