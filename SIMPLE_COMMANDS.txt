@@ -1,0 +1,47 @@
+🎯 簡化版命令列表 - 直接複製貼上執行
+
+=== 第一步：打開命令提示字元 ===
+Windows鍵+R → 輸入cmd → Enter
+
+=== 第二步：切換目錄 ===
+cd /d D:\0813\gclaude-enterprise-system
+
+=== 第三步：安裝工具 ===
+npm install -g @railway/cli
+npm install -g vercel
+
+=== 第四步：清理 Railway ===
+railway login
+railway list
+複製顯示的PROJECT_ID，然後執行：
+railway delete [貼上PROJECT_ID]
+
+=== 第五步：清理 Vercel ===
+vercel login
+vercel list
+複製顯示的PROJECT_NAME，然後執行：
+vercel remove [貼上PROJECT_NAME]
+
+=== 第六步：手動清理 Render ===
+訪問：https://dashboard.render.com/
+刪除所有舊服務
+
+=== 第七步：部署新系統 ===
+railway init
+輸入專案名：gclaude-enterprise-system
+
+=== 第八步：設定環境變量 ===
+railway env set PORT 3007
+railway env set NODE_ENV production
+railway env set JWT_SECRET gclaude-enterprise-super-secret-key-2024
+railway env set TELEGRAM_BOT_TOKEN 7659930552:AAF_jF1rAXFnjFO176-9X5fKfBwbrko8BNc
+railway env set TELEGRAM_BOSS_GROUP_ID -1002658082392
+
+=== 第九步：開始部署 ===
+railway up
+
+=== 第十步：獲取網址 ===
+railway status
+
+=== 完成！===
+使用顯示的網址測試系統功能

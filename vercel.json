@@ -13,6 +13,10 @@
     }
   ],
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "PORT": "3007",
+    "JWT_SECRET": "gclaude-enterprise-super-secret-key-2024",
+    "TELEGRAM_BOT_TOKEN": "7659930552:AAF_jF1rAXFnjFO176-9X5fKfBwbrko8BNc",
+    "TELEGRAM_BOSS_GROUP_ID": "-1002658082392"
   }
 }

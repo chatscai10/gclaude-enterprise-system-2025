@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>出勤管理 - GClaude 企業管理系統</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #2196F3 0%, #00BCD4 100%);
+            --primary-color: #2196F3;
+            --secondary-color: #00BCD4;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: var(--primary-gradient);
+            color: white;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .sidebar-header h4 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            margin: 0.2rem 0;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            border-radius: 0;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-link i {
+            margin-right: 0.8rem;
+            width: 1.2rem;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: none;
+            transition: transform 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .attendance-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .clock-card {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .clock-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 1rem 0;
+        }
+
+        .date-display {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .clock-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            border-radius: 15px;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .clock-button:hover {
+            background: white;
+            color: #28a745;
+        }
+
+        .clock-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th {
+            border-top: none;
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .btn-outline-primary {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .badge {
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .filter-box {
+            background: white;
+            border-radius: 15px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .status-present { background-color: #28a745; }
+        .status-late { background-color: #ffc107; }
+        .status-absent { background-color: #dc3545; }
+        .status-early { background-color: #17a2b8; }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .clock-display {
+                font-size: 2rem;
+            }
+
+            .clock-button {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 側邊導航 -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h4><i class="bi bi-building"></i> GClaude</h4>
+            <small>企業管理系統</small>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard.html">
+                        <i class="bi bi-speedometer2"></i> 儀表板
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="employees.html">
+                        <i class="bi bi-people"></i> 員工管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="attendance.html">
+                        <i class="bi bi-clock"></i> 出勤管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="revenue.html">
+                        <i class="bi bi-graph-up"></i> 營收記錄
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="orders.html">
+                        <i class="bi bi-box"></i> 叫貨管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="maintenance.html">
+                        <i class="bi bi-tools"></i> 維修管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="photos.html">
+                        <i class="bi bi-camera"></i> 照片管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="settings.html">
+                        <i class="bi bi-gear"></i> 系統設定
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <hr style="border-color: rgba(255, 255, 255, 0.2); margin: 1rem 0;">
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="logout()">
+                        <i class="bi bi-box-arrow-right"></i> 登出
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- 主要內容 -->
+    <div class="main-content">
+        <!-- 頁面標題 -->
+        <div class="page-header">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="h2 mb-1">
+                        <i class="bi bi-clock text-primary"></i> 出勤管理
+                    </h1>
+                    <p class="text-muted mb-0">員工打卡記錄、出勤統計及管理</p>
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-outline-primary" onclick="exportAttendance()">
+                        <i class="bi bi-download"></i> 匯出報表
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- 左側：打卡區域 -->
+            <div class="col-lg-4 mb-4">
+                <!-- 時鐘卡片 -->
+                <div class="attendance-card clock-card">
+                    <div class="clock-display" id="current-time">--:--:--</div>
+                    <div class="date-display" id="current-date">----年--月--日</div>
+                    <hr style="border-color: rgba(255, 255, 255, 0.3);">
+                    <div class="d-grid gap-2">
+                        <button class="clock-button" id="clock-in-btn" onclick="clockIn()">
+                            <i class="bi bi-clock"></i> 上班打卡
+                        </button>
+                        <button class="clock-button" id="clock-out-btn" onclick="clockOut()" disabled>
+                            <i class="bi bi-clock-history"></i> 下班打卡
+                        </button>
+                    </div>
+                    <small class="d-block mt-3" id="last-record"></small>
+                </div>
+
+                <!-- 今日狀態 -->
+                <div class="attendance-card">
+                    <h6 class="mb-3">
+                        <i class="bi bi-calendar-check"></i> 今日出勤狀態
+                    </h6>
+                    <div id="today-status">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>狀態：</span>
+                            <span id="today-status-text" class="badge bg-secondary">未打卡</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>上班時間：</span>
+                            <span id="today-clock-in">--:--</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>下班時間：</span>
+                            <span id="today-clock-out">--:--</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>工作時數：</span>
+                            <span id="today-hours">-- 小時</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右側：統計和記錄 -->
+            <div class="col-lg-8">
+                <!-- 出勤統計 -->
+                <div class="row mb-4" id="attendance-stats">
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card text-center">
+                            <div class="text-success mb-2">
+                                <i class="bi bi-check-circle-fill" style="font-size: 2rem;"></i>
+                            </div>
+                            <h3 class="mb-1" id="present-count">-</h3>
+                            <p class="text-muted mb-0">本月正常</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card text-center">
+                            <div class="text-warning mb-2">
+                                <i class="bi bi-exclamation-triangle-fill" style="font-size: 2rem;"></i>
+                            </div>
+                            <h3 class="mb-1" id="late-count">-</h3>
+                            <p class="text-muted mb-0">本月遲到</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card text-center">
+                            <div class="text-danger mb-2">
+                                <i class="bi bi-x-circle-fill" style="font-size: 2rem;"></i>
+                            </div>
+                            <h3 class="mb-1" id="absent-count">-</h3>
+                            <p class="text-muted mb-0">本月缺勤</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card text-center">
+                            <div class="text-info mb-2">
+                                <i class="bi bi-clock-fill" style="font-size: 2rem;"></i>
+                            </div>
+                            <h3 class="mb-1" id="total-hours">-</h3>
+                            <p class="text-muted mb-0">本月時數</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 篩選和搜尋 -->
+                <div class="filter-box">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <input type="date" class="form-control" id="date-filter" onchange="filterAttendance()">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="employee-filter" onchange="filterAttendance()">
+                                <option value="">所有員工</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select" id="status-filter" onchange="filterAttendance()">
+                                <option value="">所有狀態</option>
+                                <option value="present">正常</option>
+                                <option value="late">遲到</option>
+                                <option value="absent">缺勤</option>
+                                <option value="early">早退</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select" id="store-filter" onchange="filterAttendance()">
+                                <option value="">所有分店</option>
+                                <option value="1">內壢忠孝店</option>
+                                <option value="2">桃園龍安店</option>
+                                <option value="3">中壢龍崗店</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-primary w-100" onclick="resetFilters()">
+                                <i class="bi bi-arrow-clockwise"></i> 重置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 出勤記錄 -->
+                <div class="attendance-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-list-ul"></i> 出勤記錄
+                        </h5>
+                        <button class="btn btn-outline-primary btn-sm" onclick="refreshAttendance()">
+                            <i class="bi bi-arrow-clockwise"></i> 重新整理
+                        </button>
+                    </div>
+
+                    <div id="loading" class="loading" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">載入中...</span>
+                        </div>
+                        <p class="mt-2">載入出勤記錄中...</p>
+                    </div>
+
+                    <div class="table-responsive" id="attendance-table-container">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>日期</th>
+                                    <th>員工</th>
+                                    <th>分店</th>
+                                    <th>上班時間</th>
+                                    <th>下班時間</th>
+                                    <th>工作時數</th>
+                                    <th>狀態</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendance-table-body">
+                                <!-- 動態載入出勤記錄 -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 分頁 -->
+                    <nav aria-label="出勤分頁" id="pagination-container" style="display: none;">
+                        <ul class="pagination justify-content-center">
+                            <!-- 動態載入分頁 -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改出勤記錄模態框 -->
+    <div class="modal fade" id="editAttendanceModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-pencil"></i> 修改出勤記錄
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-attendance-form">
+                        <input type="hidden" id="edit-attendance-id">
+                        <div class="mb-3">
+                            <label for="edit-date" class="form-label">日期</label>
+                            <input type="date" class="form-control" id="edit-date" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-employee" class="form-label">員工</label>
+                            <input type="text" class="form-control" id="edit-employee" readonly>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-clock-in" class="form-label">上班時間</label>
+                                <input type="time" class="form-control" id="edit-clock-in">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-clock-out" class="form-label">下班時間</label>
+                                <input type="time" class="form-control" id="edit-clock-out">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-status" class="form-label">狀態</label>
+                            <select class="form-select" id="edit-status">
+                                <option value="present">正常</option>
+                                <option value="late">遲到</option>
+                                <option value="absent">缺勤</option>
+                                <option value="early">早退</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-note" class="form-label">備註</label>
+                            <textarea class="form-control" id="edit-note" rows="2"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAttendanceEdit()">
+                        <i class="bi bi-check-circle"></i> 儲存
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/attendance.js"></script>
+</body>
+</html>

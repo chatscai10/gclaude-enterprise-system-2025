@@ -209,7 +209,8 @@ app.get('/admin', (req, res) => {
     if (fs.existsSync(adminPath)) {
         res.sendFile(adminPath);
     } else {
-        res.redirect('/');
+        // 重定向到dashboard而不是首頁
+        res.redirect('/dashboard');
     }
 });
 

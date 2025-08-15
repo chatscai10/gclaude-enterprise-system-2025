@@ -13,6 +13,8 @@ class DatabaseManager {
     constructor() {
         this.dbPath = path.join(__dirname, 'data', 'enterprise.db');
         this.db = null;
+        this.isReady = false;
+        this.readyCallbacks = [];
         this.initializeDatabase();
     }
 
@@ -96,20 +98,24 @@ class DatabaseManager {
                 FOREIGN KEY (user_id) REFERENCES users(id)
             )`,
 
-            // 營收記錄表
+            // 營收記錄表 (重構版)
             `CREATE TABLE IF NOT EXISTS revenue (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 uuid TEXT UNIQUE NOT NULL,
                 record_date DATE NOT NULL,
-                amount DECIMAL(15,2) NOT NULL,
-                payment_method TEXT NOT NULL,
-                category TEXT,
-                description TEXT,
+                store_id INTEGER NOT NULL,
+                bonus_type TEXT NOT NULL,
+                order_count INTEGER DEFAULT 0,
+                income_items TEXT,
+                expense_items TEXT,
+                total_income DECIMAL(15,2) DEFAULT 0,
+                total_expense DECIMAL(15,2) DEFAULT 0,
+                bonus_amount DECIMAL(15,2) DEFAULT 0,
+                notes TEXT,
                 recorded_by INTEGER NOT NULL,
-                receipt_number TEXT,
-                customer_count INTEGER DEFAULT 1,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (recorded_by) REFERENCES users(id)
+                FOREIGN KEY (recorded_by) REFERENCES users(id),
+                FOREIGN KEY (store_id) REFERENCES stores(id)
             )`,
 
             // 庫存商品表
@@ -127,6 +133,10 @@ class DatabaseManager {
                 unit_cost DECIMAL(10,2),
                 selling_price DECIMAL(10,2),
                 supplier TEXT,
+                supplier_contact TEXT,
+                delivery_threshold DECIMAL(10,2) DEFAULT 1000,
+                frequent_order_days INTEGER DEFAULT 1,
+                rare_order_days INTEGER DEFAULT 7,
                 is_active BOOLEAN DEFAULT 1,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -154,6 +164,7 @@ class DatabaseManager {
                 uuid TEXT UNIQUE NOT NULL,
                 order_number TEXT UNIQUE NOT NULL,
                 product_id INTEGER NOT NULL,
+                store_id INTEGER,
                 requested_quantity INTEGER NOT NULL,
                 approved_quantity INTEGER,
                 unit_cost DECIMAL(10,2),
@@ -169,6 +180,7 @@ class DatabaseManager {
                 supplier TEXT,
                 notes TEXT,
                 FOREIGN KEY (product_id) REFERENCES products(id),
+                FOREIGN KEY (store_id) REFERENCES stores(id),
                 FOREIGN KEY (requested_by) REFERENCES users(id),
                 FOREIGN KEY (approved_by) REFERENCES users(id)
             )`,
@@ -252,6 +264,29 @@ class DatabaseManager {
                 FOREIGN KEY (assigned_to) REFERENCES users(id)
             )`,
 
+            // 照片管理表
+            `CREATE TABLE IF NOT EXISTS photos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                uuid TEXT UNIQUE NOT NULL,
+                original_name TEXT NOT NULL,
+                file_name TEXT NOT NULL,
+                file_path TEXT NOT NULL,
+                file_size INTEGER,
+                mime_type TEXT,
+                category TEXT NOT NULL,
+                system_type TEXT NOT NULL,
+                store_id INTEGER,
+                related_id INTEGER,
+                related_table TEXT,
+                upload_date DATE NOT NULL,
+                uploaded_by INTEGER NOT NULL,
+                description TEXT,
+                is_deleted BOOLEAN DEFAULT 0,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (uploaded_by) REFERENCES users(id),
+                FOREIGN KEY (store_id) REFERENCES stores(id)
+            )`,
+
             // 系統設定表
             `CREATE TABLE IF NOT EXISTS system_settings (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -277,6 +312,75 @@ class DatabaseManager {
                 details TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users(id)
+            )`,
+
+            // 分店表 (新增)
+            `CREATE TABLE IF NOT EXISTS stores (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                uuid TEXT UNIQUE NOT NULL,
+                name TEXT NOT NULL,
+                latitude REAL NOT NULL,
+                longitude REAL NOT NULL,
+                address TEXT NOT NULL,
+                radius INTEGER DEFAULT 100,
+                min_staff INTEGER DEFAULT 2,
+                open_hours TEXT DEFAULT '1500-0200',
+                is_active BOOLEAN DEFAULT 1,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )`,
+
+            // 通知表
+            `CREATE TABLE IF NOT EXISTS notifications (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                uuid TEXT UNIQUE NOT NULL,
+                user_id INTEGER NOT NULL,
+                title TEXT NOT NULL,
+                message TEXT NOT NULL,
+                type TEXT NOT NULL,
+                priority TEXT DEFAULT 'normal',
+                is_read BOOLEAN DEFAULT 0,
+                read_at DATETIME,
+                related_type TEXT,
+                related_id INTEGER,
+                data TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                expires_at DATETIME,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )`,
+
+            // 通知設定表
+            `CREATE TABLE IF NOT EXISTS notification_settings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                notification_type TEXT NOT NULL,
+                telegram_enabled BOOLEAN DEFAULT 1,
+                email_enabled BOOLEAN DEFAULT 0,
+                push_enabled BOOLEAN DEFAULT 1,
+                sound_enabled BOOLEAN DEFAULT 1,
+                priority_filter TEXT DEFAULT 'all',
+                quiet_hours_start TIME,
+                quiet_hours_end TIME,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id),
+                UNIQUE(user_id, notification_type)
+            )`,
+
+            // 升遷投票表 (votes的別名，用於支援舊API)
+            `CREATE TABLE IF NOT EXISTS votes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                uuid TEXT UNIQUE NOT NULL,
+                promotion_vote_id INTEGER NOT NULL,
+                voter_id INTEGER NOT NULL,
+                candidate_id INTEGER NOT NULL,
+                vote_value INTEGER NOT NULL,
+                vote_reason TEXT,
+                vote_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+                session_id TEXT NOT NULL,
+                is_anonymous BOOLEAN DEFAULT 1,
+                FOREIGN KEY (promotion_vote_id) REFERENCES promotion_votes(id),
+                FOREIGN KEY (voter_id) REFERENCES users(id),
+                FOREIGN KEY (candidate_id) REFERENCES users(id)
             )`
         ];
 
@@ -304,6 +408,9 @@ class DatabaseManager {
         try {
             // 插入部門數據
             await this.insertDepartments();
+            
+            // 插入分店數據
+            await this.insertStores();
             
             // 插入用戶數據
             await this.insertUsers();
@@ -333,6 +440,11 @@ class DatabaseManager {
             await this.insertSystemSettings();
             
             console.log('✅ 測試數據插入完成！');
+            
+            // 設置資料庫就緒狀態
+            this.isReady = true;
+            this.readyCallbacks.forEach(callback => callback());
+            this.readyCallbacks = [];
             
         } catch (error) {
             console.error('❌ 測試數據插入失敗:', error);
@@ -750,8 +862,20 @@ class DatabaseManager {
         });
     }
 
+    // 等待資料庫就緒
+    waitForReady() {
+        return new Promise((resolve) => {
+            if (this.isReady) {
+                resolve();
+            } else {
+                this.readyCallbacks.push(resolve);
+            }
+        });
+    }
+
     // 通用查詢方法
-    query(sql, params = []) {
+    async query(sql, params = []) {
+        await this.waitForReady();
         return new Promise((resolve, reject) => {
             this.db.all(sql, params, (err, rows) => {
                 if (err) {
@@ -764,7 +888,8 @@ class DatabaseManager {
     }
 
     // 通用執行方法
-    run(sql, params = []) {
+    async run(sql, params = []) {
+        await this.waitForReady();
         return new Promise((resolve, reject) => {
             this.db.run(sql, params, function(err) {
                 if (err) {
@@ -776,6 +901,11 @@ class DatabaseManager {
         });
     }
 
+    // execute 方法別名（兼容API使用）
+    async execute(sql, params = []) {
+        return this.run(sql, params);
+    }
+
     // 關閉數據庫連接
     close() {
         return new Promise((resolve, reject) => {
@@ -785,6 +915,54 @@ class DatabaseManager {
                 } else {
                     console.log('✅ 資料庫連接已關閉');
                     resolve();
+                }
+            });
+        });
+    }
+
+    // 插入分店數據
+    insertStores() {
+        const stores = [
+            {
+                uuid: uuidv4(),
+                name: '內壢忠孝店',
+                latitude: 24.9748412,
+                longitude: 121.2556713,
+                address: '桃園市中壢區忠孝路93-1號',
+                radius: 100,
+                min_staff: 2,
+                open_hours: '1500-0200'
+            },
+            {
+                uuid: uuidv4(),
+                name: '桃園龍安店',
+                latitude: 24.9880023,
+                longitude: 121.2812737,
+                address: '桃園市桃園區龍安街38-8號',
+                radius: 100,
+                min_staff: 2,
+                open_hours: '1500-0200'
+            },
+            {
+                uuid: uuidv4(),
+                name: '中壢龍崗店',
+                latitude: 24.9298502,
+                longitude: 121.2529472,
+                address: '桃園市中壢區龍東路190號正對面',
+                radius: 100,
+                min_staff: 2,
+                open_hours: '1500-0200'
+            }
+        ];
+
+        const sql = `INSERT OR IGNORE INTO stores (uuid, name, latitude, longitude, address, radius, min_staff, open_hours) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+        
+        stores.forEach(store => {
+            this.db.run(sql, [store.uuid, store.name, store.latitude, store.longitude, store.address, store.radius, store.min_staff, store.open_hours], (err) => {
+                if (err) {
+                    console.error('❌ 插入分店數據錯誤:', err.message);
+                } else {
+                    console.log(`✅ 分店數據已插入: ${store.name}`);
                 }
             });
         });

@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  gclaude-enterprise:
+    build: .
+    container_name: gclaude-enterprise
+    restart: unless-stopped
+    ports:
+      - "3007:3007"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+      - ./ssl:/app/ssl
+    env_file:
+      - .env.production
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3007/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - gclaude_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: gclaude-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./production-configs/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./ssl:/etc/nginx/ssl
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - gclaude-enterprise
+    networks:
+      - gclaude_network
+
+networks:
+  gclaude_network:
+    driver: bridge

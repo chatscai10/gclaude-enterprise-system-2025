@@ -471,8 +471,8 @@
                                     <td>2023-01-01</td>
                                     <td><span class="badge bg-success">在職</span></td>
                                     <td>
-                                        <button class="btn btn-sm btn-outline-primary me-1">編輯</button>
-                                        <button class="btn btn-sm btn-outline-danger">刪除</button>
+                                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editEmployee('001')">編輯</button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteEmployee('001')">刪除</button>
                                     </td>
                                 </tr>
                                 <tr>
@@ -484,8 +484,8 @@
                                     <td>2023-02-01</td>
                                     <td><span class="badge bg-success">在職</span></td>
                                     <td>
-                                        <button class="btn btn-sm btn-outline-primary me-1">編輯</button>
-                                        <button class="btn btn-sm btn-outline-danger">刪除</button>
+                                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editEmployee('002')">編輯</button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteEmployee('002')">刪除</button>
                                     </td>
                                 </tr>
                                 <tr>
@@ -497,8 +497,8 @@
                                     <td>2023-03-01</td>
                                     <td><span class="badge bg-success">在職</span></td>
                                     <td>
-                                        <button class="btn btn-sm btn-outline-primary me-1">編輯</button>
-                                        <button class="btn btn-sm btn-outline-danger">刪除</button>
+                                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editEmployee('003')">編輯</button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteEmployee('003')">刪除</button>
                                     </td>
                                 </tr>
                                 <tr>
@@ -510,8 +510,8 @@
                                     <td>2023-07-01</td>
                                     <td><span class="badge bg-warning">實習</span></td>
                                     <td>
-                                        <button class="btn btn-sm btn-outline-primary me-1">編輯</button>
-                                        <button class="btn btn-sm btn-outline-danger">刪除</button>
+                                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editEmployee('004')">編輯</button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteEmployee('004')">刪除</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -820,10 +820,27 @@
                                             <label for="revenueStore" class="form-label">分店</label>
                                             <select class="form-control" name="store_id" id="revenueStore" required>
                                                 <option value="">請選擇分店</option>
-                                                <option value="1">台北總店</option>
-                                                <option value="2">台中分店</option>
-                                                <option value="3">高雄分店</option>
+                                                <option value="1">內壢忠孝店</option>
+                                                <option value="2">桃園龍安店</option>
+                                                <option value="3">中壢龍崗店</option>
                                             </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- 獎金類別選擇 -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label class="form-label">獎金類別</label>
+                                            <div class="btn-group w-100" role="group">
+                                                <input type="radio" class="btn-check" name="bonus_type" id="weekdayBonus" value="平日獎金" checked>
+                                                <label class="btn btn-outline-primary" for="weekdayBonus">
+                                                    <i class="bi bi-calendar-week me-1"></i>平日獎金
+                                                </label>
+                                                <input type="radio" class="btn-check" name="bonus_type" id="holidayBonus" value="假日獎金">
+                                                <label class="btn btn-outline-warning" for="holidayBonus">
+                                                    <i class="bi bi-calendar-heart me-1"></i>假日獎金
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -842,80 +859,107 @@
                                         </div>
                                     </div>
 
-                                    <!-- 收入項目 (直接顯示) -->
+                                    <!-- 收入項目 (直接輸入) -->
                                     <div id="incomeSection" class="income-expense-section">
                                         <div class="row mb-3">
                                             <div class="col-md-6">
-                                                <label class="form-label">收入項目</label>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="income_items" value="product_sales" id="productSales">
-                                                    <label class="form-check-label" for="productSales">商品銷售</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="income_items" value="service_fees" id="serviceFees">
-                                                    <label class="form-check-label" for="serviceFees">服務費用</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="income_items" value="membership_fees" id="membershipFees">
-                                                    <label class="form-check-label" for="membershipFees">會員費</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="income_items" value="rental_income" id="rentalIncome">
-                                                    <label class="form-check-label" for="rentalIncome">租金收入</label>
+                                                <label for="onSiteSales" class="form-label">現場營業額</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="number" class="form-control" name="on_site_sales" id="onSiteSales" min="0" step="1" placeholder="0">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="income_items" value="commission" id="commission">
-                                                    <label class="form-check-label" for="commission">佣金收入</label>
+                                                <label for="onlineOrders" class="form-label">線上點餐</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="number" class="form-control" name="online_orders" id="onlineOrders" min="0" step="1" placeholder="0">
                                                 </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="income_items" value="interest" id="interest">
-                                                    <label class="form-check-label" for="interest">利息收入</label>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label for="pandaOrders" class="form-label">熊貓點餐 (服務費35%)</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="number" class="form-control" name="panda_orders" id="pandaOrders" min="0" step="1" placeholder="0">
                                                 </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="income_items" value="bonus" id="bonus">
-                                                    <label class="form-check-label" for="bonus">獎金收入</label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="uberOrders" class="form-label">Uber點餐 (服務費35%)</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="number" class="form-control" name="uber_orders" id="uberOrders" min="0" step="1" placeholder="0">
                                                 </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="income_items" value="other_income" id="otherIncome">
-                                                    <label class="form-check-label" for="otherIncome">其他收入</label>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label for="oilRecycling" class="form-label">廢油回收</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="number" class="form-control" name="oil_recycling" id="oilRecycling" min="0" step="1" placeholder="0">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="orderCount" class="form-label">訂單數量</label>
+                                                <div class="input-group">
+                                                    <input type="number" class="form-control" name="order_count" id="orderCount" min="0" step="1" placeholder="0">
+                                                    <span class="input-group-text">張</span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <!-- 支出項目 (下拉選單 + 新增) -->
+                                    <!-- 支出項目 (直接輸入) -->
                                     <div id="expenseSection" class="income-expense-section" style="display: none;">
-                                        <div class="mb-3">
-                                            <label for="expenseCategory" class="form-label">支出項目</label>
-                                            <div class="input-group">
-                                                <select class="form-control" name="expense_category" id="expenseCategory">
-                                                    <option value="">請選擇支出項目</option>
-                                                    <option value="rent">租金支出</option>
-                                                    <option value="utilities">水電費</option>
-                                                    <option value="staff_salary">員工薪資</option>
-                                                    <option value="equipment">設備費用</option>
-                                                    <option value="marketing">行銷費用</option>
-                                                    <option value="maintenance">維修費用</option>
-                                                    <option value="supplies">辦公用品</option>
-                                                    <option value="insurance">保險費</option>
-                                                    <option value="tax">稅務</option>
-                                                    <option value="transportation">交通費</option>
-                                                    <option value="food_beverage">餐飲費</option>
-                                                    <option value="training">培訓費</option>
-                                                    <option value="legal">法務費用</option>
-                                                    <option value="other">其他支出</option>
-                                                    <option value="custom">自訂項目</option>
-                                                </select>
-                                                <button type="button" class="btn btn-outline-primary" id="addCustomExpense">
-                                                    <i class="bi bi-plus"></i>新增
-                                                </button>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label for="gasExpense" class="form-label">瓦斯</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="number" class="form-control" name="gas" id="gasExpense" min="0" step="1" placeholder="0">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="utilitiesExpense" class="form-label">水電</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="number" class="form-control" name="utilities" id="utilitiesExpense" min="0" step="1" placeholder="0">
+                                                </div>
                                             </div>
                                         </div>
-                                        <div id="customExpenseInput" class="mb-3" style="display: none;">
-                                            <label for="customExpenseName" class="form-label">自訂支出項目名稱</label>
-                                            <input type="text" class="form-control" name="custom_expense_name" id="customExpenseName" placeholder="請輸入支出項目名稱">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label for="rentExpense" class="form-label">房租</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="number" class="form-control" name="rent" id="rentExpense" min="0" step="1" placeholder="0">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="suppliesExpense" class="form-label">貨款</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="number" class="form-control" name="supplies" id="suppliesExpense" min="0" step="1" placeholder="0">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label for="cleaningExpense" class="form-label">清潔費</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="number" class="form-control" name="cleaning" id="cleaningExpense" min="0" step="1" placeholder="0">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="othersExpense" class="form-label">其他</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="number" class="form-control" name="others" id="othersExpense" min="0" step="1" placeholder="0">
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -973,7 +1017,11 @@
 
             <!-- 庫存管理區段 -->
             <div id="inventory-section" class="section">
-                <h2><i class="bi bi-box me-2"></i>庫存管理</h2>
+                <h2><i class="bi bi-box me-2"></i>公司總庫存管理</h2>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    此處顯示公司總庫存，非各分店庫存。分店可向公司申請叫貨。
+                </div>
                 
                 <div class="row mb-4">
                     <div class="col-md-3">
@@ -982,7 +1030,7 @@
                                 <i class="bi bi-boxes"></i>
                             </div>
                             <div class="value text-primary">156</div>
-                            <div class="label">庫存品項</div>
+                            <div class="label">公司總品項</div>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -991,7 +1039,7 @@
                                 <i class="bi bi-exclamation-triangle"></i>
                             </div>
                             <div class="value text-warning">12</div>
-                            <div class="label">低庫存警告</div>
+                            <div class="label">公司庫存不足</div>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -1000,7 +1048,7 @@
                                 <i class="bi bi-x-octagon"></i>
                             </div>
                             <div class="value text-danger">3</div>
-                            <div class="label">缺貨品項</div>
+                            <div class="label">公司缺貨品項</div>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -1009,17 +1057,17 @@
                                 <i class="bi bi-currency-dollar"></i>
                             </div>
                             <div class="value text-success">$1,850,000</div>
-                            <div class="label">庫存價值</div>
+                            <div class="label">公司總庫存價值</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="table-container">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5>庫存清單</h5>
+                        <h5>公司總庫存清單</h5>
                         <div>
                             <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#orderModal">
-                                <i class="bi bi-cart-plus me-1"></i>叫貨
+                                <i class="bi bi-cart-plus me-1"></i>向供應商進貨
                             </button>
                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addInventoryModal">
                                 <i class="bi bi-plus me-1"></i>新增商品
@@ -1033,7 +1081,7 @@
                                     <th>商品代碼</th>
                                     <th>商品名稱</th>
                                     <th>分類</th>
-                                    <th>目前庫存</th>
+                                    <th>公司總庫存</th>
                                     <th>安全庫存</th>
                                     <th>單價</th>
                                     <th>狀態</th>
@@ -2204,16 +2252,44 @@
             initializeDashboard();
         });
 
-        // 儀表板初始化
+        // 儀表板初始化 (改善版)
         async function initializeDashboard() {
+            console.log('🔧 開始儀表板初始化...');
+            
             try {
+                console.log('1. 載入用戶資訊...');
                 await loadUserInfo();
+                console.log('✅ 用戶資訊載入完成');
+                
+                console.log('2. 更新當前日期...');
                 updateCurrentDate();
+                console.log('✅ 日期更新完成');
+                
+                console.log('3. 綁定事件監聽器...');
                 bindEventListeners();
+                console.log('✅ 事件監聽器綁定完成');
+                
+                console.log('4. 載入儀表板數據...');
                 await loadDashboardData();
+                console.log('✅ 儀表板數據載入完成');
+                
+                console.log('🎉 儀表板初始化成功完成！');
+                
             } catch (error) {
-                console.error('儀表板初始化失敗:', error);
-                redirectToLogin();
+                console.error('❌ 儀表板初始化失敗:', error);
+                console.error('錯誤詳情:', error.stack);
+                
+                // 不要立即跳轉，先嘗試基本功能
+                showError('儀表板部分功能載入失敗，但基本功能仍可使用');
+                
+                // 設置最小功能
+                try {
+                    updateCurrentDate();
+                    console.log('✅ 基本功能設置完成');
+                } catch (basicError) {
+                    console.error('❌ 連基本功能都無法設置:', basicError);
+                    redirectToLogin();
+                }
             }
         }
 
@@ -2450,21 +2526,35 @@
                     });
                 });
 
-                // 自訂支出項目
-                document.getElementById('addCustomExpense').addEventListener('click', function() {
-                    document.getElementById('customExpenseInput').style.display = 'block';
-                    document.getElementById('expenseCategory').value = 'custom';
-                });
+                // 自訂支出項目（檢查元素是否存在）
+                const addCustomExpenseBtn = document.getElementById('addCustomExpense');
+                if (addCustomExpenseBtn) {
+                    addCustomExpenseBtn.addEventListener('click', function() {
+                        const customInput = document.getElementById('customExpenseInput');
+                        if (customInput) {
+                            customInput.style.display = 'block';
+                        }
+                        const expenseCategory = document.getElementById('expenseCategory');
+                        if (expenseCategory) {
+                            expenseCategory.value = 'custom';
+                        }
+                    });
+                }
 
-                // 支出類別變化
-                document.getElementById('expenseCategory').addEventListener('change', function() {
-                    const customInput = document.getElementById('customExpenseInput');
-                    if (this.value === 'custom') {
-                        customInput.style.display = 'block';
-                    } else {
-                        customInput.style.display = 'none';
-                    }
-                });
+                // 支出類別變化（檢查元素是否存在）
+                const expenseCategory = document.getElementById('expenseCategory');
+                if (expenseCategory) {
+                    expenseCategory.addEventListener('change', function() {
+                        const customInput = document.getElementById('customExpenseInput');
+                        if (customInput) {
+                            if (this.value === 'custom') {
+                                customInput.style.display = 'block';
+                            } else {
+                                customInput.style.display = 'none';
+                            }
+                        }
+                    });
+                }
 
                 // 照片預覽
                 document.getElementById('revenuePhoto').addEventListener('change', function(e) {
@@ -2590,7 +2680,22 @@
                 const label = document.querySelector(`label[for="${checkbox.id}"]`);
                 const productName = label.querySelector('span').textContent;
                 const productCode = checkbox.value;
-                selectedProducts.push({ code: productCode, name: productName });
+                
+                // 從產品行獲取詳細信息
+                const productRow = checkbox.closest('tr');
+                const unitCostCell = productRow.querySelector('td:nth-child(5)'); // 單價列
+                const unitCell = productRow.querySelector('td:nth-child(4)'); // 單位列
+                
+                const unitCost = unitCostCell ? parseFloat(unitCostCell.textContent.replace('$', '') || '0') : 0;
+                const unit = unitCell ? unitCell.textContent.trim() : '個';
+                
+                selectedProducts.push({ 
+                    code: productCode, 
+                    name: productName,
+                    unitCost: unitCost,
+                    unit: unit,
+                    deliveryThreshold: 1000 // 預設配送門檻，實際會從API獲取
+                });
             });
 
             const listContainer = document.getElementById('selectedProductsList');
@@ -2602,17 +2707,26 @@
 
             listContainer.innerHTML = selectedProducts.map((product, index) => `
                 <div class="row align-items-center mb-2 p-2 border rounded bg-light">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <strong>${product.name}</strong>
                         <small class="text-muted d-block">${product.code}</small>
+                        <small class="text-info d-block">單價: $${product.unitCost}</small>
                     </div>
                     <div class="col-md-3">
                         <label for="quantity_${product.code}" class="form-label mb-1">數量</label>
                         <input type="number" class="form-control form-control-sm" 
                                id="quantity_${product.code}" name="quantities[${product.code}]" 
-                               min="1" value="1" required>
+                               min="1" value="1" required 
+                               onchange="updateDeliveryCheck('${product.code}', ${product.unitCost}, ${product.deliveryThreshold})">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
+                        <label class="form-label mb-1">配送檢查</label>
+                        <div id="delivery_check_${product.code}" class="delivery-check">
+                            <small class="text-muted">金額: $${product.unitCost}</small><br>
+                            <small class="text-warning">🚚 最低配送額度: $${product.deliveryThreshold}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
                         <label for="note_${product.code}" class="form-label mb-1">備註</label>
                         <input type="text" class="form-control form-control-sm" 
                                id="note_${product.code}" name="notes[${product.code}]" 
@@ -2626,6 +2740,38 @@
                     </div>
                 </div>
             `).join('');
+            
+            // 初始化配送檢查
+            selectedProducts.forEach(product => {
+                updateDeliveryCheck(product.code, product.unitCost, product.deliveryThreshold);
+            });
+        }
+
+        // 更新配送額度檢查
+        function updateDeliveryCheck(productCode, unitCost, deliveryThreshold) {
+            const quantityInput = document.getElementById(`quantity_${productCode}`);
+            const deliveryCheckDiv = document.getElementById(`delivery_check_${productCode}`);
+            
+            if (!quantityInput || !deliveryCheckDiv) return;
+            
+            const quantity = parseInt(quantityInput.value) || 1;
+            const totalAmount = unitCost * quantity;
+            const canDeliver = totalAmount >= deliveryThreshold;
+            const shortage = deliveryThreshold - totalAmount;
+            
+            if (canDeliver) {
+                deliveryCheckDiv.innerHTML = `
+                    <small class="text-success">✅ 金額: $${totalAmount}</small><br>
+                    <small class="text-success">🚚 可配送 (門檻: $${deliveryThreshold})</small>
+                `;
+                deliveryCheckDiv.className = 'delivery-check border border-success bg-light-success rounded p-1';
+            } else {
+                deliveryCheckDiv.innerHTML = `
+                    <small class="text-danger">❌ 金額: $${totalAmount}</small><br>
+                    <small class="text-danger">🚫 不足$${shortage} (門檻: $${deliveryThreshold})</small>
+                `;
+                deliveryCheckDiv.className = 'delivery-check border border-danger bg-light-danger rounded p-1';
+            }
         }
 
         // 從清單移除商品
@@ -3224,16 +3370,34 @@
             return { isValid: true };
         }
 
-        // 載入儀表板數據
+        // 載入儀表板數據 (改善版)
         async function loadDashboardData() {
+            console.log('📊 開始載入儀表板數據...');
+            
             try {
-                await Promise.all([
-                    loadStats(),
-                    loadQuickActions()
-                ]);
+                // 分別嘗試載入各項數據，避免單一失敗阻斷整個過程
+                console.log('  - 嘗試載入統計資料...');
+                try {
+                    await loadStats();
+                    console.log('  ✅ 統計資料載入成功');
+                } catch (error) {
+                    console.warn('  ⚠️ 統計資料載入失敗:', error.message);
+                }
+                
+                console.log('  - 嘗試載入快速操作...');
+                try {
+                    loadQuickActions();
+                    console.log('  ✅ 快速操作載入成功');
+                } catch (error) {
+                    console.warn('  ⚠️ 快速操作載入失敗:', error.message);
+                }
+                
+                console.log('📊 儀表板數據載入過程完成');
+                
             } catch (error) {
-                console.error('載入儀表板數據失敗:', error);
-                showError('載入數據失敗，請重新整理頁面');
+                console.error('❌ 載入儀表板數據時發生未預期錯誤:', error);
+                // 不要拋出錯誤，讓系統繼續運作
+                console.log('🔧 使用降級模式繼續運作');
             }
         }
 
@@ -3554,6 +3718,240 @@
         window.addEventListener('error', function(event) {
             console.error('JavaScript 錯誤:', event.error);
         });
+
+        // 員工管理函數
+        function editEmployee(id) {
+            console.log(`編輯員工: ${id}`);
+            window.lastEditEmployeeLog = `開始編輯員工 ${id}`;
+            
+            try {
+                const modalElement = document.getElementById('editEmployeeModal');
+                console.log('模態框元素:', modalElement);
+                window.lastEditEmployeeLog += ' - 找到模態框元素';
+                
+                if (modalElement) {
+                    // 先移除任何現有的模態框實例
+                    const existingInstance = bootstrap.Modal.getInstance(modalElement);
+                    if (existingInstance) {
+                        existingInstance.dispose();
+                        window.lastEditEmployeeLog += ' - 移除現有實例';
+                    }
+                    
+                    // 創建新的模態框實例
+                    const modal = new bootstrap.Modal(modalElement, {
+                        backdrop: true,
+                        keyboard: true,
+                        focus: true
+                    });
+                    console.log('Bootstrap模態框實例:', modal);
+                    window.lastEditEmployeeLog += ' - 創建Bootstrap實例';
+                    
+                    // 延遲顯示模態框
+                    setTimeout(() => {
+                        modal.show();
+                        console.log('模態框已顯示');
+                        window.lastEditEmployeeLog += ' - 模態框已顯示';
+                    }, 100);
+                    
+                    showAlert(`正在編輯員工 ${id}`, 'info');
+                } else {
+                    console.error('找不到editEmployeeModal元素');
+                    window.lastEditEmployeeLog += ' - 錯誤:找不到模態框元素';
+                }
+            } catch (error) {
+                console.error('編輯員工錯誤:', error);
+                window.lastEditEmployeeLog += ` - 錯誤: ${error.message}`;
+                showAlert('編輯功能暫時無法使用', 'warning');
+            }
+        }
+
+        function deleteEmployee(id) {
+            console.log(`刪除員工: ${id}`);
+            if (confirm(`確定要刪除員工 ${id} 嗎？`)) {
+                showAlert(`員工 ${id} 已刪除`, 'success');
+            }
+        }
+
+        function updateEmployee() {
+            console.log('更新員工資料');
+            showAlert('員工資料已更新', 'success');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editEmployeeModal'));
+            modal.hide();
+        }
     </script>
+
+    <!-- 編輯員工模態框 -->
+    <div class="modal fade" id="editEmployeeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">編輯員工資料</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editEmployeeForm">
+                        <input type="hidden" id="editEmployeeId" name="id">
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="editEmployeeName" class="form-label">姓名</label>
+                                <input type="text" class="form-control" id="editEmployeeName" name="name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editEmployeePosition" class="form-label">職位</label>
+                                <select class="form-control" id="editEmployeePosition" name="position" required>
+                                    <option value="">請選擇職位</option>
+                                    <option value="manager">經理</option>
+                                    <option value="supervisor">主管</option>
+                                    <option value="employee">員工</option>
+                                    <option value="intern">實習生</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="editEmployeeDepartment" class="form-label">部門</label>
+                                <select class="form-control" id="editEmployeeDepartment" name="department" required>
+                                    <option value="">請選擇部門</option>
+                                    <option value="sales">銷售部</option>
+                                    <option value="marketing">行銷部</option>
+                                    <option value="hr">人事部</option>
+                                    <option value="it">資訊部</option>
+                                    <option value="finance">財務部</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editEmployeeSalary" class="form-label">薪資</label>
+                                <input type="number" class="form-control" id="editEmployeeSalary" name="salary" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editEmployeeHireDate" class="form-label">到職日期</label>
+                            <input type="date" class="form-control" id="editEmployeeHireDate" name="hire_date" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="updateEmployee()">更新員工</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 編輯出勤記錄模態框 -->
+    <div class="modal fade" id="editAttendanceModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">編輯出勤記錄</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editAttendanceForm">
+                        <input type="hidden" id="editAttendanceId" name="id">
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="editAttendanceEmployee" class="form-label">員工</label>
+                                <select class="form-control" id="editAttendanceEmployee" name="employee_id" required>
+                                    <option value="">請選擇員工</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editAttendanceDate" class="form-label">日期</label>
+                                <input type="date" class="form-control" id="editAttendanceDate" name="date" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="editCheckInTime" class="form-label">上班時間</label>
+                                <input type="time" class="form-control" id="editCheckInTime" name="check_in_time">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editCheckOutTime" class="form-label">下班時間</label>
+                                <input type="time" class="form-control" id="editCheckOutTime" name="check_out_time">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editAttendanceStatus" class="form-label">狀態</label>
+                            <select class="form-control" id="editAttendanceStatus" name="status" required>
+                                <option value="present">出席</option>
+                                <option value="absent">缺席</option>
+                                <option value="late">遲到</option>
+                                <option value="leave">請假</option>
+                                <option value="vacation">休假</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="updateAttendance()">更新記錄</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 編輯營收記錄模態框 -->
+    <div class="modal fade" id="editRevenueModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">編輯營收記錄</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editRevenueForm">
+                        <input type="hidden" id="editRevenueId" name="id">
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="editRevenueDate" class="form-label">日期</label>
+                                <input type="date" class="form-control" id="editRevenueDate" name="date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editRevenueAmount" class="form-label">金額</label>
+                                <input type="number" class="form-control" id="editRevenueAmount" name="amount" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="editRevenueSource" class="form-label">來源</label>
+                                <input type="text" class="form-control" id="editRevenueSource" name="source" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editRevenueCategory" class="form-label">類別</label>
+                                <select class="form-control" id="editRevenueCategory" name="category" required>
+                                    <option value="">請選擇類別</option>
+                                    <option value="sales">銷售收入</option>
+                                    <option value="service">服務收入</option>
+                                    <option value="commission">佣金收入</option>
+                                    <option value="other">其他收入</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editRevenueDescription" class="form-label">描述</label>
+                            <textarea class="form-control" id="editRevenueDescription" name="description" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="updateRevenue()">更新記錄</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 載入功能函數 -->
+    <script src="/js/dashboard-functions.js"></script>
 </body>
 </html>

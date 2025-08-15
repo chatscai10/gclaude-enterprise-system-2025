@@ -54,7 +54,27 @@ app.get('/', (req, res) => {
     }
 });
 
-// 儀表板
+// 管理員儀表板
+app.get('/admin', (req, res) => {
+    const adminPath = path.join(__dirname, 'public', 'admin-dashboard.html');
+    if (fs.existsSync(adminPath)) {
+        res.sendFile(adminPath);
+    } else {
+        res.redirect('/');
+    }
+});
+
+// 員工儀表板
+app.get('/employee', (req, res) => {
+    const employeePath = path.join(__dirname, 'public', 'employee-dashboard.html');
+    if (fs.existsSync(employeePath)) {
+        res.sendFile(employeePath);
+    } else {
+        res.redirect('/');
+    }
+});
+
+// 儀表板重定向（根據權限分離）
 app.get('/dashboard', (req, res) => {
     const dashboardPath = path.join(__dirname, 'public', 'dashboard.html');
     if (fs.existsSync(dashboardPath)) {
@@ -64,20 +84,9 @@ app.get('/dashboard', (req, res) => {
     }
 });
 
-// 管理員頁面
-app.get('/admin', (req, res) => {
-    const dashboardPath = path.join(__dirname, 'public', 'dashboard.html');
-    if (fs.existsSync(dashboardPath)) {
-        res.sendFile(dashboardPath);
-    } else {
-        res.redirect('/');
-    }
-});
-
-// 所有角色的儀表板重定向
-app.get('/manager', (req, res) => res.redirect('/dashboard'));
-app.get('/employee', (req, res) => res.redirect('/dashboard'));
-app.get('/intern', (req, res) => res.redirect('/dashboard'));
+// 角色重定向
+app.get('/manager', (req, res) => res.redirect('/admin'));
+app.get('/intern', (req, res) => res.redirect('/employee'));
 
 // API 測試
 app.get('/api/test', (req, res) => {

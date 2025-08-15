@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GClaude 企業管理系統 - 員工工作台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-info">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><i class="fas fa-user me-2"></i>員工工作台</a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">歡迎，<span id="employee-name">員工</span></span>
+                <button class="btn btn-outline-light btn-sm" onclick="logout()">登出</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- 側邊欄 -->
+            <div class="col-md-3 col-lg-2">
+                <div class="list-group">
+                    <a href="#dashboard" class="list-group-item list-group-item-action active" onclick="showSection('dashboard')">
+                        <i class="fas fa-home me-2"></i>我的首頁
+                    </a>
+                    <a href="#attendance" class="list-group-item list-group-item-action" onclick="showSection('attendance')">
+                        <i class="fas fa-clock me-2"></i>打卡簽到
+                    </a>
+                    <a href="#schedule" class="list-group-item list-group-item-action" onclick="showSection('schedule')">
+                        <i class="fas fa-calendar me-2"></i>我的班表
+                    </a>
+                    <a href="#revenue" class="list-group-item list-group-item-action" onclick="showSection('revenue')">
+                        <i class="fas fa-cash-register me-2"></i>營收登記
+                    </a>
+                    <a href="#maintenance" class="list-group-item list-group-item-action" onclick="showSection('maintenance')">
+                        <i class="fas fa-tools me-2"></i>維修申請
+                    </a>
+                    <a href="#profile" class="list-group-item list-group-item-action" onclick="showSection('profile')">
+                        <i class="fas fa-user-cog me-2"></i>個人資料
+                    </a>
+                </div>
+            </div>
+
+            <!-- 主要內容 -->
+            <div class="col-md-9 col-lg-10">
+                <!-- 我的首頁 -->
+                <div id="dashboard-section" class="content-section">
+                    <h2><i class="fas fa-home me-2"></i>我的工作台</h2>
+                    
+                    <!-- 快速操作 -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card bg-success text-white h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-sign-in-alt fa-2x mb-2"></i>
+                                    <h5>上班打卡</h5>
+                                    <button class="btn btn-light btn-sm" onclick="clockIn()">立即打卡</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card bg-danger text-white h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-sign-out-alt fa-2x mb-2"></i>
+                                    <h5>下班打卡</h5>
+                                    <button class="btn btn-light btn-sm" onclick="clockOut()">立即打卡</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card bg-primary text-white h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-dollar-sign fa-2x mb-2"></i>
+                                    <h5>營收登記</h5>
+                                    <button class="btn btn-light btn-sm" onclick="showSection('revenue')">前往登記</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card bg-warning text-white h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-wrench fa-2x mb-2"></i>
+                                    <h5>維修申請</h5>
+                                    <button class="btn btn-light btn-sm" onclick="showSection('maintenance')">前往申請</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 今日統計 -->
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-clock me-1"></i>今日出勤</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-1">上班時間: <span id="clock-in-time">--:--</span></p>
+                                    <p class="mb-1">下班時間: <span id="clock-out-time">--:--</span></p>
+                                    <p class="mb-0">工作時數: <span id="work-hours">--</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-calendar me-1"></i>本月統計</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-1">出勤天數: <span id="month-days">--</span></p>
+                                    <p class="mb-1">總工時: <span id="month-hours">--</span></p>
+                                    <p class="mb-0">遲到次數: <span id="late-count">--</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-bell me-1"></i>系統通知</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div id="notifications">
+                                        <p class="text-muted">無新通知</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 打卡簽到 -->
+                <div id="attendance-section" class="content-section d-none">
+                    <h2><i class="fas fa-clock me-2"></i>出勤打卡</h2>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>GPS 打卡</h5>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div id="current-time" class="h3 text-primary mb-3"></div>
+                                    <div id="location-status" class="mb-3">
+                                        <i class="fas fa-spinner fa-spin"></i> 正在定位...
+                                    </div>
+                                    <div class="btn-group" role="group">
+                                        <button id="clock-in-btn" class="btn btn-success btn-lg" onclick="clockIn()">
+                                            <i class="fas fa-sign-in-alt me-1"></i>上班打卡
+                                        </button>
+                                        <button id="clock-out-btn" class="btn btn-danger btn-lg" onclick="clockOut()">
+                                            <i class="fas fa-sign-out-alt me-1"></i>下班打卡
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>最近打卡記錄</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>日期</th>
+                                                    <th>上班</th>
+                                                    <th>下班</th>
+                                                    <th>狀態</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="attendance-history">
+                                                <tr>
+                                                    <td colspan="4" class="text-center">載入中...</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 我的班表 -->
+                <div id="schedule-section" class="content-section d-none">
+                    <h2><i class="fas fa-calendar me-2"></i>我的班表</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="text-muted">班表功能開發中...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 營收登記 -->
+                <div id="revenue-section" class="content-section d-none">
+                    <h2><i class="fas fa-cash-register me-2"></i>營收登記</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="text-muted">營收登記功能開發中...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 維修申請 -->
+                <div id="maintenance-section" class="content-section d-none">
+                    <h2><i class="fas fa-tools me-2"></i>維修申請</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="text-muted">維修申請功能開發中...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 個人資料 -->
+                <div id="profile-section" class="content-section d-none">
+                    <h2><i class="fas fa-user-cog me-2"></i>個人資料</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>基本資料</h5>
+                                    <table class="table table-borderless">
+                                        <tr><th>姓名:</th><td id="profile-name">--</td></tr>
+                                        <tr><th>員工編號:</th><td id="profile-id">--</td></tr>
+                                        <tr><th>職位:</th><td id="profile-role">--</td></tr>
+                                        <tr><th>部門:</th><td id="profile-department">--</td></tr>
+                                        <tr><th>電話:</th><td id="profile-phone">--</td></tr>
+                                        <tr><th>信箱:</th><td id="profile-email">--</td></tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>修改密碼</h5>
+                                    <div class="mb-3">
+                                        <label class="form-label">舊密碼</label>
+                                        <input type="password" class="form-control" id="old-password">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">新密碼</label>
+                                        <input type="password" class="form-control" id="new-password">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">確認新密碼</label>
+                                        <input type="password" class="form-control" id="confirm-password">
+                                    </div>
+                                    <button class="btn btn-primary" onclick="changePassword()">修改密碼</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 檢查員工權限
+        function checkEmployeeAuth() {
+            const token = localStorage.getItem('jwt_token');
+            const user = JSON.parse(localStorage.getItem('user_data') || '{}');
+            
+            if (!token || !user) {
+                alert('請先登入');
+                window.location.href = '/login.html';
+                return false;
+            }
+            
+            document.getElementById('employee-name').textContent = user.name;
+            return true;
+        }
+
+        // 顯示指定區塊
+        function showSection(sectionName) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.add('d-none');
+            });
+            
+            document.querySelectorAll('.list-group-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            document.getElementById(sectionName + '-section').classList.remove('d-none');
+            document.querySelector(`[onclick="showSection('${sectionName}')"]`).classList.add('active');
+            
+            if (sectionName === 'dashboard') loadDashboard();
+            if (sectionName === 'attendance') loadAttendance();
+            if (sectionName === 'profile') loadProfile();
+        }
+
+        // 載入首頁數據
+        async function loadDashboard() {
+            const token = localStorage.getItem('jwt_token');
+            
+            try {
+                // 載入今日出勤
+                const response = await fetch('/api/attendance/today', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const attendance = await response.json();
+                    document.getElementById('clock-in-time').textContent = 
+                        attendance.clock_in ? new Date(attendance.clock_in).toLocaleTimeString() : '--:--';
+                    document.getElementById('clock-out-time').textContent = 
+                        attendance.clock_out ? new Date(attendance.clock_out).toLocaleTimeString() : '--:--';
+                    
+                    if (attendance.clock_in && attendance.clock_out) {
+                        const hours = (new Date(attendance.clock_out) - new Date(attendance.clock_in)) / (1000 * 60 * 60);
+                        document.getElementById('work-hours').textContent = hours.toFixed(1) + ' 小時';
+                    }
+                }
+            } catch (error) {
+                console.error('載入首頁數據失敗:', error);
+            }
+        }
+
+        // 載入出勤頁面
+        function loadAttendance() {
+            updateCurrentTime();
+            getCurrentLocation();
+            loadAttendanceHistory();
+            
+            // 每秒更新時間
+            setInterval(updateCurrentTime, 1000);
+        }
+
+        // 載入個人資料
+        function loadProfile() {
+            const user = JSON.parse(localStorage.getItem('user_data') || '{}');
+            
+            document.getElementById('profile-name').textContent = user.name || '--';
+            document.getElementById('profile-id').textContent = user.employee_id || '--';
+            document.getElementById('profile-role').textContent = user.role || '--';
+            document.getElementById('profile-department').textContent = user.department_name || '--';
+            document.getElementById('profile-phone').textContent = user.phone || '--';
+            document.getElementById('profile-email').textContent = user.email || '--';
+        }
+
+        // 更新當前時間
+        function updateCurrentTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleTimeString('zh-TW');
+        }
+
+        // 獲取當前位置
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        document.getElementById('location-status').innerHTML = 
+                            '<i class="fas fa-map-marker-alt text-success"></i> 定位成功';
+                    },
+                    function(error) {
+                        document.getElementById('location-status').innerHTML = 
+                            '<i class="fas fa-exclamation-triangle text-warning"></i> 定位失敗';
+                    }
+                );
+            } else {
+                document.getElementById('location-status').innerHTML = 
+                    '<i class="fas fa-times text-danger"></i> 不支援定位';
+            }
+        }
+
+        // 載入出勤記錄
+        async function loadAttendanceHistory() {
+            const token = localStorage.getItem('jwt_token');
+            
+            try {
+                const response = await fetch('/api/attendance/history?limit=5', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const history = await response.json();
+                    const tbody = document.getElementById('attendance-history');
+                    
+                    if (history.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4" class="text-center">無記錄</td></tr>';
+                    } else {
+                        tbody.innerHTML = history.map(record => `
+                            <tr>
+                                <td>${new Date(record.date).toLocaleDateString()}</td>
+                                <td>${record.clock_in ? new Date(record.clock_in).toLocaleTimeString() : '--'}</td>
+                                <td>${record.clock_out ? new Date(record.clock_out).toLocaleTimeString() : '--'}</td>
+                                <td><span class="badge bg-success">正常</span></td>
+                            </tr>
+                        `).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('載入出勤記錄失敗:', error);
+            }
+        }
+
+        // 上班打卡
+        async function clockIn() {
+            const token = localStorage.getItem('jwt_token');
+            
+            try {
+                const response = await fetch('/api/attendance/clock-in', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        location: 'GPS定位中...'
+                    })
+                });
+                
+                if (response.ok) {
+                    alert('上班打卡成功！');
+                    loadDashboard();
+                    loadAttendance();
+                } else {
+                    const error = await response.json();
+                    alert('打卡失敗：' + error.message);
+                }
+            } catch (error) {
+                alert('打卡失敗：' + error.message);
+            }
+        }
+
+        // 下班打卡
+        async function clockOut() {
+            const token = localStorage.getItem('jwt_token');
+            
+            try {
+                const response = await fetch('/api/attendance/clock-out', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        location: 'GPS定位中...'
+                    })
+                });
+                
+                if (response.ok) {
+                    alert('下班打卡成功！');
+                    loadDashboard();
+                    loadAttendance();
+                } else {
+                    const error = await response.json();
+                    alert('打卡失敗：' + error.message);
+                }
+            } catch (error) {
+                alert('打卡失敗：' + error.message);
+            }
+        }
+
+        // 修改密碼
+        function changePassword() {
+            const oldPassword = document.getElementById('old-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            if (!oldPassword || !newPassword || !confirmPassword) {
+                alert('請填寫完整的密碼資料');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                alert('新密碼確認不一致');
+                return;
+            }
+            
+            alert('修改密碼功能開發中...');
+        }
+
+        // 登出
+        function logout() {
+            localStorage.removeItem('jwt_token');
+            localStorage.removeItem('user_data');
+            window.location.href = '/login.html';
+        }
+
+        // 頁面載入時執行
+        document.addEventListener('DOMContentLoaded', function() {
+            if (checkEmployeeAuth()) {
+                loadDashboard();
+            }
+        });
+    </script>
+</body>
+</html>

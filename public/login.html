@@ -356,16 +356,17 @@
                 
                 if (response.ok && data.success) {
                     // 登入成功
-                    localStorage.setItem('authToken', data.token);
-                    localStorage.setItem('userInfo', JSON.stringify(data.user));
+                    localStorage.setItem('jwt_token', data.token);
+                    localStorage.setItem('user_data', JSON.stringify(data.user));
                     
                     showAlert(`登入成功！歡迎 ${data.user.name}`, 'success');
                     
                     console.log(`✅ 登入成功: ${data.user.name} (${data.user.role})`);
+                    console.log(`🔄 將重定向到: ${data.redirectUrl}`);
                     
                     // 延遲跳轉以顯示成功訊息
                     setTimeout(() => {
-                        redirectToDashboard(data.user.role);
+                        window.location.href = data.redirectUrl || '/dashboard';
                     }, 1500);
                     
                 } else {

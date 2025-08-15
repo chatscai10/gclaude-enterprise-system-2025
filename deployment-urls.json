@@ -1,0 +1,44 @@
+{
+  "timestamp": "2025-08-13T19:51:11.764Z",
+  "availableUrls": [
+    {
+      "name": "Local Development",
+      "url": "http://localhost:3007",
+      "status": "active",
+      "healthCheck": "http://localhost:3007/api/health"
+    },
+    {
+      "name": "Railway Production",
+      "url": "https://gclaude-enterprise-system-production.railway.app",
+      "status": "pending_deployment",
+      "healthCheck": "https://gclaude-enterprise-system-production.railway.app/api/health",
+      "deployCommand": "railway link && railway up"
+    },
+    {
+      "name": "Vercel Production",
+      "url": "https://gclaude-enterprise-system-vercel.app",
+      "status": "pending_deployment",
+      "healthCheck": "https://gclaude-enterprise-system-vercel.app/api/health",
+      "deployCommand": "vercel login && vercel --prod"
+    }
+  ],
+  "deploymentInstructions": {
+    "railway": [
+      "cd \"D:\\0813\\gclaude-enterprise-system\"",
+      "railway login (已完成)",
+      "railway link (選擇專案)",
+      "railway up (執行部署)"
+    ],
+    "vercel": [
+      "cd \"D:\\0813\\gclaude-enterprise-system\"",
+      "vercel login",
+      "vercel --prod"
+    ],
+    "docker": [
+      "啟動 Docker Desktop",
+      "cd \"D:\\0813\\gclaude-enterprise-system\"",
+      "docker build -t gclaude-enterprise .",
+      "docker run -d -p 3007:3007 gclaude-enterprise"
+    ]
+  }
+}

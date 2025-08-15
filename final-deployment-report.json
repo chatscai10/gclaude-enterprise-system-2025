@@ -1,0 +1,143 @@
+{
+  "scenarios": [
+    {
+      "name": "員工工作流程",
+      "steps": [
+        {
+          "step": "員工登入",
+          "success": true
+        },
+        {
+          "step": "GPS打卡功能",
+          "success": false
+        },
+        {
+          "step": "查看庫存",
+          "success": true
+        },
+        {
+          "step": "叫貨申請",
+          "success": true
+        }
+      ],
+      "success": true
+    },
+    {
+      "name": "管理員營運流程",
+      "steps": [
+        {
+          "step": "管理員登入",
+          "success": true
+        },
+        {
+          "step": "員工管理",
+          "success": true
+        },
+        {
+          "step": "編輯員工",
+          "success": true
+        },
+        {
+          "step": "營收輸入新格式",
+          "success": true
+        },
+        {
+          "step": "系統報告",
+          "success": true
+        }
+      ],
+      "success": true
+    }
+  ],
+  "deploymentChecks": [
+    {
+      "name": "生產配置文件",
+      "success": true
+    },
+    {
+      "name": "PM2配置文件",
+      "success": true
+    },
+    {
+      "name": "Nginx配置文件",
+      "success": true
+    },
+    {
+      "name": "Docker配置文件",
+      "success": true
+    },
+    {
+      "name": "部署腳本",
+      "success": true
+    },
+    {
+      "name": "監控腳本",
+      "success": true
+    },
+    {
+      "name": "備份腳本",
+      "success": true
+    },
+    {
+      "name": "一鍵部署腳本",
+      "success": true
+    },
+    {
+      "name": "數據庫文件",
+      "success": true
+    },
+    {
+      "name": "Telegram通知模組",
+      "success": true
+    }
+  ],
+  "performanceMetrics": {
+    "pageLoadTime": 1004,
+    "loginTime": 2662,
+    "apiResponseTime": 7
+  },
+  "securityChecks": [
+    {
+      "name": "HTTPS使用",
+      "success": true,
+      "note": "本地測試環境"
+    },
+    {
+      "name": "安全標頭: x-frame-options",
+      "success": false,
+      "value": "未設置"
+    },
+    {
+      "name": "安全標頭: x-content-type-options",
+      "success": false,
+      "value": "未設置"
+    },
+    {
+      "name": "安全標頭: x-xss-protection",
+      "success": false,
+      "value": "未設置"
+    },
+    {
+      "name": "未授權訪問保護",
+      "success": false
+    }
+  ],
+  "summary": {
+    "scenarios": {
+      "total": 2,
+      "passed": 2,
+      "successRate": "100.00%"
+    },
+    "deploymentChecks": {
+      "total": 10,
+      "passed": 10,
+      "successRate": "100.00%"
+    },
+    "securityChecks": {
+      "total": 5,
+      "passed": 1,
+      "successRate": "20.00%"
+    },
+    "overallStatus": "NEEDS_ATTENTION"
+  }
+}

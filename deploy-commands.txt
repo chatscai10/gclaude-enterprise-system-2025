@@ -1,0 +1,36 @@
+REM === GClaude Enterprise System - Manual Deploy Commands ===
+REM Copy and paste these commands one by one
+
+REM Step 1: Navigate to project directory
+cd /d D:\0813\gclaude-enterprise-system
+
+REM Step 2: Install tools
+npm install -g @railway/cli
+npm install -g vercel
+
+REM Step 3: Login to Railway
+railway login
+
+REM Step 4: List existing projects (note down PROJECT_IDs to delete)
+railway list
+
+REM Step 5: Delete old projects (replace PROJECT_ID with actual ID)
+REM railway delete PROJECT_ID
+
+REM Step 6: Initialize new project
+railway init gclaude-enterprise-system
+
+REM Step 7: Set environment variables
+railway env set PORT=3007
+railway env set NODE_ENV=production
+railway env set JWT_SECRET=gclaude-enterprise-super-secret-key-2024
+railway env set TELEGRAM_BOT_TOKEN=7659930552:AAF_jF1rAXFnjFO176-9X5fKfBwbrko8BNc
+railway env set TELEGRAM_BOSS_GROUP_ID=-1002658082392
+
+REM Step 8: Deploy
+railway up
+
+REM Step 9: Check status and get URL
+railway status
+
+REM === End of deployment ===

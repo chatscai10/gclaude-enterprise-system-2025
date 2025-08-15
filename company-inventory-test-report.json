@@ -1,0 +1,51 @@
+{
+  "testTime": "2025/8/14 上午11:04:19",
+  "summary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "successRate": "100.0%"
+  },
+  "results": [
+    {
+      "test": "公司庫存不足通知",
+      "success": true,
+      "details": "公司總庫存警告發送成功，包含供應商聯絡資訊",
+      "timestamp": "2025/8/14 上午11:04:13"
+    },
+    {
+      "test": "公司庫存耗盡通知",
+      "success": true,
+      "details": "公司缺貨警告發送成功",
+      "timestamp": "2025/8/14 上午11:04:13"
+    },
+    {
+      "test": "公司採購頻率異常通知",
+      "success": true,
+      "details": "進貨頻率過高警告發送成功",
+      "timestamp": "2025/8/14 上午11:04:18"
+    },
+    {
+      "test": "公司進貨間隔過久通知",
+      "success": true,
+      "details": "進貨間隔過久警告發送成功",
+      "timestamp": "2025/8/14 上午11:04:18"
+    },
+    {
+      "test": "分店叫貨申請通知",
+      "success": true,
+      "details": "分店向公司申請叫貨記錄發送成功",
+      "timestamp": "2025/8/14 上午11:04:19"
+    }
+  ],
+  "logicCorrection": {
+    "before": "各分店庫存管理",
+    "after": "公司總庫存管理",
+    "changes": [
+      "通知訊息改為公司庫存警告",
+      "包含供應商聯絡資訊",
+      "界面標題和說明更新",
+      "區分進貨和叫貨概念"
+    ]
+  }
+}

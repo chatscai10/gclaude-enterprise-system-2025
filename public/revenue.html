@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>營收記錄 - GClaude 企業管理系統</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #2196F3 0%, #00BCD4 100%);
+            --primary-color: #2196F3;
+            --secondary-color: #00BCD4;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: var(--primary-gradient);
+            color: white;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .sidebar-header h4 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            margin: 0.2rem 0;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            border-radius: 0;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-link i {
+            margin-right: 0.8rem;
+            width: 1.2rem;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: none;
+            transition: transform 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .revenue-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 2rem 0;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th {
+            border-top: none;
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .btn-outline-primary {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .badge {
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .filter-box {
+            background: white;
+            border-radius: 15px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        .currency {
+            font-weight: 600;
+            color: #28a745;
+        }
+
+        .currency.negative {
+            color: #dc3545;
+        }
+
+        .trend-up {
+            color: #28a745;
+        }
+
+        .trend-down {
+            color: #dc3545;
+        }
+
+        .revenue-summary {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .revenue-summary h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .period-selector {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+        }
+
+        .period-selector:focus {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            color: white;
+            box-shadow: none;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .revenue-summary h2 {
+                font-size: 2rem;
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 側邊導航 -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h4><i class="bi bi-building"></i> GClaude</h4>
+            <small>企業管理系統</small>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard.html">
+                        <i class="bi bi-speedometer2"></i> 儀表板
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="employees.html">
+                        <i class="bi bi-people"></i> 員工管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="attendance.html">
+                        <i class="bi bi-clock"></i> 出勤管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="revenue.html">
+                        <i class="bi bi-graph-up"></i> 營收記錄
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="orders.html">
+                        <i class="bi bi-box"></i> 叫貨管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="maintenance.html">
+                        <i class="bi bi-tools"></i> 維修管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="photos.html">
+                        <i class="bi bi-camera"></i> 照片管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="settings.html">
+                        <i class="bi bi-gear"></i> 系統設定
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <hr style="border-color: rgba(255, 255, 255, 0.2); margin: 1rem 0;">
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="logout()">
+                        <i class="bi bi-box-arrow-right"></i> 登出
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- 主要內容 -->
+    <div class="main-content">
+        <!-- 頁面標題 -->
+        <div class="page-header">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="h2 mb-1">
+                        <i class="bi bi-graph-up text-primary"></i> 營收記錄
+                    </h1>
+                    <p class="text-muted mb-0">營收統計分析、記錄管理及報表</p>
+                </div>
+                <div class="col-auto">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRevenueModal">
+                            <i class="bi bi-plus-circle"></i> 新增記錄
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" onclick="exportRevenue()">
+                            <i class="bi bi-download"></i> 匯出報表
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 營收總覽 -->
+        <div class="revenue-summary">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h2 id="total-revenue">NT$ --,---</h2>
+                    <p class="mb-0">
+                        <span id="period-text">本月營收</span>
+                        <span id="revenue-trend" class="ms-3">
+                            <i class="bi bi-arrow-up"></i> +0.0%
+                        </span>
+                    </p>
+                </div>
+                <div class="col-lg-4 text-end">
+                    <select class="form-select period-selector" id="period-selector" onchange="changePeriod()">
+                        <option value="today">今日</option>
+                        <option value="week">本週</option>
+                        <option value="month" selected>本月</option>
+                        <option value="quarter">本季</option>
+                        <option value="year">本年</option>
+                        <option value="custom">自訂期間</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 統計卡片 -->
+        <div class="row mb-4" id="revenue-stats">
+            <div class="col-md-3 mb-3">
+                <div class="stats-card text-center">
+                    <div class="text-success mb-2">
+                        <i class="bi bi-cash-stack" style="font-size: 2rem;"></i>
+                    </div>
+                    <h4 class="mb-1 currency" id="today-revenue">NT$ 0</h4>
+                    <p class="text-muted mb-0">今日營收</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stats-card text-center">
+                    <div class="text-info mb-2">
+                        <i class="bi bi-receipt" style="font-size: 2rem;"></i>
+                    </div>
+                    <h4 class="mb-1" id="total-transactions">0</h4>
+                    <p class="text-muted mb-0">交易筆數</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stats-card text-center">
+                    <div class="text-warning mb-2">
+                        <i class="bi bi-calculator" style="font-size: 2rem;"></i>
+                    </div>
+                    <h4 class="mb-1 currency" id="average-transaction">NT$ 0</h4>
+                    <p class="text-muted mb-0">平均客單價</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stats-card text-center">
+                    <div class="text-primary mb-2">
+                        <i class="bi bi-shop" style="font-size: 2rem;"></i>
+                    </div>
+                    <h4 class="mb-1" id="best-store">--</h4>
+                    <p class="text-muted mb-0">最佳分店</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- 左側：圖表分析 -->
+            <div class="col-lg-8">
+                <!-- 營收趨勢圖表 -->
+                <div class="revenue-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-graph-up"></i> 營收趨勢
+                        </h5>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <input type="radio" class="btn-check" name="chart-type" id="chart-line" autocomplete="off" checked>
+                            <label class="btn btn-outline-primary" for="chart-line">線型圖</label>
+                            
+                            <input type="radio" class="btn-check" name="chart-type" id="chart-bar" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="chart-bar">柱狀圖</label>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="revenue-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 分店營收對比 -->
+                <div class="revenue-card">
+                    <h5 class="mb-3">
+                        <i class="bi bi-pie-chart"></i> 分店營收對比
+                    </h5>
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="store-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右側：詳細記錄 -->
+            <div class="col-lg-4">
+                <!-- 篩選器 -->
+                <div class="filter-box">
+                    <h6 class="mb-3">
+                        <i class="bi bi-funnel"></i> 篩選條件
+                    </h6>
+                    <div class="mb-3">
+                        <label class="form-label">日期範圍</label>
+                        <div class="row">
+                            <div class="col-6">
+                                <input type="date" class="form-control form-control-sm" id="start-date">
+                            </div>
+                            <div class="col-6">
+                                <input type="date" class="form-control form-control-sm" id="end-date">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">分店</label>
+                        <select class="form-select form-select-sm" id="store-filter-detailed">
+                            <option value="">所有分店</option>
+                            <option value="1">內壢忠孝店</option>
+                            <option value="2">桃園龍安店</option>
+                            <option value="3">中壢龍崗店</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">金額範圍</label>
+                        <div class="row">
+                            <div class="col-6">
+                                <input type="number" class="form-control form-control-sm" placeholder="最小" id="min-amount">
+                            </div>
+                            <div class="col-6">
+                                <input type="number" class="form-control form-control-sm" placeholder="最大" id="max-amount">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary btn-sm" onclick="applyFilters()">
+                            <i class="bi bi-search"></i> 套用篩選
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="resetFilters()">
+                            <i class="bi bi-arrow-clockwise"></i> 重置
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 營收記錄列表 -->
+                <div class="revenue-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">
+                            <i class="bi bi-list-ul"></i> 最近記錄
+                        </h6>
+                        <button class="btn btn-outline-primary btn-sm" onclick="refreshRevenue()">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                    </div>
+
+                    <div id="loading-records" class="text-center py-3" style="display: none;">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">載入中...</span>
+                        </div>
+                    </div>
+
+                    <div id="revenue-records" style="max-height: 400px; overflow-y: auto;">
+                        <!-- 動態載入營收記錄 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 詳細記錄表格 -->
+        <div class="revenue-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-table"></i> 詳細記錄
+                </h5>
+                <div>
+                    <input type="text" class="form-control form-control-sm d-inline-block" style="width: 200px;" 
+                           placeholder="搜尋記錄..." id="search-input" onkeyup="searchRevenue()">
+                    <button class="btn btn-outline-primary btn-sm ms-2" onclick="refreshRevenue()">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">載入中...</span>
+                </div>
+                <p class="mt-2">載入營收記錄中...</p>
+            </div>
+
+            <div class="table-responsive" id="revenue-table-container">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>日期時間</th>
+                            <th>分店</th>
+                            <th>金額</th>
+                            <th>付款方式</th>
+                            <th>分類</th>
+                            <th>備註</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="revenue-table-body">
+                        <!-- 動態載入營收記錄 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 分頁 -->
+            <nav aria-label="營收分頁" id="pagination-container" style="display: none;">
+                <ul class="pagination justify-content-center">
+                    <!-- 動態載入分頁 -->
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 新增營收記錄模態框 -->
+    <div class="modal fade" id="addRevenueModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-plus-circle"></i> 新增營收記錄
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-revenue-form">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="revenue-date" class="form-label">日期 *</label>
+                                <input type="date" class="form-control" id="revenue-date" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="revenue-time" class="form-label">時間 *</label>
+                                <input type="time" class="form-control" id="revenue-time" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="revenue-store" class="form-label">分店 *</label>
+                                <select class="form-select" id="revenue-store" required>
+                                    <option value="">請選擇分店</option>
+                                    <option value="1">內壢忠孝店</option>
+                                    <option value="2">桃園龍安店</option>
+                                    <option value="3">中壢龍崗店</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="revenue-amount" class="form-label">金額 *</label>
+                                <input type="number" class="form-control" id="revenue-amount" min="0" step="0.01" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="payment-method" class="form-label">付款方式</label>
+                                <select class="form-select" id="payment-method">
+                                    <option value="cash">現金</option>
+                                    <option value="card">信用卡</option>
+                                    <option value="mobile">行動支付</option>
+                                    <option value="transfer">轉帳</option>
+                                    <option value="other">其他</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="revenue-category" class="form-label">分類</label>
+                                <select class="form-select" id="revenue-category">
+                                    <option value="sale">銷售</option>
+                                    <option value="service">服務</option>
+                                    <option value="rental">租賃</option>
+                                    <option value="other">其他</option>
+                                </select>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label for="revenue-note" class="form-label">備註</label>
+                                <textarea class="form-control" id="revenue-note" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="addRevenue()">
+                        <i class="bi bi-check-circle"></i> 新增記錄
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/revenue.js"></script>
+</body>
+</html>

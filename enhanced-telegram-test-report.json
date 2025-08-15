@@ -1,0 +1,83 @@
+{
+  "testTime": "2025/8/14 上午10:59:06",
+  "summary": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0,
+    "successRate": "100.0%"
+  },
+  "results": [
+    {
+      "test": "員工生日通知",
+      "success": true,
+      "details": "生日祝福訊息發送成功",
+      "timestamp": "2025/8/14 上午10:58:43"
+    },
+    {
+      "test": "新員工註冊通知",
+      "success": true,
+      "details": "新員工歡迎訊息發送成功",
+      "timestamp": "2025/8/14 上午10:58:43"
+    },
+    {
+      "test": "排班通知",
+      "success": true,
+      "details": "排班異動訊息發送成功",
+      "timestamp": "2025/8/14 上午10:58:50"
+    },
+    {
+      "test": "投票通知",
+      "success": true,
+      "details": "投票活動訊息發送成功",
+      "timestamp": "2025/8/14 上午10:58:52"
+    },
+    {
+      "test": "庫存異常通知",
+      "success": true,
+      "details": "庫存不足警告發送成功",
+      "timestamp": "2025/8/14 上午10:58:52"
+    },
+    {
+      "test": "叫貨頻率異常通知",
+      "success": true,
+      "details": "叫貨頻率警告發送成功",
+      "timestamp": "2025/8/14 上午10:58:56"
+    },
+    {
+      "test": "品項異常通知",
+      "success": true,
+      "details": "品項異常警告發送成功",
+      "timestamp": "2025/8/14 上午10:58:56"
+    },
+    {
+      "test": "系統錯誤通知",
+      "success": true,
+      "details": "系統錯誤警告發送成功",
+      "timestamp": "2025/8/14 上午10:58:57"
+    },
+    {
+      "test": "修復後打卡通知 - 正常時間戳",
+      "success": true,
+      "details": "無Invalid Date錯誤",
+      "timestamp": "2025/8/14 上午10:59:04"
+    },
+    {
+      "test": "修復後打卡通知 - 無時間戳(使用預設)",
+      "success": true,
+      "details": "無Invalid Date錯誤",
+      "timestamp": "2025/8/14 上午10:59:05"
+    },
+    {
+      "test": "修復後打卡通知 - 使用clock_time欄位",
+      "success": true,
+      "details": "無Invalid Date錯誤",
+      "timestamp": "2025/8/14 上午10:59:05"
+    },
+    {
+      "test": "叫貨記錄通知",
+      "success": true,
+      "details": "叫貨記錄發送成功",
+      "timestamp": "2025/8/14 上午10:59:06"
+    }
+  ]
+}
