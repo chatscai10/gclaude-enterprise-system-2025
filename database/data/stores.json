@@ -1,0 +1,13 @@
+[
+  {
+    "id": 1,
+    "name": "總公司",
+    "address": "台北市信義區",
+    "phone": "02-12345678",
+    "latitude": 25.033,
+    "longitude": 121.5654,
+    "gps_range": 100,
+    "is_active": true,
+    "created_at": "2025-08-15T17:34:45.123Z"
+  }
+]

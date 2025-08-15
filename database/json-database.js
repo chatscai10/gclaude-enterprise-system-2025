@@ -435,4 +435,4 @@ class JsonDatabase {
     }
 }
 
-module.exports = DatabaseOperations;
+module.exports = JsonDatabase;
