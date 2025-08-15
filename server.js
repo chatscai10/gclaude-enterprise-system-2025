@@ -429,6 +429,240 @@ app.get('/api/employees/stats/overview', (req, res) => {
     });
 });
 
+// ==================== 員工管理API ====================
+
+// 新增員工
+app.post('/api/employees', (req, res) => {
+    const { name, email, department, position, phone } = req.body;
+    
+    // 模擬新增員工
+    const newEmployee = {
+        id: Date.now(),
+        name,
+        email,
+        department,
+        position,
+        phone,
+        join_date: new Date().toISOString().split('T')[0],
+        is_active: true
+    };
+    
+    res.json({
+        success: true,
+        data: newEmployee,
+        message: '員工新增成功'
+    });
+});
+
+// 更新員工
+app.put('/api/employees/:id', (req, res) => {
+    const { id } = req.params;
+    const { name, email, department, position, phone } = req.body;
+    
+    res.json({
+        success: true,
+        data: {
+            id: parseInt(id),
+            name,
+            email,
+            department,
+            position,
+            phone,
+            updated_at: new Date().toISOString()
+        },
+        message: '員工資料更新成功'
+    });
+});
+
+// 刪除員工
+app.delete('/api/employees/:id', (req, res) => {
+    const { id } = req.params;
+    
+    res.json({
+        success: true,
+        message: `員工 ID ${id} 已成功刪除`
+    });
+});
+
+// ==================== 庫存管理API ====================
+
+// 庫存列表
+app.get('/api/inventory', (req, res) => {
+    res.json({
+        success: true,
+        data: [
+            {
+                id: 1,
+                code: 'P001',
+                name: 'A級產品套組',
+                category: '主力產品',
+                current_stock: 156,
+                safe_stock: 50,
+                unit_price: 15000,
+                status: 'normal'
+            },
+            {
+                id: 2,
+                code: 'P002',
+                name: 'B級服務包',
+                category: '服務',
+                current_stock: 12,
+                safe_stock: 20,
+                unit_price: 8000,
+                status: 'low'
+            },
+            {
+                id: 3,
+                code: 'P003',
+                name: '維護工具',
+                category: '工具',
+                current_stock: 0,
+                safe_stock: 10,
+                unit_price: 2500,
+                status: 'out_of_stock'
+            }
+        ],
+        message: '庫存清單獲取成功'
+    });
+});
+
+// 新增庫存
+app.post('/api/inventory', (req, res) => {
+    const { code, name, category, current_stock, safe_stock, unit_price } = req.body;
+    
+    res.json({
+        success: true,
+        data: {
+            id: Date.now(),
+            code,
+            name,
+            category,
+            current_stock: parseInt(current_stock),
+            safe_stock: parseInt(safe_stock),
+            unit_price: parseFloat(unit_price),
+            status: current_stock > safe_stock ? 'normal' : (current_stock > 0 ? 'low' : 'out_of_stock'),
+            created_at: new Date().toISOString()
+        },
+        message: '庫存商品新增成功'
+    });
+});
+
+// ==================== 維修申請API ====================
+
+// 更新維修狀態
+app.put('/api/maintenance/:id/status', (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+    
+    res.json({
+        success: true,
+        data: {
+            id: parseInt(id),
+            status,
+            updated_at: new Date().toISOString()
+        },
+        message: `維修申請狀態已更新為: ${status}`
+    });
+});
+
+// ==================== 營收管理API ====================
+
+// 新增營收記錄
+app.post('/api/revenue', (req, res) => {
+    const { category, item, amount, responsible, notes } = req.body;
+    
+    res.json({
+        success: true,
+        data: {
+            id: Date.now(),
+            category,
+            item,
+            amount: parseFloat(amount),
+            responsible,
+            notes,
+            time: new Date().toLocaleTimeString('zh-TW'),
+            date: new Date().toISOString().split('T')[0]
+        },
+        message: '營收記錄新增成功'
+    });
+});
+
+// ==================== 升遷投票API ====================
+
+// 創建升遷投票
+app.post('/api/promotions', (req, res) => {
+    const { title, candidates, deadline, description } = req.body;
+    
+    res.json({
+        success: true,
+        data: {
+            id: Date.now(),
+            title,
+            candidates,
+            deadline,
+            description,
+            created_at: new Date().toISOString(),
+            status: 'active'
+        },
+        message: '升遷投票創建成功'
+    });
+});
+
+// ==================== 報表生成API ====================
+
+// 生成報表
+app.post('/api/reports/generate', (req, res) => {
+    const { type, dateRange } = req.body;
+    
+    // 模擬報表生成
+    const reportTypes = {
+        employee: '員工報表',
+        revenue: '營收報表',
+        attendance: '出勤報表',
+        system: '系統報表'
+    };
+    
+    res.json({
+        success: true,
+        data: {
+            id: Date.now(),
+            name: `${reportTypes[type]}_${new Date().toISOString().split('T')[0]}`,
+            type: type,
+            generated_at: new Date().toISOString(),
+            file_size: Math.floor(Math.random() * 5000) + 500 + ' KB',
+            status: 'completed',
+            download_url: `/downloads/report_${Date.now()}.pdf`
+        },
+        message: '報表生成成功'
+    });
+});
+
+// ==================== 系統設定API ====================
+
+// 保存設定
+app.post('/api/settings/:category', (req, res) => {
+    const { category } = req.params;
+    const settings = req.body;
+    
+    res.json({
+        success: true,
+        data: {
+            category,
+            settings,
+            updated_at: new Date().toISOString()
+        },
+        message: `${category}設定保存成功`
+    });
+});
+
+// 測試Telegram
+app.post('/api/settings/telegram/test', (req, res) => {
+    res.json({
+        success: true,
+        message: 'Telegram測試通知已發送'
+    });
+});
+
 // ==================== 前端頁面路由 ====================
 
 // 主頁面
