@@ -111,7 +111,7 @@ app.get('/api/health', async (req, res) => {
         res.json({
             status: 'healthy',
             service: 'GClaude Enterprise Management System',
-            version: '4.0.0',
+            version: '4.1.0',
             timestamp: new Date().toISOString(),
             uptime: process.uptime(),
             environment: process.env.NODE_ENV || 'production',
