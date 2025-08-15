@@ -42,7 +42,7 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^1.11.0",
-    "bcrypt": "^5.1.0",
+    "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
@@ -60,7 +60,7 @@
     "sequelize": "^6.32.1",
     "sharp": "^0.32.4",
     "socket.io": "^4.8.1",
-    "sqlite3": "^5.1.6",
+    "sqlite3": "^5.1.7",
     "telegraf": "^4.13.0",
     "uuid": "^9.0.0",
     "winston": "^3.10.0"

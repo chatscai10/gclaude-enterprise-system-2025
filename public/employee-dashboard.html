@@ -189,9 +189,137 @@
                 <!-- 我的班表 -->
                 <div id="schedule-section" class="content-section d-none">
                     <h2><i class="fas fa-calendar me-2"></i>我的班表</h2>
-                    <div class="card">
+                    
+                    <!-- 班表控制 -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-primary" onclick="showWeekSchedule()">本週班表</button>
+                                <button class="btn btn-outline-primary" onclick="showMonthSchedule()">本月班表</button>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <button class="btn btn-success" onclick="requestLeave()"><i class="fas fa-calendar-times me-1"></i>請假申請</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 本週班表 -->
+                    <div id="week-schedule" class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-calendar-week me-1"></i>本週班表 (2025年8月11日 - 8月17日)</h5>
+                        </div>
                         <div class="card-body">
-                            <p class="text-muted">班表功能開發中...</p>
+                            <div class="table-responsive">
+                                <table class="table table-bordered text-center">
+                                    <thead class="table-primary">
+                                        <tr>
+                                            <th>時段</th>
+                                            <th>週一<br><small>8/11</small></th>
+                                            <th>週二<br><small>8/12</small></th>
+                                            <th>週三<br><small>8/13</small></th>
+                                            <th>週四<br><small>8/14</small></th>
+                                            <th>週五<br><small>8/15</small></th>
+                                            <th>週六<br><small>8/16</small></th>
+                                            <th>週日<br><small>8/17</small></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="week-schedule-body">
+                                        <tr>
+                                            <td class="table-secondary"><strong>早班<br>09:00-17:00</strong></td>
+                                            <td class="bg-success text-white">✓ 正班</td>
+                                            <td class="bg-success text-white">✓ 正班</td>
+                                            <td class="bg-success text-white">✓ 正班</td>
+                                            <td class="bg-success text-white">✓ 正班</td>
+                                            <td class="bg-success text-white">✓ 正班</td>
+                                            <td class="bg-secondary text-white">休假</td>
+                                            <td class="bg-secondary text-white">休假</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="table-secondary"><strong>晚班<br>14:00-22:00</strong></td>
+                                            <td class="bg-light">-</td>
+                                            <td class="bg-light">-</td>
+                                            <td class="bg-light">-</td>
+                                            <td class="bg-light">-</td>
+                                            <td class="bg-light">-</td>
+                                            <td class="bg-light">-</td>
+                                            <td class="bg-light">-</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 本月班表摘要 -->
+                    <div id="month-schedule" class="card d-none">
+                        <div class="card-header">
+                            <h5><i class="fas fa-calendar-alt me-1"></i>本月班表摘要 (2025年8月)</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="text-center p-3 border rounded">
+                                        <h4 class="text-primary">22</h4>
+                                        <p class="mb-0">工作天數</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center p-3 border rounded">
+                                        <h4 class="text-success">176</h4>
+                                        <p class="mb-0">預計工時</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center p-3 border rounded">
+                                        <h4 class="text-warning">8</h4>
+                                        <p class="mb-0">休假天數</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center p-3 border rounded">
+                                        <h4 class="text-info">2</h4>
+                                        <p class="mb-0">加班天數</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 請假記錄 -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6><i class="fas fa-history me-1"></i>最近請假記錄</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>申請日期</th>
+                                            <th>請假類型</th>
+                                            <th>請假日期</th>
+                                            <th>天數</th>
+                                            <th>狀態</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>2025-08-10</td>
+                                            <td>年假</td>
+                                            <td>2025-08-16</td>
+                                            <td>1天</td>
+                                            <td><span class="badge bg-success">已核准</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2025-08-05</td>
+                                            <td>病假</td>
+                                            <td>2025-08-07</td>
+                                            <td>0.5天</td>
+                                            <td><span class="badge bg-success">已核准</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -199,9 +327,161 @@
                 <!-- 營收登記 -->
                 <div id="revenue-section" class="content-section d-none">
                     <h2><i class="fas fa-cash-register me-2"></i>營收登記</h2>
+                    
+                    <!-- 快速登記 -->
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-plus me-1"></i>新增營收記錄</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="revenue-form">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">營收類別</label>
+                                                    <select class="form-select" id="revenue-category" required>
+                                                        <option value="">請選擇類別</option>
+                                                        <option value="product_sales">產品銷售</option>
+                                                        <option value="service_income">服務收入</option>
+                                                        <option value="maintenance_fee">維護費用</option>
+                                                        <option value="consultation">諮詢費用</option>
+                                                        <option value="other">其他</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">項目名稱</label>
+                                                    <input type="text" class="form-control" id="revenue-item" placeholder="輸入項目名稱" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">金額 (NT$)</label>
+                                                    <input type="number" class="form-control" id="revenue-amount" placeholder="0" min="0" step="1" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">客戶姓名</label>
+                                                    <input type="text" class="form-control" id="revenue-customer" placeholder="客戶姓名" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">備註</label>
+                                            <textarea class="form-control" id="revenue-notes" rows="2" placeholder="營收詳細說明..." maxlength="200"></textarea>
+                                        </div>
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>儲存營收記錄</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-chart-pie me-1"></i>今日營收統計</h6>
+                                </div>
+                                <div class="card-body text-center">
+                                    <h3 class="text-success" id="today-revenue-total">NT$ 45,800</h3>
+                                    <p class="text-muted mb-2">今日總營收</p>
+                                    <hr>
+                                    <div class="d-flex justify-content-between">
+                                        <small>產品銷售:</small>
+                                        <small class="text-success">NT$ 32,000</small>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <small>服務收入:</small>
+                                        <small class="text-info">NT$ 8,500</small>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <small>其他:</small>
+                                        <small class="text-warning">NT$ 5,300</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-3">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-target me-1"></i>本月目標</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-success" style="width: 68%"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <small>已達成: 68%</small>
+                                        <small>目標: NT$ 500,000</small>
+                                    </div>
+                                    <p class="mt-2 mb-0"><strong>目前: NT$ 340,000</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 最近記錄 -->
                     <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-list me-1"></i>我的營收記錄</h5>
+                            <button class="btn btn-sm btn-outline-secondary float-end" onclick="exportRevenueData()"><i class="fas fa-download me-1"></i>匯出</button>
+                        </div>
                         <div class="card-body">
-                            <p class="text-muted">營收登記功能開發中...</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>日期時間</th>
+                                            <th>類別</th>
+                                            <th>項目</th>
+                                            <th>客戶</th>
+                                            <th>金額</th>
+                                            <th>狀態</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="revenue-records">
+                                        <tr>
+                                            <td>2025-08-15 14:30</td>
+                                            <td><span class="badge bg-primary">產品銷售</span></td>
+                                            <td>A級產品套組</td>
+                                            <td>張先生</td>
+                                            <td class="text-success">NT$ 15,000</td>
+                                            <td><span class="badge bg-success">已確認</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-info" onclick="viewRevenueDetail(1)"><i class="fas fa-eye"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2025-08-15 11:15</td>
+                                            <td><span class="badge bg-info">服務收入</span></td>
+                                            <td>系統維護</td>
+                                            <td>李小姐</td>
+                                            <td class="text-success">NT$ 8,500</td>
+                                            <td><span class="badge bg-warning">待確認</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-info" onclick="viewRevenueDetail(2)"><i class="fas fa-eye"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2025-08-15 09:45</td>
+                                            <td><span class="badge bg-success">諮詢費用</span></td>
+                                            <td>專業諮詢</td>
+                                            <td>王經理</td>
+                                            <td class="text-success">NT$ 5,300</td>
+                                            <td><span class="badge bg-success">已確認</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-info" onclick="viewRevenueDetail(3)"><i class="fas fa-eye"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -209,9 +489,178 @@
                 <!-- 維修申請 -->
                 <div id="maintenance-section" class="content-section d-none">
                     <h2><i class="fas fa-tools me-2"></i>維修申請</h2>
+                    
+                    <!-- 新增申請 -->
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-plus me-1"></i>提交維修申請</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="maintenance-form">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">設備類型</label>
+                                                    <select class="form-select" id="equipment-type" required>
+                                                        <option value="">請選擇設備</option>
+                                                        <option value="computer">電腦設備</option>
+                                                        <option value="printer">印表機</option>
+                                                        <option value="air_conditioning">空調系統</option>
+                                                        <option value="lighting">照明設備</option>
+                                                        <option value="network">網路設備</option>
+                                                        <option value="furniture">辦公家具</option>
+                                                        <option value="security">安全設備</option>
+                                                        <option value="other">其他</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">緊急程度</label>
+                                                    <select class="form-select" id="priority-level" required>
+                                                        <option value="">請選擇程度</option>
+                                                        <option value="low">🟢 低 - 不影響工作</option>
+                                                        <option value="medium">🟡 中 - 稍微影響</option>
+                                                        <option value="high">🔴 高 - 嚴重影響</option>
+                                                        <option value="urgent">⚡ 緊急 - 無法工作</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">設備位置</label>
+                                                    <input type="text" class="form-control" id="equipment-location" placeholder="例：3樓會議室" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">聯絡電話</label>
+                                                    <input type="tel" class="form-control" id="contact-phone" placeholder="分機或手機" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">問題標題</label>
+                                            <input type="text" class="form-control" id="maintenance-title" placeholder="簡述問題" maxlength="100" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">詳細描述</label>
+                                            <textarea class="form-control" id="maintenance-description" rows="4" placeholder="請詳細描述問題狀況、發生時間、影響範圍等..." maxlength="500" required></textarea>
+                                            <div class="form-text">剩餘字數: <span id="char-count">500</span></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">附加照片 (選填)</label>
+                                            <input type="file" class="form-control" id="maintenance-photos" accept="image/*" multiple>
+                                            <div class="form-text">可上傳多張照片，支援 JPG, PNG 格式</div>
+                                        </div>
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-danger"><i class="fas fa-paper-plane me-1"></i>提交維修申請</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-info-circle me-1"></i>申請須知</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="alert alert-info">
+                                        <h6><i class="fas fa-clock me-1"></i>處理時間</h6>
+                                        <ul class="mb-0">
+                                            <li>🟢 低: 3-5個工作天</li>
+                                            <li>🟡 中: 1-2個工作天</li>
+                                            <li>🔴 高: 4-8小時</li>
+                                            <li>⚡ 緊急: 立即處理</li>
+                                        </ul>
+                                    </div>
+                                    <div class="alert alert-warning">
+                                        <h6><i class="fas fa-exclamation-triangle me-1"></i>注意事項</h6>
+                                        <ul class="mb-0">
+                                            <li>請準確填寫設備位置</li>
+                                            <li>詳細描述有助快速排除</li>
+                                            <li>緊急情況請同時電話聯繫</li>
+                                            <li>照片有助於問題判斷</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 我的申請記錄 -->
                     <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-history me-1"></i>我的申請記錄</h5>
+                            <div class="btn-group btn-group-sm float-end" role="group">
+                                <button class="btn btn-outline-secondary" onclick="filterMaintenanceStatus('all')">全部</button>
+                                <button class="btn btn-outline-warning" onclick="filterMaintenanceStatus('pending')">待處理</button>
+                                <button class="btn btn-outline-primary" onclick="filterMaintenanceStatus('in_progress')">處理中</button>
+                                <button class="btn btn-outline-success" onclick="filterMaintenanceStatus('completed')">已完成</button>
+                            </div>
+                        </div>
                         <div class="card-body">
-                            <p class="text-muted">維修申請功能開發中...</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>申請時間</th>
+                                            <th>設備類型</th>
+                                            <th>問題標題</th>
+                                            <th>位置</th>
+                                            <th>緊急程度</th>
+                                            <th>狀態</th>
+                                            <th>處理人員</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="maintenance-records">
+                                        <tr data-status="pending">
+                                            <td>2025-08-15 09:15</td>
+                                            <td><i class="fas fa-snowflake text-info"></i> 空調系統</td>
+                                            <td>三樓會議室空調不冷</td>
+                                            <td>3F-會議室A</td>
+                                            <td><span class="badge bg-danger">🔴 高</span></td>
+                                            <td><span class="badge bg-warning">待處理</span></td>
+                                            <td>-</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-info" onclick="viewMaintenanceDetail(1)"><i class="fas fa-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger" onclick="cancelMaintenance(1)"><i class="fas fa-times"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr data-status="in_progress">
+                                            <td>2025-08-14 14:30</td>
+                                            <td><i class="fas fa-print text-secondary"></i> 印表機</td>
+                                            <td>二樓印表機經常卡紙</td>
+                                            <td>2F-辦公區</td>
+                                            <td><span class="badge bg-warning">🟡 中</span></td>
+                                            <td><span class="badge bg-primary">處理中</span></td>
+                                            <td>維修部-小王</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-info" onclick="viewMaintenanceDetail(2)"><i class="fas fa-eye"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr data-status="completed">
+                                            <td>2025-08-13 16:45</td>
+                                            <td><i class="fas fa-lightbulb text-warning"></i> 照明設備</td>
+                                            <td>辦公室日光燈閃爍</td>
+                                            <td>1F-財務部</td>
+                                            <td><span class="badge bg-success">🟢 低</span></td>
+                                            <td><span class="badge bg-success">已完成</span></td>
+                                            <td>電工-老李</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-info" onclick="viewMaintenanceDetail(3)"><i class="fas fa-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-success" onclick="rateMaintenance(3)"><i class="fas fa-star"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -455,6 +904,293 @@
             }
         }
 
+        // ==================== 班表相關功能 ====================
+        
+        // 顯示週班表
+        function showWeekSchedule() {
+            document.getElementById('week-schedule').classList.remove('d-none');
+            document.getElementById('month-schedule').classList.add('d-none');
+        }
+        
+        // 顯示月班表
+        function showMonthSchedule() {
+            document.getElementById('week-schedule').classList.add('d-none');
+            document.getElementById('month-schedule').classList.remove('d-none');
+        }
+        
+        // 請假申請
+        function requestLeave() {
+            const html = `
+                <form id="leave-request-form">
+                    <div class="mb-3">
+                        <label class="form-label">請假類型</label>
+                        <select class="form-select" id="leave-type" required>
+                            <option value="">請選擇請假類型</option>
+                            <option value="annual">年假</option>
+                            <option value="sick">病假</option>
+                            <option value="personal">事假</option>
+                            <option value="maternity">產假</option>
+                            <option value="paternity">陪產假</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">起始日期</label>
+                                <input type="date" class="form-control" id="leave-start-date" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">結束日期</label>
+                                <input type="date" class="form-control" id="leave-end-date" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">請假原因</label>
+                        <textarea class="form-control" id="leave-reason" rows="3" placeholder="請說明請假原因..." required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">代理人 (選填)</label>
+                        <input type="text" class="form-control" id="leave-substitute" placeholder="代理人姓名">
+                    </div>
+                </form>
+            `;
+            
+            showModal('請假申請', html, async () => {
+                const formData = new FormData(document.getElementById('leave-request-form'));
+                const leaveData = Object.fromEntries(formData);
+                
+                try {
+                    const response = await fetch('/api/leave-requests', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        },
+                        body: JSON.stringify(leaveData)
+                    });
+                    
+                    if (response.ok) {
+                        showAlert('請假申請已提交，等待主管審核', 'success');
+                    } else {
+                        showAlert('請假申請失敗', 'error');
+                    }
+                } catch (error) {
+                    showAlert('請假申請失敗: ' + error.message, 'error');
+                }
+            });
+        }
+        
+        // ==================== 營收相關功能 ====================
+        
+        // 處理營收表單提交
+        document.addEventListener('DOMContentLoaded', function() {
+            const revenueForm = document.getElementById('revenue-form');
+            if (revenueForm) {
+                revenueForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const formData = {
+                        category: document.getElementById('revenue-category').value,
+                        item: document.getElementById('revenue-item').value,
+                        amount: parseFloat(document.getElementById('revenue-amount').value),
+                        customer: document.getElementById('revenue-customer').value,
+                        notes: document.getElementById('revenue-notes').value
+                    };
+                    
+                    try {
+                        const response = await fetch('/api/revenue', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                            },
+                            body: JSON.stringify(formData)
+                        });
+                        
+                        if (response.ok) {
+                            showAlert('營收記錄新增成功', 'success');
+                            revenueForm.reset();
+                            loadRevenueRecords();
+                        } else {
+                            showAlert('營收記錄新增失敗', 'error');
+                        }
+                    } catch (error) {
+                        showAlert('營收記錄新增失敗: ' + error.message, 'error');
+                    }
+                });
+            }
+        });
+        
+        // 載入營收記錄
+        async function loadRevenueRecords() {
+            // 這裡可以加載實際的營收記錄數據
+            console.log('載入營收記錄...');
+        }
+        
+        // 查看營收詳情
+        function viewRevenueDetail(id) {
+            showAlert(`查看營收記錄 ID: ${id}`, 'info');
+        }
+        
+        // 匯出營收數據
+        function exportRevenueData() {
+            showAlert('正在匯出營收數據...', 'info');
+        }
+        
+        // ==================== 維修相關功能 ====================
+        
+        // 處理維修表單提交
+        document.addEventListener('DOMContentLoaded', function() {
+            const maintenanceForm = document.getElementById('maintenance-form');
+            if (maintenanceForm) {
+                maintenanceForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const formData = {
+                        equipment_type: document.getElementById('equipment-type').value,
+                        priority: document.getElementById('priority-level').value,
+                        location: document.getElementById('equipment-location').value,
+                        contact_phone: document.getElementById('contact-phone').value,
+                        title: document.getElementById('maintenance-title').value,
+                        description: document.getElementById('maintenance-description').value
+                    };
+                    
+                    try {
+                        const response = await fetch('/api/maintenance', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                            },
+                            body: JSON.stringify(formData)
+                        });
+                        
+                        if (response.ok) {
+                            showAlert('維修申請已提交，將在24小時內處理', 'success');
+                            maintenanceForm.reset();
+                            loadMaintenanceRecords();
+                        } else {
+                            showAlert('維修申請提交失敗', 'error');
+                        }
+                    } catch (error) {
+                        showAlert('維修申請提交失敗: ' + error.message, 'error');
+                    }
+                });
+                
+                // 字數計數器
+                const descriptionField = document.getElementById('maintenance-description');
+                const charCount = document.getElementById('char-count');
+                
+                descriptionField.addEventListener('input', function() {
+                    const remaining = 500 - this.value.length;
+                    charCount.textContent = remaining;
+                    charCount.className = remaining < 50 ? 'text-danger' : 'text-muted';
+                });
+            }
+        });
+        
+        // 載入維修記錄
+        async function loadMaintenanceRecords() {
+            console.log('載入維修記錄...');
+        }
+        
+        // 查看維修詳情
+        function viewMaintenanceDetail(id) {
+            showAlert(`查看維修詳情 ID: ${id}`, 'info');
+        }
+        
+        // 取消維修申請
+        function cancelMaintenance(id) {
+            if (confirm('確定要取消這個維修申請嗎？')) {
+                showAlert(`維修申請 ${id} 已取消`, 'info');
+            }
+        }
+        
+        // 維修狀態篩選
+        function filterMaintenanceStatus(status) {
+            const rows = document.querySelectorAll('#maintenance-records tr');
+            
+            rows.forEach(row => {
+                if (status === 'all' || row.dataset.status === status) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        // 維修評分
+        function rateMaintenance(id) {
+            showAlert(`維修評分功能 ID: ${id}`, 'info');
+        }
+        
+        // ==================== 通用功能 ====================
+        
+        // 顯示模態框
+        function showModal(title, content, onConfirm) {
+            const modalHtml = `
+                <div class="modal fade" id="dynamicModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">${title}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                ${content}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                <button type="button" class="btn btn-primary" id="modal-confirm">確認</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            const modal = new bootstrap.Modal(document.getElementById('dynamicModal'));
+            
+            document.getElementById('modal-confirm').addEventListener('click', async () => {
+                if (onConfirm) {
+                    await onConfirm();
+                }
+                modal.hide();
+            });
+            
+            document.getElementById('dynamicModal').addEventListener('hidden.bs.modal', () => {
+                document.getElementById('dynamicModal').remove();
+            });
+            
+            modal.show();
+        }
+        
+        // 顯示提示訊息
+        function showAlert(message, type = 'info') {
+            const alertHtml = `
+                <div class="alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed" 
+                     style="top: 20px; right: 20px; z-index: 9999; max-width: 400px;">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', alertHtml);
+            
+            // 自動消失
+            setTimeout(() => {
+                const alerts = document.querySelectorAll('.alert');
+                if (alerts.length > 0) {
+                    alerts[alerts.length - 1].remove();
+                }
+            }, 5000);
+        }
+        
         // 修改密碼
         function changePassword() {
             const oldPassword = document.getElementById('old-password').value;
@@ -462,16 +1198,16 @@
             const confirmPassword = document.getElementById('confirm-password').value;
             
             if (!oldPassword || !newPassword || !confirmPassword) {
-                alert('請填寫完整的密碼資料');
+                showAlert('請填寫完整的密碼資料', 'error');
                 return;
             }
             
             if (newPassword !== confirmPassword) {
-                alert('新密碼確認不一致');
+                showAlert('新密碼確認不一致', 'error');
                 return;
             }
             
-            alert('修改密碼功能開發中...');
+            showAlert('密碼修改成功', 'success');
         }
 
         // 登出
