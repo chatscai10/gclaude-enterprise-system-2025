@@ -1456,6 +1456,205 @@ class JsonDatabase {
         return { success: true };
     }
 
+    // ==================== 營收系統 ====================
+
+    async createRevenueRecord(data) {
+        const revenues = await this.readTable('revenue');
+        const stores = await this.readTable('stores');
+        const employees = await this.readTable('employees');
+        
+        // 獲取分店和員工資訊
+        const store = stores.find(s => s.id === data.store_id);
+        const employee = employees.find(e => e.id === data.employee_id);
+        
+        const newRevenue = {
+            id: revenues.length > 0 ? Math.max(...revenues.map(r => r.id)) + 1 : 1,
+            date: data.date,
+            store_id: data.store_id,
+            store_name: store ? store.name : '未知分店',
+            employee_id: data.employee_id,
+            employee_name: employee ? employee.name : '未知員工',
+            bonus_type: data.bonus_type,
+            order_count: data.order_count,
+            revenue_items: JSON.stringify(data.revenue_items),
+            expense_items: JSON.stringify(data.expense_items),
+            notes: data.notes,
+            total_revenue: data.total_revenue,
+            total_expense: data.total_expense,
+            net_revenue: data.net_revenue,
+            bonus_amount: data.bonus_amount,
+            shortage_amount: data.shortage_amount,
+            achievement_rate: data.achievement_rate,
+            target: data.target,
+            photos: JSON.stringify(data.photos),
+            status: 'active',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+        
+        revenues.push(newRevenue);
+        await this.writeTable('revenue', revenues);
+        
+        return {
+            id: newRevenue.id,
+            message: '營收記錄創建成功'
+        };
+    }
+
+    async getRevenueRecords(filters = {}) {
+        const revenues = await this.readTable('revenue');
+        
+        let filteredRevenues = revenues.filter(r => r.status === 'active');
+        
+        // 按分店篩選
+        if (filters.store_id) {
+            filteredRevenues = filteredRevenues.filter(r => r.store_id === filters.store_id);
+        }
+        
+        // 按日期篩選
+        if (filters.date) {
+            filteredRevenues = filteredRevenues.filter(r => r.date === filters.date);
+        }
+        
+        // 排序：最新的在前
+        filteredRevenues.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        
+        // 分頁
+        const offset = filters.offset || 0;
+        const limit = filters.limit || 50;
+        filteredRevenues = filteredRevenues.slice(offset, offset + limit);
+        
+        // 解析JSON字段
+        return filteredRevenues.map(revenue => ({
+            ...revenue,
+            revenue_items: JSON.parse(revenue.revenue_items || '[]'),
+            expense_items: JSON.parse(revenue.expense_items || '[]'),
+            photos: JSON.parse(revenue.photos || '[]')
+        }));
+    }
+
+    async voidRevenueRecord(recordId, employeeId, reason) {
+        const revenues = await this.readTable('revenue');
+        const revenue = revenues.find(r => r.id === recordId);
+        
+        if (!revenue) {
+            throw new Error('找不到營收記錄');
+        }
+        
+        if (revenue.status === 'voided') {
+            throw new Error('記錄已經作廢');
+        }
+        
+        // 更新記錄狀態
+        revenue.status = 'voided';
+        revenue.voided_by = employeeId;
+        revenue.void_reason = reason;
+        revenue.voided_at = new Date().toISOString();
+        revenue.updated_at = new Date().toISOString();
+        
+        await this.writeTable('revenue', revenues);
+        
+        return {
+            success: true,
+            message: '營收記錄已作廢'
+        };
+    }
+
+    async getRevenueStats(filters = {}) {
+        const revenues = await this.readTable('revenue');
+        const activeRevenues = revenues.filter(r => r.status === 'active');
+        
+        // 按條件篩選
+        let filteredRevenues = activeRevenues;
+        
+        if (filters.store_id) {
+            filteredRevenues = filteredRevenues.filter(r => r.store_id === filters.store_id);
+        }
+        
+        if (filters.employee_id) {
+            filteredRevenues = filteredRevenues.filter(r => r.employee_id === filters.employee_id);
+        }
+        
+        // 按期間篩選
+        const now = new Date();
+        let startDate;
+        
+        switch (filters.period) {
+            case 'today':
+                startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                break;
+            case 'week':
+                startDate = new Date(now.setDate(now.getDate() - 7));
+                break;
+            case 'month':
+                startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                break;
+            case 'quarter':
+                startDate = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1);
+                break;
+            case 'year':
+                startDate = new Date(now.getFullYear(), 0, 1);
+                break;
+            default:
+                startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        }
+        
+        filteredRevenues = filteredRevenues.filter(r => new Date(r.date) >= startDate);
+        
+        // 計算統計
+        const stats = {
+            total_records: filteredRevenues.length,
+            total_revenue: filteredRevenues.reduce((sum, r) => sum + (r.total_revenue || 0), 0),
+            total_expense: filteredRevenues.reduce((sum, r) => sum + (r.total_expense || 0), 0),
+            total_bonus: filteredRevenues.reduce((sum, r) => sum + (r.bonus_amount || 0), 0),
+            achieved_records: filteredRevenues.filter(r => r.bonus_amount > 0).length,
+            weekday_records: filteredRevenues.filter(r => r.bonus_type === 'weekday').length,
+            holiday_records: filteredRevenues.filter(r => r.bonus_type === 'holiday').length,
+            average_revenue: filteredRevenues.length > 0 ? 
+                filteredRevenues.reduce((sum, r) => sum + (r.total_revenue || 0), 0) / filteredRevenues.length : 0,
+            best_store: this.calculateBestStore(filteredRevenues),
+            recent_records: filteredRevenues
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                .slice(0, 10)
+                .map(r => ({
+                    ...r,
+                    revenue_items: JSON.parse(r.revenue_items || '[]'),
+                    expense_items: JSON.parse(r.expense_items || '[]')
+                }))
+        };
+        
+        return stats;
+    }
+
+    calculateBestStore(revenues) {
+        const storeStats = {};
+        
+        revenues.forEach(revenue => {
+            if (!storeStats[revenue.store_name]) {
+                storeStats[revenue.store_name] = {
+                    name: revenue.store_name,
+                    total_revenue: 0,
+                    count: 0
+                };
+            }
+            
+            storeStats[revenue.store_name].total_revenue += revenue.total_revenue || 0;
+            storeStats[revenue.store_name].count += 1;
+        });
+        
+        let bestStore = null;
+        let maxRevenue = 0;
+        
+        Object.values(storeStats).forEach(store => {
+            if (store.total_revenue > maxRevenue) {
+                maxRevenue = store.total_revenue;
+                bestStore = store.name;
+            }
+        });
+        
+        return bestStore || '暫無數據';
+    }
+
     // ==================== 儀表板統計 ====================
     
     async getDashboardStats() {

@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>營收記錄系統 - GClaude企業管理系統</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .revenue-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .form-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .revenue-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #28a745;
+        }
+        .expense-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #dc3545;
+        }
+        .bonus-calculator {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .achievement-status {
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .achievement-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        .achievement-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            color: white;
+        }
+        .record-item {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #007bff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .photo-upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .photo-upload-area:hover {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+        }
+        .photo-preview {
+            max-width: 100px;
+            max-height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .bonus-formula {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .formula-text {
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/employee">
+                <i class="fas fa-chart-line me-2"></i>營收記錄系統
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/employee">
+                    <i class="fas fa-arrow-left me-1"></i>返回主頁
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-4">
+        <!-- 頁面標題 -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="text-center">
+                    <i class="fas fa-money-bill-wave text-success me-2"></i>營收記錄系統
+                </h2>
+                <p class="text-muted text-center">記錄每日營業額，自動計算獎金</p>
+            </div>
+        </div>
+
+        <!-- 營收記錄表單 -->
+        <div class="form-section">
+            <h5 class="mb-4">
+                <i class="fas fa-plus-circle text-primary me-2"></i>新增營收記錄
+            </h5>
+            
+            <form id="revenueForm">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="revenueDate" class="form-label">選擇日期</label>
+                        <input type="date" class="form-control" id="revenueDate" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="storeSelect" class="form-label">分店</label>
+                        <select class="form-control" id="storeSelect" required>
+                            <option value="">請選擇分店</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="bonusType" class="form-label">獎金類別</label>
+                        <select class="form-control" id="bonusType" required onchange="updateBonusFormula()">
+                            <option value="">請選擇類別</option>
+                            <option value="weekday">平日獎金</option>
+                            <option value="holiday">假日獎金</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-3">
+                        <label for="orderCount" class="form-label">訂單數量</label>
+                        <input type="number" class="form-control" id="orderCount" min="0" required onchange="calculateAverageOrder()">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="averageOrder" class="form-label">訂單平均（自動計算）</label>
+                        <input type="number" class="form-control" id="averageOrder" readonly>
+                    </div>
+                </div>
+
+                <!-- 收入項目 -->
+                <div class="mb-4">
+                    <h6><i class="fas fa-plus-circle text-success me-2"></i>收入項目</h6>
+                    <div id="revenueItems">
+                        <!-- 收入項目將動態生成 -->
+                    </div>
+                    <div class="text-center mt-3">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <strong>原始總額: NT$ <span id="originalRevenue">0</span></strong>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>扣除服務費: NT$ <span id="serviceFeeTotal">0</span></strong>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>淨收入總額: NT$ <span id="totalRevenue">0</span></strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 支出項目 -->
+                <div class="mb-4">
+                    <h6><i class="fas fa-minus-circle text-danger me-2"></i>支出項目</h6>
+                    <div id="expenseItems">
+                        <!-- 支出項目將動態生成 -->
+                    </div>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="addExpenseItem()">
+                        <i class="fas fa-plus me-1"></i>新增支出項目
+                    </button>
+                    <div class="text-center mt-3">
+                        <strong>支出總額: NT$ <span id="totalExpense">0</span></strong>
+                    </div>
+                </div>
+
+                <!-- 備註 -->
+                <div class="mb-3">
+                    <label for="notes" class="form-label">備註欄位</label>
+                    <textarea class="form-control" id="notes" rows="3" placeholder="請輸入備註信息"></textarea>
+                </div>
+
+                <!-- 照片上傳 -->
+                <div class="mb-4">
+                    <label class="form-label">上傳照片</label>
+                    <div class="row mb-2">
+                        <div class="col-md-3">
+                            <span class="badge bg-info">廢油回收</span>
+                        </div>
+                        <div class="col-md-3">
+                            <span class="badge bg-warning">器具保養</span>
+                        </div>
+                        <div class="col-md-3">
+                            <span class="badge bg-primary">貨款單據</span>
+                        </div>
+                        <div class="col-md-3">
+                            <span class="badge bg-secondary">其他開支</span>
+                        </div>
+                    </div>
+                    <div class="photo-upload-area" onclick="document.getElementById('photoInput').click()">
+                        <i class="fas fa-camera fa-2x text-muted mb-2"></i>
+                        <p class="text-muted">點擊上傳相關照片</p>
+                    </div>
+                    <input type="file" id="photoInput" accept="image/*" multiple style="display: none;">
+                    <div id="photoPreview" class="mt-3"></div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save me-2"></i>提交營收記錄
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 獎金計算器 -->
+        <div class="bonus-calculator" id="bonusCalculator" style="display: none;">
+            <h5><i class="fas fa-calculator me-2"></i>獎金計算結果</h5>
+            
+            <!-- 獎金預算文字說明 -->
+            <div class="bonus-formula" id="bonusFormula">
+                <h6>獎金計算公式：</h6>
+                <div class="formula-text" id="formulaText">
+                    請選擇獎金類別以顯示計算公式
+                </div>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <div class="mb-2">
+                        <strong>收入總額（扣除服務費）:</strong> NT$ <span id="calculatedRevenue">0</span>
+                    </div>
+                    <div class="mb-2">
+                        <strong>支出總額:</strong> NT$ <span id="calculatedExpense">0</span>
+                    </div>
+                    <div class="mb-2">
+                        <strong>淨收入:</strong> NT$ <span id="netRevenue">0</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-2">
+                        <strong>獎金門檻:</strong> NT$ <span id="bonusThreshold">0</span>
+                    </div>
+                    <div class="mb-2">
+                        <strong>獎金比例:</strong> <span id="bonusRate">0</span>%
+                    </div>
+                    <div class="achievement-status" id="achievementStatus">
+                        <!-- 達成狀態 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 營收記錄列表 -->
+        <div class="form-section">
+            <h5 class="mb-4">
+                <i class="fas fa-list me-2"></i>所有分店的營收記錄（各分店顯示3筆）
+            </h5>
+            
+            <!-- 篩選器 -->
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">篩選分店</label>
+                    <select class="form-control" id="filterStore">
+                        <option value="">所有分店</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">篩選日期</label>
+                    <input type="date" class="form-control" id="filterDate">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">&nbsp;</label>
+                    <div>
+                        <button class="btn btn-outline-primary" onclick="loadRevenueRecords()">
+                            <i class="fas fa-search me-1"></i>篩選
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="resetFilters()">
+                            <i class="fas fa-undo me-1"></i>重置
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 記錄列表 -->
+            <div id="revenueRecords">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">載入中...</span>
+                    </div>
+                    <p class="mt-2">載入營收記錄中...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 確認作廢模態框 -->
+    <div class="modal fade" id="voidModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-trash-alt me-2"></i>確認作廢記錄
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="voidRecordInfo"></div>
+                    <div class="mt-3">
+                        <label for="voidReason" class="form-label">作廢原因</label>
+                        <textarea class="form-control" id="voidReason" rows="3" placeholder="請輸入作廢原因" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" id="confirmVoidBtn">確認作廢</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentVoidId = null;
+        let stores = [];
+        let uploadedPhotos = [];
+
+        // 預設收入類別（按系統邏輯文件設定）
+        const defaultRevenueCategories = [
+            { name: "現場營業額", serviceFee: 0, includeInBonus: true },
+            { name: "線上點餐", serviceFee: 0, includeInBonus: true },
+            { name: "熊貓點餐", serviceFee: 0.35, includeInBonus: true },
+            { name: "uber點餐", serviceFee: 0.35, includeInBonus: true },
+            { name: "廢油回收", serviceFee: 0, includeInBonus: false }
+        ];
+
+        // 預設支出類別
+        const defaultExpenseCategories = ["瓦斯", "水電", "房租", "貨款", "清潔費", "其他"];
+
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadStores();
+            initializeForm();
+            loadRevenueRecords();
+            
+            // 設定今日日期為預設值
+            document.getElementById('revenueDate').valueAsDate = new Date();
+        });
+
+        // 驗證登入狀態
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/';
+                return;
+            }
+        }
+
+        // 載入分店列表
+        async function loadStores() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/stores', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    stores = result.data;
+                    populateStoreSelects();
+                } else {
+                    console.error('載入分店失敗:', result.message);
+                    // 如果API失敗，使用預設分店
+                    stores = [
+                        { id: 1, name: '總公司' },
+                        { id: 2, name: '內壢忠孝店' },
+                        { id: 3, name: '桃園龍安店' }
+                    ];
+                    populateStoreSelects();
+                }
+            } catch (error) {
+                console.error('載入分店時發生錯誤:', error);
+                // 使用預設分店
+                stores = [
+                    { id: 1, name: '總公司' },
+                    { id: 2, name: '內壢忠孝店' },
+                    { id: 3, name: '桃園龍安店' }
+                ];
+                populateStoreSelects();
+            }
+        }
+
+        // 填充分店選擇器
+        function populateStoreSelects() {
+            const storeSelect = document.getElementById('storeSelect');
+            const filterStore = document.getElementById('filterStore');
+            
+            storeSelect.innerHTML = '<option value="">請選擇分店</option>';
+            filterStore.innerHTML = '<option value="">所有分店</option>';
+            
+            stores.forEach(store => {
+                storeSelect.innerHTML += `<option value="${store.id}">${store.name}</option>`;
+                filterStore.innerHTML += `<option value="${store.id}">${store.name}</option>`;
+            });
+        }
+
+        // 初始化表單
+        function initializeForm() {
+            generateRevenueItems();
+            
+            // 綁定表單提交事件
+            document.getElementById('revenueForm').addEventListener('submit', submitRevenue);
+            
+            // 綁定照片上傳事件
+            document.getElementById('photoInput').addEventListener('change', handlePhotoUpload);
+        }
+
+        // 生成收入項目
+        function generateRevenueItems() {
+            const container = document.getElementById('revenueItems');
+            container.innerHTML = '';
+            
+            defaultRevenueCategories.forEach((category, index) => {
+                const serviceFeeText = category.serviceFee > 0 ? ` (服務費${(category.serviceFee * 100)}%)` : '';
+                
+                container.innerHTML += `
+                    <div class="revenue-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-4">
+                                <strong>${category.name}${serviceFeeText}</strong>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <span class="input-group-text">NT$</span>
+                                    <input type="number" class="form-control revenue-input" 
+                                           id="revenue_${index}" min="0" 
+                                           data-service-fee="${category.serviceFee}"
+                                           data-include-bonus="${category.includeInBonus}"
+                                           onchange="calculateTotals()">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted">
+                                    ${category.includeInBonus ? '💰 計入獎金' : '🚫 不計入獎金'}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // 更新獎金公式說明
+        function updateBonusFormula() {
+            const bonusType = document.getElementById('bonusType').value;
+            const formulaText = document.getElementById('formulaText');
+            
+            if (bonusType === 'weekday') {
+                formulaText.innerHTML = `
+                    <strong>平日獎金計算方式：</strong><br>
+                    例如：現場$10,000 + 熊貓$10,000(服務費35%) + UBER$10,000(服務費35%) = ?<br>
+                    計算：10,000 + 6,500 + 6,500 = 23,000<br>
+                    <span class="text-warning">大於 13,000 的 30% 值就是今天平日的獎金</span><br>
+                    獎金 = 23,000 × 30% = 6,900
+                `;
+            } else if (bonusType === 'holiday') {
+                formulaText.innerHTML = `
+                    <strong>假日獎金計算方式：</strong><br>
+                    例如：現場$10,000 + 熊貓$10,000(服務費35%) + UBER$10,000(服務費35%) = ?<br>
+                    計算：10,000 + 6,500 + 6,500 = 23,000<br>
+                    <span class="text-warning">項目加總的金額大於或等於 0 然後取出 38% 的值</span><br>
+                    獎金 = 23,000 × 38% = 8,740
+                `;
+            } else {
+                formulaText.innerHTML = '請選擇獎金類別以顯示計算公式';
+            }
+            
+            calculateTotals();
+        }
+
+        // 新增支出項目
+        function addExpenseItem() {
+            const container = document.getElementById('expenseItems');
+            
+            container.innerHTML += `
+                <div class="expense-item">
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <select class="form-control expense-category" required>
+                                <option value="">請選擇支出類別</option>
+                                ${defaultExpenseCategories.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <span class="input-group-text">NT$</span>
+                                <input type="number" class="form-control expense-input" 
+                                       min="0" onchange="calculateTotals()">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-outline-danger btn-sm" 
+                                    onclick="removeExpenseItem(this)">
+                                <i class="fas fa-trash-alt"></i> 移除
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 移除支出項目
+        function removeExpenseItem(btn) {
+            btn.closest('.expense-item').remove();
+            calculateTotals();
+        }
+
+        // 計算總額
+        function calculateTotals() {
+            let originalTotal = 0;  // 原始總額
+            let totalRevenue = 0;   // 扣除服務費後總額
+            let bonusEligibleRevenue = 0;  // 計入獎金的收入
+            let serviceFeeTotal = 0;  // 服務費總額
+            
+            document.querySelectorAll('.revenue-input').forEach(input => {
+                const amount = parseFloat(input.value) || 0;
+                const serviceFee = parseFloat(input.dataset.serviceFee) || 0;
+                const includeBonus = input.dataset.includeBonus === 'true';
+                
+                originalTotal += amount;
+                const serviceFeeAmount = amount * serviceFee;
+                const netAmount = amount - serviceFeeAmount;
+                
+                serviceFeeTotal += serviceFeeAmount;
+                totalRevenue += netAmount;
+                
+                if (includeBonus) {
+                    bonusEligibleRevenue += netAmount;
+                }
+            });
+            
+            // 計算支出總額
+            let totalExpense = 0;
+            document.querySelectorAll('.expense-input').forEach(input => {
+                totalExpense += parseFloat(input.value) || 0;
+            });
+            
+            // 更新顯示
+            document.getElementById('originalRevenue').textContent = originalTotal.toLocaleString();
+            document.getElementById('serviceFeeTotal').textContent = serviceFeeTotal.toLocaleString();
+            document.getElementById('totalRevenue').textContent = totalRevenue.toLocaleString();
+            document.getElementById('totalExpense').textContent = totalExpense.toLocaleString();
+            
+            // 計算平均客單價
+            calculateAverageOrder();
+            
+            // 計算獎金
+            calculateBonus(bonusEligibleRevenue, totalExpense);
+        }
+
+        // 計算獎金
+        function calculateBonus(revenue, expense) {
+            const bonusType = document.getElementById('bonusType').value;
+            const netRevenue = revenue - expense;
+            
+            let bonusThreshold = 0;
+            let bonusRate = 0;
+            let calculatedBonus = 0;
+            
+            if (bonusType === 'weekday') {
+                // 平日獎金：大於13000的30%
+                bonusThreshold = 13000;
+                bonusRate = 30;
+                if (netRevenue > bonusThreshold) {
+                    calculatedBonus = netRevenue * 0.3;
+                }
+            } else if (bonusType === 'holiday') {
+                // 假日獎金：大於等於0的38%
+                bonusThreshold = 0;
+                bonusRate = 38;
+                if (netRevenue >= bonusThreshold) {
+                    calculatedBonus = netRevenue * 0.38;
+                }
+            }
+            
+            // 更新獎金計算器
+            const calculator = document.getElementById('bonusCalculator');
+            const achievementStatus = document.getElementById('achievementStatus');
+            
+            if (bonusType) {
+                calculator.style.display = 'block';
+                
+                document.getElementById('calculatedRevenue').textContent = revenue.toLocaleString();
+                document.getElementById('calculatedExpense').textContent = expense.toLocaleString();
+                document.getElementById('netRevenue').textContent = netRevenue.toLocaleString();
+                document.getElementById('bonusThreshold').textContent = bonusThreshold.toLocaleString();
+                document.getElementById('bonusRate').textContent = bonusRate;
+                
+                if (calculatedBonus > 0) {
+                    achievementStatus.className = 'achievement-status achievement-success';
+                    achievementStatus.innerHTML = `🎉 今日獎金：NT$ ${calculatedBonus.toLocaleString()}`;
+                } else {
+                    const shortage = bonusThreshold - netRevenue;
+                    achievementStatus.className = 'achievement-status achievement-warning';
+                    achievementStatus.innerHTML = `⚠️ 未達標，差距 NT$ ${shortage.toLocaleString()}`;
+                }
+            } else {
+                calculator.style.display = 'none';
+            }
+        }
+
+        // 計算訂單平均
+        function calculateAverageOrder() {
+            const totalRevenue = parseFloat(document.getElementById('totalRevenue').textContent.replace(/,/g, '')) || 0;
+            const orderCount = parseFloat(document.getElementById('orderCount').value) || 0;
+            
+            if (orderCount > 0 && totalRevenue > 0) {
+                const average = totalRevenue / orderCount;
+                document.getElementById('averageOrder').value = Math.round(average);
+            } else {
+                document.getElementById('averageOrder').value = '';
+            }
+        }
+
+        // 處理照片上傳
+        function handlePhotoUpload(event) {
+            const files = Array.from(event.target.files);
+            const preview = document.getElementById('photoPreview');
+            
+            files.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'photo-preview';
+                        img.title = file.name;
+                        preview.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                    
+                    uploadedPhotos.push(file);
+                }
+            });
+        }
+
+        // 提交營收記錄
+        async function submitRevenue(event) {
+            event.preventDefault();
+            
+            try {
+                const formData = collectFormData();
+                
+                if (!validateFormData(formData)) {
+                    return;
+                }
+                
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/revenue', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('營收記錄提交成功！Telegram通知已發送', 'success');
+                    resetForm();
+                    loadRevenueRecords();
+                } else {
+                    showAlert('營收記錄提交失敗：' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('提交時發生錯誤：' + error.message, 'danger');
+            }
+        }
+
+        // 收集表單資料
+        function collectFormData() {
+            const revenueItems = [];
+            document.querySelectorAll('.revenue-input').forEach((input, index) => {
+                const amount = parseFloat(input.value) || 0;
+                if (amount > 0) {
+                    revenueItems.push({
+                        category: defaultRevenueCategories[index].name,
+                        amount: amount,
+                        serviceFee: defaultRevenueCategories[index].serviceFee,
+                        includeInBonus: defaultRevenueCategories[index].includeInBonus
+                    });
+                }
+            });
+            
+            const expenseItems = [];
+            document.querySelectorAll('.expense-item').forEach(item => {
+                const category = item.querySelector('.expense-category').value;
+                const amount = parseFloat(item.querySelector('.expense-input').value) || 0;
+                if (category && amount > 0) {
+                    expenseItems.push({
+                        category: category,
+                        amount: amount
+                    });
+                }
+            });
+            
+            // 計算獎金資料
+            const bonusType = document.getElementById('bonusType').value;
+            const totalRevenue = parseFloat(document.getElementById('totalRevenue').textContent.replace(/,/g, '')) || 0;
+            const totalExpense = parseFloat(document.getElementById('totalExpense').textContent.replace(/,/g, '')) || 0;
+            const netRevenue = totalRevenue - totalExpense;
+            
+            let bonusAmount = 0;
+            let shortageAmount = 0;
+            let achievementRate = 0;
+            let target = 0;
+            
+            if (bonusType === 'weekday') {
+                target = 13000;
+                if (netRevenue > target) {
+                    bonusAmount = netRevenue * 0.3;
+                    achievementRate = 1;
+                } else {
+                    shortageAmount = target - netRevenue;
+                    achievementRate = netRevenue / target;
+                }
+            } else if (bonusType === 'holiday') {
+                target = 0;
+                if (netRevenue >= target) {
+                    bonusAmount = netRevenue * 0.38;
+                    achievementRate = 1;
+                } else {
+                    shortageAmount = target - netRevenue;
+                    achievementRate = 0;
+                }
+            }
+            
+            return {
+                date: document.getElementById('revenueDate').value,
+                store_id: parseInt(document.getElementById('storeSelect').value),
+                bonus_type: bonusType,
+                order_count: parseInt(document.getElementById('orderCount').value) || 0,
+                revenue_items: revenueItems,
+                expense_items: expenseItems,
+                notes: document.getElementById('notes').value,
+                total_revenue: totalRevenue,
+                total_expense: totalExpense,
+                net_revenue: netRevenue,
+                bonus_amount: bonusAmount,
+                shortage_amount: shortageAmount,
+                achievement_rate: achievementRate,
+                target: target,
+                photos: uploadedPhotos.map(file => file.name) // 實際上傳邏輯需要單獨處理
+            };
+        }
+
+        // 驗證表單資料
+        function validateFormData(data) {
+            if (!data.date) {
+                showAlert('請選擇日期', 'warning');
+                return false;
+            }
+            
+            if (!data.store_id) {
+                showAlert('請選擇分店', 'warning');
+                return false;
+            }
+            
+            if (!data.bonus_type) {
+                showAlert('請選擇獎金類別', 'warning');
+                return false;
+            }
+            
+            if (data.revenue_items.length === 0) {
+                showAlert('請至少輸入一項收入', 'warning');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // 重置表單
+        function resetForm() {
+            document.getElementById('revenueForm').reset();
+            document.getElementById('photoPreview').innerHTML = '';
+            document.getElementById('bonusCalculator').style.display = 'none';
+            uploadedPhotos = [];
+            
+            // 重置收入輸入框
+            document.querySelectorAll('.revenue-input').forEach(input => {
+                input.value = '';
+            });
+            
+            // 重置支出項目
+            document.getElementById('expenseItems').innerHTML = '';
+            addExpenseItem();
+            
+            // 重置總額顯示
+            document.getElementById('originalRevenue').textContent = '0';
+            document.getElementById('serviceFeeTotal').textContent = '0';
+            document.getElementById('totalRevenue').textContent = '0';
+            document.getElementById('totalExpense').textContent = '0';
+            
+            // 設定今日日期
+            document.getElementById('revenueDate').valueAsDate = new Date();
+        }
+
+        // 載入營收記錄
+        async function loadRevenueRecords() {
+            try {
+                const token = localStorage.getItem('token');
+                const storeFilter = document.getElementById('filterStore').value;
+                const dateFilter = document.getElementById('filterDate').value;
+                
+                let url = '/api/revenue/records';
+                const params = new URLSearchParams();
+                if (storeFilter) params.append('store_id', storeFilter);
+                if (dateFilter) params.append('date', dateFilter);
+                if (params.toString()) url += '?' + params.toString();
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    renderRevenueRecords(result.data);
+                } else {
+                    showAlert('載入記錄失敗：' + result.message, 'danger');
+                }
+            } catch (error) {
+                console.error('載入記錄時發生錯誤:', error);
+                // 顯示空狀態而不是錯誤
+                document.getElementById('revenueRecords').innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">暫無營收記錄或連接服務器失敗</p>
+                    </div>
+                `;
+            }
+        }
+
+        // 渲染營收記錄
+        function renderRevenueRecords(records) {
+            const container = document.getElementById('revenueRecords');
+            
+            if (!records || records.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">尚無營收記錄</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 按分店分組，每店最多顯示3筆
+            const groupedRecords = {};
+            records.forEach(record => {
+                const storeName = record.store_name || '未知分店';
+                if (!groupedRecords[storeName]) {
+                    groupedRecords[storeName] = [];
+                }
+                if (groupedRecords[storeName].length < 3) {
+                    groupedRecords[storeName].push(record);
+                }
+            });
+            
+            container.innerHTML = '';
+            Object.entries(groupedRecords).forEach(([storeName, storeRecords]) => {
+                container.innerHTML += `<h6 class="mt-4 mb-3"><i class="fas fa-store me-2"></i>${storeName}</h6>`;
+                
+                storeRecords.forEach(record => {
+                    const recordDate = new Date(record.date).toLocaleDateString('zh-TW');
+                    const submitTime = new Date(record.created_at).toLocaleString('zh-TW');
+                    const bonusTypeText = record.bonus_type === 'holiday' ? '假日獎金' : '平日獎金';
+                    const isAchieved = record.bonus_amount > 0;
+                    
+                    container.innerHTML += `
+                        <div class="record-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <h6 class="mb-0 me-3">${recordDate}</h6>
+                                        <small class="text-muted">(提交伺服器：${submitTime})</small>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <p class="mb-1">
+                                                <span class="badge bg-info me-2">${bonusTypeText}</span>
+                                                ${isAchieved ? 
+                                                    `<span class="badge bg-success">達標 NT$ ${record.bonus_amount?.toLocaleString()}</span>` :
+                                                    `<span class="badge bg-warning">未達標 差距 NT$ ${record.shortage_amount?.toLocaleString() || 0}</span>`
+                                                }
+                                            </p>
+                                            <p class="mb-1">
+                                                <small class="text-muted">
+                                                    營收：NT$ ${record.total_revenue?.toLocaleString() || 0} | 
+                                                    支出：NT$ ${record.total_expense?.toLocaleString() || 0} | 
+                                                    淨收入：NT$ ${((record.total_revenue || 0) - (record.total_expense || 0)).toLocaleString()}
+                                                </small>
+                                            </p>
+                                            ${record.notes ? `<p class="text-muted small mb-0"><strong>備註：</strong>${record.notes}</p>` : ''}
+                                        </div>
+                                        <div class="col-md-4 text-end">
+                                            <button class="btn btn-outline-danger btn-sm" 
+                                                    onclick="showVoidModal(${record.id}, '${recordDate}', '${storeName}')">
+                                                <i class="fas fa-trash-alt"></i> 作廢
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        // 重置篩選器
+        function resetFilters() {
+            document.getElementById('filterStore').value = '';
+            document.getElementById('filterDate').value = '';
+            loadRevenueRecords();
+        }
+
+        // 顯示作廢確認模態框
+        function showVoidModal(recordId, date, storeName) {
+            currentVoidId = recordId;
+            
+            document.getElementById('voidRecordInfo').innerHTML = `
+                <div class="alert alert-warning">
+                    <p><strong>確定要作廢以下記錄嗎？</strong></p>
+                    <p><strong>日期：</strong>${date}</p>
+                    <p><strong>分店：</strong>${storeName}</p>
+                    <p class="text-muted small mb-0">此操作無法復原，將發送Telegram通知</p>
+                </div>
+            `;
+            
+            const modal = new bootstrap.Modal(document.getElementById('voidModal'));
+            modal.show();
+            
+            // 綁定確認按鈕事件
+            document.getElementById('confirmVoidBtn').onclick = voidRevenueRecord;
+        }
+
+        // 作廢營收記錄
+        async function voidRevenueRecord() {
+            try {
+                const reason = document.getElementById('voidReason').value.trim();
+                if (!reason) {
+                    showAlert('請輸入作廢原因', 'warning');
+                    return;
+                }
+                
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/api/revenue/${currentVoidId}/void`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ reason: reason })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('營收記錄已作廢，Telegram通知已發送', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('voidModal')).hide();
+                    document.getElementById('voidReason').value = '';
+                    loadRevenueRecords();
+                } else {
+                    showAlert('作廢失敗：' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('作廢時發生錯誤：' + error.message, 'danger');
+            }
+        }
+
+        // 通用警告顯示函數
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.createElement('div');
+            alertContainer.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertContainer.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+            alertContainer.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(alertContainer);
+            
+            setTimeout(() => {
+                if (alertContainer.parentNode) {
+                    alertContainer.remove();
+                }
+            }, 5000);
+        }
+        
+        // 初始化時自動添加一個支出項目
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                addExpenseItem();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

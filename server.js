@@ -1209,6 +1209,180 @@ app.post('/api/notify-order-anomalies', authenticateToken, async (req, res) => {
     }
 });
 
+// ==================== 營收系統APIs ====================
+
+// 創建營收記錄
+app.post('/api/revenue', authenticateToken, async (req, res) => {
+    try {
+        const {
+            date,
+            store_id,
+            bonus_type,
+            order_count,
+            revenue_items,
+            expense_items,
+            notes,
+            total_revenue,
+            total_expense,
+            net_revenue,
+            bonus_amount,
+            shortage_amount,
+            achievement_rate,
+            target,
+            photos
+        } = req.body;
+        
+        if (!date || !store_id || !bonus_type || !revenue_items || revenue_items.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: '請填寫所有必填欄位'
+            });
+        }
+        
+        const result = await db.createRevenueRecord({
+            date,
+            store_id,
+            employee_id: req.user.employee_id,
+            bonus_type,
+            order_count: order_count || 0,
+            revenue_items,
+            expense_items: expense_items || [],
+            notes: notes || '',
+            total_revenue: total_revenue || 0,
+            total_expense: total_expense || 0,
+            net_revenue: net_revenue || 0,
+            bonus_amount: bonus_amount || 0,
+            shortage_amount: shortage_amount || 0,
+            achievement_rate: achievement_rate || 0,
+            target: target || 0,
+            photos: photos || []
+        });
+        
+        // 發送Telegram通知
+        try {
+            const revenueData = {
+                date: date,
+                store_name: req.user.store_name || '未知分店',
+                employee_name: req.user.name || '未知員工',
+                day_type: bonus_type,
+                amount: total_revenue,
+                target: target,
+                achievement_rate: achievement_rate,
+                bonus: bonus_amount,
+                shortage_amount: shortage_amount,
+                notes: notes
+            };
+            
+            await telegramNotifier.notifyRevenue(revenueData);
+        } catch (notificationError) {
+            console.error('營收Telegram通知發送失敗:', notificationError);
+        }
+        
+        res.json({
+            success: true,
+            data: result,
+            message: '營收記錄創建成功'
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: '營收記錄創建失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取營收記錄
+app.get('/api/revenue/records', authenticateToken, async (req, res) => {
+    try {
+        const { store_id, date, limit = 50, offset = 0 } = req.query;
+        
+        const records = await db.getRevenueRecords({
+            store_id: store_id ? parseInt(store_id) : null,
+            date: date || null,
+            limit: parseInt(limit),
+            offset: parseInt(offset)
+        });
+        
+        res.json({
+            success: true,
+            data: records,
+            message: '營收記錄獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取營收記錄失敗: ' + error.message
+        });
+    }
+});
+
+// 作廢營收記錄
+app.post('/api/revenue/:id/void', authenticateToken, async (req, res) => {
+    try {
+        const recordId = parseInt(req.params.id);
+        const { reason } = req.body;
+        
+        if (!reason || !reason.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: '請提供作廢原因'
+            });
+        }
+        
+        const result = await db.voidRevenueRecord(recordId, req.user.employee_id, reason.trim());
+        
+        // 發送Telegram通知
+        try {
+            const voidData = {
+                employee_name: req.user.name || '未知員工',
+                store_name: req.user.store_name || '未知分店',
+                data_type: '營收記錄',
+                reason: reason.trim(),
+                record_id: recordId
+            };
+            
+            await telegramNotifier.notifyDataVoid(voidData);
+        } catch (notificationError) {
+            console.error('作廢通知發送失敗:', notificationError);
+        }
+        
+        res.json({
+            success: true,
+            data: result,
+            message: '營收記錄已作廢'
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: '作廢營收記錄失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取營收統計
+app.get('/api/revenue/stats', authenticateToken, async (req, res) => {
+    try {
+        const { period = 'month', store_id } = req.query;
+        
+        const stats = await db.getRevenueStats({
+            period,
+            store_id: store_id ? parseInt(store_id) : null,
+            employee_id: req.user.role === 'admin' ? null : req.user.employee_id
+        });
+        
+        res.json({
+            success: true,
+            data: stats,
+            message: '營收統計獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取營收統計失敗: ' + error.message
+        });
+    }
+});
+
 // ==================== 其他APIs ====================
 
 // 員工班表API
