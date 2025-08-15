@@ -1,6 +1,6 @@
 /**
- * 🚀 GClaude Enterprise Management System - Render 雲端部署版
- * 使用JSON檔案存儲，完全相容雲端環境
+ * 🚀 GClaude Enterprise Management System - 完整資料庫版
+ * 整合真正的SQLite資料庫持久化
  */
 
 const express = require('express');
@@ -10,14 +10,14 @@ const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 const fs = require('fs');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-// 使用JSON檔案資料庫而非SQLite
-const DatabaseOperations = require('./database/json-database');
+const DatabaseOperations = require('./database/database-operations');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3008;
 const JWT_SECRET = process.env.JWT_SECRET || 'gclaude-enterprise-secret-key';
 
 // 初始化資料庫
@@ -106,22 +106,22 @@ function authenticateToken(req, res, next) {
 // 健康檢查
 app.get('/api/health', async (req, res) => {
     try {
+        // 檢查資料庫連接
         const stats = await db.getDashboardStats();
         
         res.json({
             status: 'healthy',
             service: 'GClaude Enterprise Management System',
-            version: '4.0.0',
+            version: '3.0.0',
             timestamp: new Date().toISOString(),
             uptime: process.uptime(),
             environment: process.env.NODE_ENV || 'production',
-            database: 'JSON File Database - Cloud Compatible',
+            database: 'connected',
             features: {
                 authentication: true,
                 employeeManagement: true,
                 telegramIntegration: !!process.env.TELEGRAM_BOT_TOKEN,
-                dataPersistence: true,
-                cloudCompatible: true
+                dataPersistence: true
             },
             stats
         });
@@ -141,6 +141,7 @@ app.post('/api/auth/login', async (req, res) => {
     const { username, password } = req.body;
     
     try {
+        // 從資料庫查找用戶
         const user = await db.getUserByUsername(username);
         
         if (!user) {
@@ -150,6 +151,7 @@ app.post('/api/auth/login', async (req, res) => {
             });
         }
 
+        // 驗證密碼（暫時使用明文比較，實際應用中應使用bcrypt）
         const isValidPassword = password === user.password;
         
         if (!isValidPassword) {
@@ -159,6 +161,7 @@ app.post('/api/auth/login', async (req, res) => {
             });
         }
 
+        // 生成JWT令牌
         const token = jwt.sign(
             { 
                 id: user.id,
@@ -171,6 +174,7 @@ app.post('/api/auth/login', async (req, res) => {
             { expiresIn: '24h' }
         );
 
+        // 確定重定向URL
         const redirectUrl = user.role === 'admin' ? '/admin' : '/employee';
 
         res.json({
@@ -233,6 +237,7 @@ app.post('/api/auth/verify', authenticateToken, async (req, res) => {
 
 // ==================== 員工管理API ====================
 
+// 獲取所有員工
 app.get('/api/employees', authenticateToken, async (req, res) => {
     try {
         const employees = await db.getAllEmployees();
@@ -249,6 +254,7 @@ app.get('/api/employees', authenticateToken, async (req, res) => {
     }
 });
 
+// 新增員工
 app.post('/api/employees', authenticateToken, async (req, res) => {
     try {
         const result = await db.createEmployee(req.body);
@@ -265,6 +271,7 @@ app.post('/api/employees', authenticateToken, async (req, res) => {
     }
 });
 
+// 更新員工
 app.put('/api/employees/:id', authenticateToken, async (req, res) => {
     try {
         await db.updateEmployee(req.params.id, req.body);
@@ -281,6 +288,7 @@ app.put('/api/employees/:id', authenticateToken, async (req, res) => {
     }
 });
 
+// 刪除員工
 app.delete('/api/employees/:id', authenticateToken, async (req, res) => {
     try {
         await db.deleteEmployee(req.params.id);
@@ -298,6 +306,7 @@ app.delete('/api/employees/:id', authenticateToken, async (req, res) => {
 
 // ==================== 出勤管理API ====================
 
+// 今日出勤狀態
 app.get('/api/attendance/today', authenticateToken, async (req, res) => {
     try {
         const attendance = await db.getTodayAttendance(req.user.employee_id);
@@ -319,6 +328,7 @@ app.get('/api/attendance/today', authenticateToken, async (req, res) => {
     }
 });
 
+// 出勤歷史記錄
 app.get('/api/attendance/history', authenticateToken, async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 10;
@@ -336,6 +346,7 @@ app.get('/api/attendance/history', authenticateToken, async (req, res) => {
     }
 });
 
+// 上班打卡
 app.post('/api/attendance/clock-in', authenticateToken, async (req, res) => {
     try {
         const { location } = req.body;
@@ -359,6 +370,7 @@ app.post('/api/attendance/clock-in', authenticateToken, async (req, res) => {
     }
 });
 
+// 下班打卡
 app.post('/api/attendance/clock-out', authenticateToken, async (req, res) => {
     try {
         const { location } = req.body;
@@ -384,6 +396,7 @@ app.post('/api/attendance/clock-out', authenticateToken, async (req, res) => {
 
 // ==================== 營收管理API ====================
 
+// 新增營收記錄
 app.post('/api/revenue', authenticateToken, async (req, res) => {
     try {
         const revenueData = {
@@ -417,6 +430,7 @@ app.post('/api/revenue', authenticateToken, async (req, res) => {
     }
 });
 
+// 獲取員工營收記錄
 app.get('/api/revenue/employee', authenticateToken, async (req, res) => {
     try {
         const [revenueRecords, todayStats] = await Promise.all([
@@ -434,7 +448,7 @@ app.get('/api/revenue/employee', authenticateToken, async (req, res) => {
                     other: todayStats.other || 0
                 },
                 month_target: 500000,
-                month_current: (todayStats.total || 0) * 20,
+                month_current: (todayStats.total || 0) * 20, // 估算月收入
                 month_progress: Math.round((todayStats.total || 0) * 20 / 500000 * 100),
                 recent_records: revenueRecords
             },
@@ -450,6 +464,7 @@ app.get('/api/revenue/employee', authenticateToken, async (req, res) => {
 
 // ==================== 維修申請API ====================
 
+// 新增維修申請
 app.post('/api/maintenance', authenticateToken, async (req, res) => {
     try {
         const maintenanceData = {
@@ -483,6 +498,7 @@ app.post('/api/maintenance', authenticateToken, async (req, res) => {
     }
 });
 
+// 獲取員工維修記錄
 app.get('/api/maintenance/employee', authenticateToken, async (req, res) => {
     try {
         const maintenanceRecords = await db.getMaintenanceByEmployee(req.user.employee_id);
@@ -501,6 +517,7 @@ app.get('/api/maintenance/employee', authenticateToken, async (req, res) => {
 
 // ==================== 請假申請API ====================
 
+// 新增請假申請
 app.post('/api/leave-requests', authenticateToken, async (req, res) => {
     try {
         const leaveData = {
@@ -533,6 +550,7 @@ app.post('/api/leave-requests', authenticateToken, async (req, res) => {
     }
 });
 
+// 計算請假天數
 function calculateLeaveDays(startDate, endDate) {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -575,6 +593,7 @@ app.get('/api/dashboard/stats', authenticateToken, async (req, res) => {
 
 // ==================== 管理員專用API ====================
 
+// 權限檢查中間件
 function requireAdmin(req, res, next) {
     if (!req.user || req.user.role !== 'admin') {
         return res.status(403).json({
@@ -588,7 +607,15 @@ function requireAdmin(req, res, next) {
 // 獲取所有出勤記錄（管理員用）
 app.get('/api/admin/attendance', authenticateToken, requireAdmin, async (req, res) => {
     try {
-        const attendance = await db.allQuery('SELECT * FROM attendance ORDER BY date DESC LIMIT 100');
+        const sql = `
+            SELECT a.*, e.name as employee_name, s.name as store_name
+            FROM attendance a
+            LEFT JOIN employees e ON a.employee_id = e.id
+            LEFT JOIN stores s ON a.store_id = s.id
+            ORDER BY a.date DESC, a.created_at DESC
+            LIMIT 100
+        `;
+        const attendance = await db.allQuery(sql);
         
         res.json({
             success: true,
@@ -603,36 +630,300 @@ app.get('/api/admin/attendance', authenticateToken, requireAdmin, async (req, re
     }
 });
 
-// ==================== 其他APIs ====================
+// 編輯出勤記錄（管理員用）
+app.put('/api/admin/attendance/:id', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { clock_in, clock_out, status, notes } = req.body;
+        
+        const sql = `
+            UPDATE attendance SET 
+                clock_in = ?, clock_out = ?, status = ?, notes = ?, 
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        `;
+        
+        await db.runQuery(sql, [clock_in, clock_out, status, notes, id]);
+        
+        res.json({
+            success: true,
+            data: { id: parseInt(id), ...req.body },
+            message: '出勤記錄更新成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '出勤記錄更新失敗: ' + error.message
+        });
+    }
+});
 
-// 員工班表API
-app.get('/api/schedule/employee', authenticateToken, async (req, res) => {
-    res.json({
-        success: true,
-        data: {
-            week_schedule: {
-                monday: { shift: '早班', time: '09:00-17:00', status: 'scheduled' },
-                tuesday: { shift: '早班', time: '09:00-17:00', status: 'scheduled' },
-                wednesday: { shift: '早班', time: '09:00-17:00', status: 'scheduled' },
-                thursday: { shift: '早班', time: '09:00-17:00', status: 'scheduled' },
-                friday: { shift: '早班', time: '09:00-17:00', status: 'scheduled' },
-                saturday: { shift: '休假', time: '-', status: 'off' },
-                sunday: { shift: '休假', time: '-', status: 'off' }
-            },
-            month_summary: {
-                work_days: 22,
-                estimated_hours: 176,
-                off_days: 8,
-                overtime_days: 2
-            },
-            leave_balance: {
-                annual_leave: 7,
-                sick_leave: 3,
-                personal_leave: 2
-            }
-        },
-        message: '班表資料獲取成功'
-    });
+// 獲取所有營收記錄（管理員用）
+app.get('/api/admin/revenue', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const sql = `
+            SELECT r.*, e.name as employee_name, s.name as store_name
+            FROM revenue r
+            LEFT JOIN employees e ON r.employee_id = e.id
+            LEFT JOIN stores s ON r.store_id = s.id
+            ORDER BY r.revenue_date DESC, r.created_at DESC
+            LIMIT 200
+        `;
+        const revenue = await db.allQuery(sql);
+        
+        res.json({
+            success: true,
+            data: revenue,
+            message: '營收記錄獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取營收記錄失敗: ' + error.message
+        });
+    }
+});
+
+// 編輯營收記錄（管理員用）
+app.put('/api/admin/revenue/:id', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { category, item, amount, customer_name, status, notes } = req.body;
+        
+        const sql = `
+            UPDATE revenue SET 
+                category = ?, item = ?, amount = ?, customer_name = ?, 
+                status = ?, notes = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        `;
+        
+        await db.runQuery(sql, [category, item, amount, customer_name, status, notes, id]);
+        
+        res.json({
+            success: true,
+            data: { id: parseInt(id), ...req.body },
+            message: '營收記錄更新成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '營收記錄更新失敗: ' + error.message
+        });
+    }
+});
+
+// 刪除營收記錄（管理員用）
+app.delete('/api/admin/revenue/:id', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        const sql = `DELETE FROM revenue WHERE id = ?`;
+        const result = await db.runQuery(sql, [id]);
+        
+        if (result.changes === 0) {
+            return res.status(404).json({
+                success: false,
+                message: '找不到指定的營收記錄'
+            });
+        }
+        
+        res.json({
+            success: true,
+            message: `營收記錄 ID ${id} 已成功刪除`
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '營收記錄刪除失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取所有維修記錄（管理員用）
+app.get('/api/admin/maintenance', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const sql = `
+            SELECT m.*, e.name as employee_name, s.name as store_name, a.name as assigned_to_name
+            FROM maintenance m
+            LEFT JOIN employees e ON m.employee_id = e.id
+            LEFT JOIN stores s ON m.store_id = s.id
+            LEFT JOIN employees a ON m.assigned_to = a.id
+            ORDER BY m.created_at DESC
+            LIMIT 100
+        `;
+        const maintenance = await db.allQuery(sql);
+        
+        res.json({
+            success: true,
+            data: maintenance,
+            message: '維修記錄獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取維修記錄失敗: ' + error.message
+        });
+    }
+});
+
+// 編輯維修記錄（管理員用）
+app.put('/api/admin/maintenance/:id', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status, assigned_to, cost, notes } = req.body;
+        
+        let sql, params;
+        
+        if (status === 'completed') {
+            sql = `
+                UPDATE maintenance SET 
+                    status = ?, assigned_to = ?, cost = ?, notes = ?, 
+                    completed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            `;
+            params = [status, assigned_to, cost, notes, id];
+        } else {
+            sql = `
+                UPDATE maintenance SET 
+                    status = ?, assigned_to = ?, cost = ?, notes = ?, 
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            `;
+            params = [status, assigned_to, cost, notes, id];
+        }
+        
+        await db.runQuery(sql, params);
+        
+        res.json({
+            success: true,
+            data: { id: parseInt(id), ...req.body },
+            message: '維修記錄更新成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '維修記錄更新失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取所有請假記錄（管理員用）
+app.get('/api/admin/leave-requests', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const sql = `
+            SELECT lr.*, e.name as employee_name, s.name as substitute_name, a.name as approved_by_name
+            FROM leave_requests lr
+            LEFT JOIN employees e ON lr.employee_id = e.id
+            LEFT JOIN employees s ON lr.substitute_id = s.id
+            LEFT JOIN employees a ON lr.approved_by = a.id
+            ORDER BY lr.applied_at DESC
+            LIMIT 100
+        `;
+        const leaveRequests = await db.allQuery(sql);
+        
+        res.json({
+            success: true,
+            data: leaveRequests,
+            message: '請假記錄獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取請假記錄失敗: ' + error.message
+        });
+    }
+});
+
+// 審核請假申請（管理員用）
+app.put('/api/admin/leave-requests/:id', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status, notes } = req.body;
+        
+        const sql = `
+            UPDATE leave_requests SET 
+                status = ?, notes = ?, approved_by = ?, approved_at = CURRENT_TIMESTAMP,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        `;
+        
+        await db.runQuery(sql, [status, notes, req.user.employee_id, id]);
+        
+        res.json({
+            success: true,
+            data: { id: parseInt(id), status, notes },
+            message: '請假申請審核成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '請假申請審核失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取所有商品（管理員用）
+app.get('/api/admin/products', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const products = await db.getAllProducts();
+        res.json({
+            success: true,
+            data: products,
+            message: '商品清單獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取商品清單失敗'
+        });
+    }
+});
+
+// 更新商品庫存（管理員用）
+app.put('/api/admin/products/:id/stock', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { stock, operation_type, notes } = req.body;
+        
+        await db.updateProductStock(id, parseInt(stock), operation_type, req.user.employee_id, notes);
+        
+        res.json({
+            success: true,
+            data: { id: parseInt(id), stock: parseInt(stock) },
+            message: '庫存更新成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '庫存更新失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取庫存異動記錄（管理員用）
+app.get('/api/admin/inventory-logs', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const sql = `
+            SELECT il.*, p.name as product_name, p.code as product_code, e.name as operated_by_name
+            FROM inventory_logs il
+            LEFT JOIN products p ON il.product_id = p.id
+            LEFT JOIN employees e ON il.operated_by = e.id
+            ORDER BY il.created_at DESC
+            LIMIT 100
+        `;
+        const logs = await db.allQuery(sql);
+        
+        res.json({
+            success: true,
+            data: logs,
+            message: '庫存異動記錄獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取庫存異動記錄失敗'
+        });
+    }
 });
 
 // ==================== 前端頁面路由 ====================
@@ -644,19 +935,19 @@ app.get('/', (req, res) => {
     } else {
         res.json({
             service: 'GClaude Enterprise Management System',
-            version: '4.0.0 - Cloud Version',
+            version: '3.0.0',
             status: 'running',
-            message: '🎉 企業員工管理系統 - 雲端版本！',
+            message: '🎉 企業員工管理系統 - 完整資料庫版！',
             testAccounts: {
                 admin: { username: 'admin', password: 'admin123' },
                 employee: { username: 'employee', password: 'emp123' }
             },
             features: [
-                '✅ JSON檔案資料庫',
-                '✅ 雲端完全相容',
                 '✅ 多角色認證系統',
-                '✅ 完整數據持久化',
+                '✅ 完整SQLite資料庫',
+                '✅ 數據持久化支持',
                 '✅ JWT令牌認證',
+                '✅ 管理員/員工分離頁面',
                 '✅ 響應式設計'
             ]
         });
@@ -714,12 +1005,12 @@ app.use((error, req, res, next) => {
 // ==================== 伺服器啟動 ====================
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 GClaude Enterprise System (Cloud Version) started on port ${PORT}`);
+    console.log(`🚀 GClaude Enterprise System (Database Version) started on port ${PORT}`);
     console.log(`🌐 Server URL: http://0.0.0.0:${PORT}`);
     console.log(`📊 Environment: ${process.env.NODE_ENV || 'production'}`);
-    console.log(`🗄️ Database: JSON File Database (Cloud Compatible)`);
+    console.log(`🗄️ Database: SQLite with full persistence`);
     console.log(`🔧 Telegram Bot: ${process.env.TELEGRAM_BOT_TOKEN ? '已設定' : '未設定'}`);
-    console.log(`✅ All systems operational - Cloud deployment ready!`);
+    console.log(`✅ All systems operational with real database support!`);
 });
 
 // 優雅關閉
