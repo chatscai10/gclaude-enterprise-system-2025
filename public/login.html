@@ -354,19 +354,19 @@
                 
                 const data = await response.json();
                 
-                if (response.ok && data.success) {
+                if (response.ok && data.success && data.data && data.data.user) {
                     // 登入成功
-                    localStorage.setItem('jwt_token', data.token);
-                    localStorage.setItem('user_data', JSON.stringify(data.user));
+                    localStorage.setItem('jwt_token', data.data.token);
+                    localStorage.setItem('user_data', JSON.stringify(data.data.user));
                     
-                    showAlert(`登入成功！歡迎 ${data.user.name}`, 'success');
+                    showAlert(`登入成功！歡迎 ${data.data.user.name}`, 'success');
                     
-                    console.log(`✅ 登入成功: ${data.user.name} (${data.user.role})`);
-                    console.log(`🔄 將重定向到: ${data.redirectUrl}`);
+                    console.log(`✅ 登入成功: ${data.data.user.name} (${data.data.user.role})`);
+                    console.log(`🔄 將重定向到: ${data.data.redirectUrl}`);
                     
                     // 延遲跳轉以顯示成功訊息
                     setTimeout(() => {
-                        window.location.href = data.redirectUrl || '/dashboard';
+                        window.location.href = data.data.redirectUrl || '/dashboard';
                     }, 1500);
                     
                 } else {
