@@ -16,12 +16,16 @@ require('dotenv').config();
 // 使用JSON檔案資料庫而非SQLite
 const DatabaseOperations = require('./database/json-database');
 
+// Telegram通知系統
+const TelegramNotifier = require('./modules/telegram-notifier');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'gclaude-enterprise-secret-key';
 
-// 初始化資料庫
+// 初始化資料庫和通知系統
 const db = new DatabaseOperations();
+const telegramNotifier = new TelegramNotifier();
 
 // ==================== 中間件設定 ====================
 
@@ -657,6 +661,30 @@ app.post('/api/orders', authenticateToken, async (req, res) => {
             notes || ''
         );
 
+        // 發送Telegram通知
+        try {
+            const orderData = {
+                created_at: new Date().toISOString(),
+                employee_name: req.user.name || '未知員工',
+                store_name: req.user.store_name || '未知分店',
+                items: items.map(item => ({
+                    product_name: item.product_name,
+                    quantity: item.quantity,
+                    unit_price: item.unit_price,
+                    supplier: item.supplier
+                })),
+                notes: notes || ''
+            };
+
+            // 檢查進貨異常
+            const anomalies = await db.checkOrderingAnomalies(req.user.store_id, items);
+            
+            await telegramNotifier.notifyOrdering(orderData, anomalies);
+        } catch (notificationError) {
+            console.error('Telegram通知發送失敗:', notificationError);
+            // 不影響主要業務流程
+        }
+
         res.json({
             success: true,
             data: {
@@ -778,6 +806,15 @@ app.get('/api/promotion/check-eligibility', authenticateToken, async (req, res) 
 app.post('/api/promotion/start', authenticateToken, async (req, res) => {
     try {
         const result = await db.startPromotion(req.user.employee_id);
+        
+        // 發送Telegram通知
+        try {
+            if (result.promotion) {
+                await telegramNotifier.notifyPromotionStart(result.promotion);
+            }
+        } catch (notificationError) {
+            console.error('升遷投票通知發送失敗:', notificationError);
+        }
         
         res.json({
             success: true,
@@ -969,6 +1006,19 @@ app.post('/api/schedule/save', authenticateToken, async (req, res) => {
 
         const result = await db.saveEmployeeSchedule(req.user.employee_id, { leaveDates });
         
+        // 發送Telegram通知
+        try {
+            const scheduleData = {
+                employee_name: req.user.name || '未知員工',
+                store_name: req.user.store_name || '未知分店',
+                leave_dates: leaveDates
+            };
+            
+            await telegramNotifier.notifyScheduleCompleted(scheduleData);
+        } catch (notificationError) {
+            console.error('排班完成通知發送失敗:', notificationError);
+        }
+        
         res.json({
             success: true,
             data: result,
@@ -1105,6 +1155,56 @@ app.post('/api/schedule/:id/void', authenticateToken, async (req, res) => {
         res.status(500).json({
             success: false,
             message: '作廢排班紀錄失敗: ' + error.message
+        });
+    }
+});
+
+// ==================== Telegram通知APIs ====================
+
+// 測試Telegram通知
+app.post('/api/test-telegram', authenticateToken, async (req, res) => {
+    try {
+        const result = await telegramNotifier.testNotification();
+        
+        res.json({
+            success: true,
+            message: 'Telegram通知測試成功',
+            data: result
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Telegram通知測試失敗: ' + error.message
+        });
+    }
+});
+
+// 手動發送訂單異常提醒
+app.post('/api/notify-order-anomalies', authenticateToken, async (req, res) => {
+    try {
+        const { storeId } = req.body;
+        const anomalies = await db.checkAllOrderingAnomalies(storeId);
+        
+        if (anomalies.length > 0) {
+            const orderData = {
+                created_at: new Date().toISOString(),
+                employee_name: '系統自動檢查',
+                store_name: req.user.store_name || '未知分店',
+                items: []
+            };
+            
+            await telegramNotifier.notifyOrdering(orderData, anomalies);
+        }
+        
+        res.json({
+            success: true,
+            message: `檢查到 ${anomalies.length} 個異常項目`,
+            data: { anomalies_count: anomalies.length }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '異常檢查失敗: ' + error.message
         });
     }
 });
