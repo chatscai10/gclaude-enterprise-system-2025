@@ -17,16 +17,18 @@ const PORT = process.env.PORT || 3007;
 
 // ==================== 中間件設定 ====================
 
-// 安全設定
+// 安全設定 - 更寬鬆的CSP用於開發和功能測試
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net"],
-            styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
+            scriptSrcAttr: ["'unsafe-inline'"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
+            styleSrcElem: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
             imgSrc: ["'self'", "data:", "https:", "blob:"],
             connectSrc: ["'self'", "https://api.telegram.org"],
-            fontSrc: ["'self'", "https://cdn.jsdelivr.net"]
+            fontSrc: ["'self'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"]
         }
     }
 }));
@@ -167,6 +169,111 @@ app.get('/api/employees', (req, res) => {
             }
         ],
         message: '員工資料獲取成功'
+    });
+});
+
+// 儀表板統計API
+app.get('/api/dashboard/stats', (req, res) => {
+    res.json({
+        success: true,
+        data: {
+            totalEmployees: 12,
+            activeEmployees: 10,
+            onLeave: 1,
+            newHires: 1,
+            todayAttendance: 85,
+            monthlyRevenue: 2450000,
+            pendingRequests: 3,
+            systemHealth: 98,
+            recentActivities: [
+                { time: '09:30', action: '張三 已打卡上班', type: 'attendance' },
+                { time: '09:15', action: '李四 提交維修申請', type: 'maintenance' },
+                { time: '09:00', action: '王五 完成月報表', type: 'report' }
+            ]
+        },
+        message: '儀表板統計獲取成功'
+    });
+});
+
+// 出勤記錄API
+app.get('/api/attendance', (req, res) => {
+    res.json({
+        success: true,
+        data: [
+            {
+                id: 1,
+                employeeName: '張三',
+                date: '2025-08-15',
+                checkIn: '09:00',
+                checkOut: '18:00',
+                status: 'present'
+            },
+            {
+                id: 2,
+                employeeName: '李四',
+                date: '2025-08-15',
+                checkIn: '09:15',
+                checkOut: '-',
+                status: 'present'
+            }
+        ],
+        message: '出勤記錄獲取成功'
+    });
+});
+
+// 營收數據API
+app.get('/api/revenue', (req, res) => {
+    res.json({
+        success: true,
+        data: {
+            daily: [
+                { date: '2025-08-10', amount: 75000 },
+                { date: '2025-08-11', amount: 82000 },
+                { date: '2025-08-12', amount: 91000 },
+                { date: '2025-08-13', amount: 88000 },
+                { date: '2025-08-14', amount: 95000 },
+                { date: '2025-08-15', amount: 87000 }
+            ],
+            monthly: {
+                current: 2450000,
+                previous: 2280000,
+                growth: 7.5
+            },
+            byCategory: [
+                { category: '產品銷售', amount: 1850000, percentage: 75.5 },
+                { category: '服務收入', amount: 400000, percentage: 16.3 },
+                { category: '其他', amount: 200000, percentage: 8.2 }
+            ]
+        },
+        message: '營收數據獲取成功'
+    });
+});
+
+// 維修申請API
+app.get('/api/maintenance', (req, res) => {
+    res.json({
+        success: true,
+        data: [
+            {
+                id: 1,
+                title: '辦公室空調維修',
+                description: '三樓會議室空調不冷',
+                reporter: '李四',
+                status: 'pending',
+                priority: 'high',
+                createdAt: '2025-08-15 09:15'
+            },
+            {
+                id: 2,
+                title: '影印機卡紙',
+                description: '二樓影印機經常卡紙',
+                reporter: '王五',
+                status: 'in_progress',
+                priority: 'medium',
+                createdAt: '2025-08-14 14:30'
+            }
+        ],
+        message: '維修申請獲取成功'
     });
 });
 
