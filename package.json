@@ -2,9 +2,9 @@
   "name": "gclaude-enterprise-management-system",
   "version": "2.0.0",
   "description": "GClaude相容企業員工管理系統 - 強化版 (基於D:0809專案)",
-  "main": "enterprise-server.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node enterprise-server.js",
+    "start": "node server.js",
     "start:simple": "node simple-server.js",
     "start:complete": "node enterprise-server.js",
     "dev": "nodemon enterprise-server.js",
