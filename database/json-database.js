@@ -21,7 +21,9 @@ class JsonDatabase {
             maintenance: 'maintenance.json',
             leave_requests: 'leave_requests.json',
             products: 'products.json',
-            inventory_logs: 'inventory_logs.json'
+            inventory_logs: 'inventory_logs.json',
+            orders: 'orders.json',
+            order_items: 'order_items.json'
         };
         
         this.initializeData();
@@ -124,8 +126,68 @@ class JsonDatabase {
                 }
             ]);
 
+            // 初始化商品資料表
+            await this.initializeTable('products', [
+                {
+                    id: 1,
+                    name: '精緻咖啡豆',
+                    category: '原料',
+                    supplier: '台灣精品咖啡',
+                    current_stock: 50,
+                    min_threshold: 10,
+                    max_threshold: 100,
+                    unit_price: 450,
+                    unit: '包',
+                    description: '阿里山高山咖啡豆',
+                    is_active: true,
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 2,
+                    name: '一次性咖啡杯',
+                    category: '包材',
+                    supplier: '環保包材有限公司',
+                    current_stock: 200,
+                    min_threshold: 50,
+                    max_threshold: 500,
+                    unit_price: 12,
+                    unit: '個',
+                    description: '16oz環保紙杯',
+                    is_active: true,
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 3,
+                    name: '有機牛奶',
+                    category: '原料',
+                    supplier: '純淨乳品公司',
+                    current_stock: 25,
+                    min_threshold: 10,
+                    max_threshold: 50,
+                    unit_price: 85,
+                    unit: '瓶',
+                    description: '1000ml有機全脂牛奶',
+                    is_active: true,
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 4,
+                    name: '糖包',
+                    category: '配料',
+                    supplier: '甜蜜調味公司',
+                    current_stock: 300,
+                    min_threshold: 100,
+                    max_threshold: 1000,
+                    unit_price: 2,
+                    unit: '包',
+                    description: '5g白砂糖包',
+                    is_active: true,
+                    created_at: new Date().toISOString()
+                }
+            ]);
+
             // 初始化其他空白資料表
-            const emptyTables = ['attendance', 'revenue', 'maintenance', 'leave_requests', 'products', 'inventory_logs'];
+            const emptyTables = ['attendance', 'revenue', 'maintenance', 'leave_requests', 'inventory_logs', 'orders', 'order_items'];
             for (const table of emptyTables) {
                 await this.initializeTable(table, []);
             }
@@ -399,12 +461,26 @@ class JsonDatabase {
         return await this.readTable('products');
     }
 
-    async updateProductStock(productId, stock, operationType, operatedBy, notes) {
+    async getProductsByCategory(category = null) {
+        const products = await this.readTable('products');
+        if (category) {
+            return products.filter(p => p.category === category && p.is_active);
+        }
+        return products.filter(p => p.is_active);
+    }
+
+    async getProductById(productId) {
+        const products = await this.readTable('products');
+        return products.find(p => p.id === parseInt(productId));
+    }
+
+    async updateProductStock(productId, newStock, operationType, operatedBy, notes) {
         const products = await this.readTable('products');
         const index = products.findIndex(p => p.id === parseInt(productId));
         
         if (index !== -1) {
-            products[index].current_stock = stock;
+            const oldStock = products[index].current_stock;
+            products[index].current_stock = newStock;
             products[index].updated_at = new Date().toISOString();
             await this.writeTable('products', products);
 
@@ -414,13 +490,205 @@ class JsonDatabase {
                 id: Date.now(),
                 product_id: parseInt(productId),
                 operation_type: operationType,
-                quantity: stock,
+                old_stock: oldStock,
+                new_stock: newStock,
+                quantity_change: newStock - oldStock,
                 operated_by: operatedBy,
                 notes: notes,
                 created_at: new Date().toISOString()
             });
             await this.writeTable('inventory_logs', logs);
+            
+            return { success: true, oldStock, newStock };
         }
+        return { success: false, message: '商品不存在' };
+    }
+
+    async checkLowStockProducts() {
+        const products = await this.readTable('products');
+        return products.filter(p => 
+            p.is_active && 
+            p.current_stock <= p.min_threshold
+        );
+    }
+
+    // ==================== 叫貨系統操作 ====================
+    
+    async createOrder(employeeId, storeId, orderItems, notes = '') {
+        const orders = await this.readTable('orders');
+        const orderItemsTable = await this.readTable('order_items');
+        
+        const orderId = Date.now();
+        
+        // 創建訂單主檔
+        const newOrder = {
+            id: orderId,
+            employee_id: employeeId,
+            store_id: storeId,
+            order_date: new Date().toISOString().split('T')[0],
+            status: 'pending',
+            total_amount: 0,
+            notes: notes,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+        
+        let totalAmount = 0;
+        
+        // 創建訂單明細並檢查庫存
+        for (const item of orderItems) {
+            const product = await this.getProductById(item.product_id);
+            if (!product) {
+                throw new Error(`商品ID ${item.product_id} 不存在`);
+            }
+            
+            const itemTotal = item.quantity * product.unit_price;
+            totalAmount += itemTotal;
+            
+            // 新增訂單明細
+            orderItemsTable.push({
+                id: Date.now() + Math.random(),
+                order_id: orderId,
+                product_id: item.product_id,
+                product_name: product.name,
+                quantity: item.quantity,
+                unit_price: product.unit_price,
+                total_price: itemTotal,
+                created_at: new Date().toISOString()
+            });
+            
+            // 自動扣減庫存
+            const newStock = product.current_stock - item.quantity;
+            if (newStock < 0) {
+                throw new Error(`商品 ${product.name} 庫存不足，目前庫存：${product.current_stock}，需要：${item.quantity}`);
+            }
+            
+            await this.updateProductStock(
+                item.product_id, 
+                newStock, 
+                'order_deduction', 
+                employeeId, 
+                `訂單 #${orderId} 扣減庫存`
+            );
+        }
+        
+        newOrder.total_amount = totalAmount;
+        orders.push(newOrder);
+        
+        await this.writeTable('orders', orders);
+        await this.writeTable('order_items', orderItemsTable);
+        
+        return { 
+            orderId, 
+            totalAmount,
+            message: '叫貨訂單創建成功',
+            lowStockWarnings: await this.checkLowStockProducts()
+        };
+    }
+
+    async getOrdersByEmployee(employeeId, limit = 10) {
+        const orders = await this.readTable('orders');
+        const orderItems = await this.readTable('order_items');
+        
+        const employeeOrders = orders
+            .filter(order => order.employee_id === employeeId)
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+            .slice(0, limit);
+            
+        // 為每個訂單加入明細
+        for (const order of employeeOrders) {
+            order.items = orderItems.filter(item => item.order_id === order.id);
+        }
+        
+        return employeeOrders;
+    }
+
+    async getOrderHistory(limit = 50) {
+        const orders = await this.readTable('orders');
+        const orderItems = await this.readTable('order_items');
+        
+        const recentOrders = orders
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+            .slice(0, limit);
+            
+        // 為每個訂單加入明細
+        for (const order of recentOrders) {
+            order.items = orderItems.filter(item => item.order_id === order.id);
+        }
+        
+        return recentOrders;
+    }
+
+    // ==================== 異常偵測系統 ====================
+    
+    async detectOrderingAnomalies(employeeId, days = 30) {
+        const orders = await this.readTable('orders');
+        const orderItems = await this.readTable('order_items');
+        
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - days);
+        
+        const recentOrders = orders.filter(order => 
+            order.employee_id === employeeId && 
+            new Date(order.created_at) >= cutoffDate
+        );
+        
+        const anomalies = [];
+        
+        // 1. 頻率異常檢測
+        if (recentOrders.length > days * 0.8) { // 平均每天超過0.8次訂購
+            anomalies.push({
+                type: 'high_frequency',
+                message: `${days}天內訂購次數過於頻繁 (${recentOrders.length}次)`,
+                severity: 'warning'
+            });
+        }
+        
+        // 2. 金額異常檢測
+        const amounts = recentOrders.map(o => o.total_amount);
+        if (amounts.length > 0) {
+            const avgAmount = amounts.reduce((a, b) => a + b, 0) / amounts.length;
+            const maxAmount = Math.max(...amounts);
+            
+            if (maxAmount > avgAmount * 3) {
+                anomalies.push({
+                    type: 'high_amount',
+                    message: `發現異常高額訂購 (${maxAmount}元，平均：${avgAmount.toFixed(0)}元)`,
+                    severity: 'alert'
+                });
+            }
+        }
+        
+        // 3. 數量異常檢測
+        const allItems = recentOrders.flatMap(order => 
+            orderItems.filter(item => item.order_id === order.id)
+        );
+        
+        const productQuantities = {};
+        allItems.forEach(item => {
+            if (!productQuantities[item.product_id]) {
+                productQuantities[item.product_id] = [];
+            }
+            productQuantities[item.product_id].push(item.quantity);
+        });
+        
+        for (const [productId, quantities] of Object.entries(productQuantities)) {
+            if (quantities.length > 1) {
+                const avg = quantities.reduce((a, b) => a + b, 0) / quantities.length;
+                const max = Math.max(...quantities);
+                
+                if (max > avg * 5) {
+                    const product = await this.getProductById(parseInt(productId));
+                    anomalies.push({
+                        type: 'unusual_quantity',
+                        message: `${product?.name || '未知商品'} 訂購數量異常 (${max}個，平均：${avg.toFixed(1)}個)`,
+                        severity: 'warning'
+                    });
+                }
+            }
+        }
+        
+        return anomalies;
     }
 
     // ==================== 儀表板統計 ====================

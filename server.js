@@ -599,6 +599,143 @@ app.get('/api/admin/attendance', authenticateToken, requireAdmin, async (req, re
     }
 });
 
+// ==================== 叫貨系統API ====================
+
+// 獲取商品列表
+app.get('/api/products', authenticateToken, async (req, res) => {
+    try {
+        const { category } = req.query;
+        const products = await db.getProductsByCategory(category);
+        
+        res.json({
+            success: true,
+            data: products,
+            message: '商品列表獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取商品列表失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取庫存警告
+app.get('/api/products/low-stock', authenticateToken, async (req, res) => {
+    try {
+        const lowStockProducts = await db.checkLowStockProducts();
+        
+        res.json({
+            success: true,
+            data: lowStockProducts,
+            message: '庫存警告獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取庫存警告失敗: ' + error.message
+        });
+    }
+});
+
+// 創建叫貨訂單
+app.post('/api/orders', authenticateToken, async (req, res) => {
+    try {
+        const { items, notes } = req.body;
+        
+        if (!items || !Array.isArray(items) || items.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: '訂單項目不能為空'
+            });
+        }
+
+        const result = await db.createOrder(
+            req.user.employee_id,
+            req.user.store_id,
+            items,
+            notes || ''
+        );
+
+        res.json({
+            success: true,
+            data: {
+                order_id: result.orderId,
+                total_amount: result.totalAmount,
+                low_stock_warnings: result.lowStockWarnings
+            },
+            message: result.message
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: '訂單創建失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取員工訂單歷史
+app.get('/api/orders/employee', authenticateToken, async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 10;
+        const orders = await db.getOrdersByEmployee(req.user.employee_id, limit);
+        
+        res.json({
+            success: true,
+            data: orders,
+            message: '訂單歷史獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取訂單歷史失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取異常偵測報告
+app.get('/api/orders/anomalies', authenticateToken, async (req, res) => {
+    try {
+        const days = parseInt(req.query.days) || 30;
+        const anomalies = await db.detectOrderingAnomalies(req.user.employee_id, days);
+        
+        res.json({
+            success: true,
+            data: {
+                anomalies,
+                period_days: days,
+                total_anomalies: anomalies.length,
+                has_alerts: anomalies.some(a => a.severity === 'alert')
+            },
+            message: '異常偵測分析完成'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '異常偵測失敗: ' + error.message
+        });
+    }
+});
+
+// 管理員用：獲取所有訂單歷史
+app.get('/api/admin/orders', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 50;
+        const orders = await db.getOrderHistory(limit);
+        
+        res.json({
+            success: true,
+            data: orders,
+            message: '所有訂單歷史獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取訂單歷史失敗: ' + error.message
+        });
+    }
+});
+
 // ==================== 其他APIs ====================
 
 // 員工班表API

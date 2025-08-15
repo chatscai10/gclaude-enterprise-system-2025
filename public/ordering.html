@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>叫貨系統 - GClaude企業管理系統</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .product-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .product-card.selected {
+            border-color: #0d6efd;
+            background-color: #f8f9fa;
+        }
+        .cart-item {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+        .low-stock {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        .out-of-stock {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+            opacity: 0.6;
+        }
+        .category-filter {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 8px 20px;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        .category-filter.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            transform: scale(1.05);
+        }
+        .order-summary {
+            position: sticky;
+            top: 20px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/employee">
+                <i class="fas fa-shopping-cart me-2"></i>叫貨系統
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/employee">
+                    <i class="fas fa-arrow-left me-1"></i>返回主頁
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-4">
+        <!-- 頁面標題 -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="text-center">
+                    <i class="fas fa-boxes text-primary me-2"></i>智慧叫貨系統
+                </h2>
+                <p class="text-muted text-center">選擇商品加入購物車，系統將自動扣減庫存並偵測異常模式</p>
+            </div>
+        </div>
+
+        <!-- 庫存警告區域 -->
+        <div id="lowStockAlert" class="alert alert-warning alert-dismissible fade show d-none" role="alert">
+            <h6><i class="fas fa-exclamation-triangle me-2"></i>庫存警告</h6>
+            <div id="lowStockList"></div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row">
+            <!-- 商品選擇區域 -->
+            <div class="col-lg-8">
+                <!-- 分類篩選 -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-filter me-2"></i>商品分類
+                        </h5>
+                        <div id="categoryFilters" class="text-center">
+                            <button class="btn category-filter active" data-category="">全部商品</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 商品列表 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-cube me-2"></i>商品列表
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="productsGrid" class="row">
+                            <!-- 商品卡片將動態載入 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 購物車區域 -->
+            <div class="col-lg-4">
+                <div class="order-summary">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-shopping-cart me-2"></i>購物車
+                                <span id="cartItemCount" class="badge bg-light text-dark ms-2">0</span>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="cartItems">
+                                <div class="text-muted text-center py-4">
+                                    <i class="fas fa-cart-plus fa-3x mb-3"></i>
+                                    <p>購物車是空的<br>點擊商品加入購物車</p>
+                                </div>
+                            </div>
+                            
+                            <hr>
+                            
+                            <!-- 總計 -->
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="mb-0">總計金額：</h6>
+                                <h5 class="text-success mb-0">$<span id="totalAmount">0</span></h5>
+                            </div>
+
+                            <!-- 備註 -->
+                            <div class="mb-3">
+                                <label for="orderNotes" class="form-label">訂單備註</label>
+                                <textarea class="form-control" id="orderNotes" rows="3" placeholder="選填：訂單備註說明"></textarea>
+                            </div>
+
+                            <!-- 送出訂單 -->
+                            <button id="submitOrder" class="btn btn-primary w-100" disabled>
+                                <i class="fas fa-paper-plane me-2"></i>送出叫貨訂單
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 近期訂單 -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-history me-2"></i>近期訂單
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div id="recentOrders">
+                                <div class="text-muted text-center py-3">
+                                    <i class="fas fa-clock fa-2x mb-2"></i>
+                                    <p class="small">載入中...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 商品選擇模態框 -->
+    <div class="modal fade" id="productModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-plus-circle me-2"></i>加入購物車
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="selectedProductInfo" class="mb-3"></div>
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">數量</label>
+                        <div class="input-group">
+                            <button class="btn btn-outline-secondary" type="button" id="decreaseBtn">-</button>
+                            <input type="number" class="form-control text-center" id="quantity" value="1" min="1">
+                            <button class="btn btn-outline-secondary" type="button" id="increaseBtn">+</button>
+                        </div>
+                        <div class="form-text">目前庫存：<span id="currentStock">0</span> 個</div>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>小計：$<span id="subtotal">0</span></strong>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="addToCart">加入購物車</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let products = [];
+        let cart = [];
+        let selectedProduct = null;
+        let currentCategory = '';
+
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadProducts();
+            loadRecentOrders();
+            checkLowStock();
+            
+            // 綁定事件
+            document.getElementById('submitOrder').addEventListener('click', submitOrder);
+            document.getElementById('addToCart').addEventListener('click', addProductToCart);
+            document.getElementById('decreaseBtn').addEventListener('click', () => changeQuantity(-1));
+            document.getElementById('increaseBtn').addEventListener('click', () => changeQuantity(1));
+            document.getElementById('quantity').addEventListener('input', updateSubtotal);
+        });
+
+        // 驗證登入狀態
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/';
+                return;
+            }
+        }
+
+        // 載入商品列表
+        async function loadProducts(category = '') {
+            try {
+                const token = localStorage.getItem('token');
+                const url = category ? `/api/products?category=${category}` : '/api/products';
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    products = result.data;
+                    renderProducts();
+                    renderCategoryFilters();
+                } else {
+                    showAlert('載入商品失敗：' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('載入商品時發生錯誤：' + error.message, 'danger');
+            }
+        }
+
+        // 渲染商品列表
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            
+            if (products.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">暫無商品資料</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = products.map(product => {
+                const stockClass = getStockClass(product);
+                const stockIcon = getStockIcon(product);
+                const isDisabled = product.current_stock <= 0;
+                
+                return `
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card product-card h-100 ${stockClass}" 
+                             onclick="${!isDisabled ? `openProductModal(${product.id})` : ''}"
+                             style="${isDisabled ? 'cursor: not-allowed;' : ''}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="card-title">${product.name}</h6>
+                                    <span class="badge bg-secondary">${product.category}</span>
+                                </div>
+                                <p class="card-text small text-muted">${product.description}</p>
+                                <div class="row mb-2">
+                                    <div class="col-6">
+                                        <small class="text-muted">供應商</small><br>
+                                        <strong>${product.supplier}</strong>
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <small class="text-muted">單價</small><br>
+                                        <strong class="text-success">$${product.unit_price}/${product.unit}</strong>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge ${getStockBadgeClass(product)}">
+                                        ${stockIcon} 庫存：${product.current_stock}
+                                    </span>
+                                    ${!isDisabled ? '<i class="fas fa-plus-circle text-primary"></i>' : '<i class="fas fa-ban text-danger"></i>'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 渲染分類篩選器
+        function renderCategoryFilters() {
+            const categories = [...new Set(products.map(p => p.category))];
+            const filtersContainer = document.getElementById('categoryFilters');
+            
+            const buttons = [
+                '<button class="btn category-filter active" data-category="">全部商品</button>',
+                ...categories.map(cat => 
+                    `<button class="btn category-filter" data-category="${cat}">${cat}</button>`
+                )
+            ];
+            
+            filtersContainer.innerHTML = buttons.join('');
+            
+            // 綁定分類篩選事件
+            filtersContainer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('category-filter')) {
+                    document.querySelectorAll('.category-filter').forEach(btn => 
+                        btn.classList.remove('active')
+                    );
+                    e.target.classList.add('active');
+                    currentCategory = e.target.dataset.category;
+                    loadProducts(currentCategory);
+                }
+            });
+        }
+
+        // 開啟商品選擇模態框
+        function openProductModal(productId) {
+            selectedProduct = products.find(p => p.id === productId);
+            if (!selectedProduct) return;
+            
+            document.getElementById('selectedProductInfo').innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6>${selectedProduct.name}</h6>
+                        <p class="text-muted mb-0">${selectedProduct.description}</p>
+                    </div>
+                    <div class="text-end">
+                        <div class="text-success">$${selectedProduct.unit_price}/${selectedProduct.unit}</div>
+                        <small class="text-muted">${selectedProduct.supplier}</small>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('currentStock').textContent = selectedProduct.current_stock;
+            document.getElementById('quantity').value = 1;
+            document.getElementById('quantity').max = selectedProduct.current_stock;
+            updateSubtotal();
+            
+            new bootstrap.Modal(document.getElementById('productModal')).show();
+        }
+
+        // 數量變更
+        function changeQuantity(delta) {
+            const input = document.getElementById('quantity');
+            const newValue = parseInt(input.value) + delta;
+            if (newValue >= 1 && newValue <= selectedProduct.current_stock) {
+                input.value = newValue;
+                updateSubtotal();
+            }
+        }
+
+        // 更新小計
+        function updateSubtotal() {
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            const subtotal = quantity * selectedProduct.unit_price;
+            document.getElementById('subtotal').textContent = subtotal;
+        }
+
+        // 加入購物車
+        function addProductToCart() {
+            const quantity = parseInt(document.getElementById('quantity').value);
+            
+            // 檢查購物車中是否已有此商品
+            const existingItem = cart.find(item => item.product_id === selectedProduct.id);
+            
+            if (existingItem) {
+                existingItem.quantity += quantity;
+                existingItem.total_price = existingItem.quantity * selectedProduct.unit_price;
+            } else {
+                cart.push({
+                    product_id: selectedProduct.id,
+                    product_name: selectedProduct.name,
+                    unit_price: selectedProduct.unit_price,
+                    unit: selectedProduct.unit,
+                    quantity: quantity,
+                    total_price: quantity * selectedProduct.unit_price
+                });
+            }
+            
+            renderCart();
+            bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
+            showAlert(`${selectedProduct.name} 已加入購物車`, 'success');
+        }
+
+        // 渲染購物車
+        function renderCart() {
+            const cartContainer = document.getElementById('cartItems');
+            const cartItemCount = document.getElementById('cartItemCount');
+            const totalAmount = document.getElementById('totalAmount');
+            const submitBtn = document.getElementById('submitOrder');
+            
+            cartItemCount.textContent = cart.length;
+            
+            if (cart.length === 0) {
+                cartContainer.innerHTML = `
+                    <div class="text-muted text-center py-4">
+                        <i class="fas fa-cart-plus fa-3x mb-3"></i>
+                        <p>購物車是空的<br>點擊商品加入購物車</p>
+                    </div>
+                `;
+                totalAmount.textContent = '0';
+                submitBtn.disabled = true;
+                return;
+            }
+            
+            const total = cart.reduce((sum, item) => sum + item.total_price, 0);
+            totalAmount.textContent = total;
+            submitBtn.disabled = false;
+            
+            cartContainer.innerHTML = cart.map((item, index) => `
+                <div class="cart-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">${item.product_name}</h6>
+                            <small class="text-muted">
+                                $${item.unit_price}/${item.unit} × ${item.quantity}
+                            </small>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-success">$${item.total_price}</div>
+                            <button class="btn btn-sm btn-outline-danger" onclick="removeFromCart(${index})">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 從購物車移除商品
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            renderCart();
+            showAlert('商品已從購物車移除', 'info');
+        }
+
+        // 送出訂單
+        async function submitOrder() {
+            if (cart.length === 0) {
+                showAlert('購物車是空的', 'warning');
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('token');
+                const notes = document.getElementById('orderNotes').value;
+                
+                const response = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        items: cart,
+                        notes: notes
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('叫貨訂單送出成功！', 'success');
+                    cart = [];
+                    renderCart();
+                    document.getElementById('orderNotes').value = '';
+                    loadProducts(currentCategory); // 重新載入商品更新庫存
+                    loadRecentOrders();
+                    
+                    // 顯示庫存警告
+                    if (result.data.low_stock_warnings && result.data.low_stock_warnings.length > 0) {
+                        showLowStockWarning(result.data.low_stock_warnings);
+                    }
+                } else {
+                    showAlert('訂單送出失敗：' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('送出訂單時發生錯誤：' + error.message, 'danger');
+            }
+        }
+
+        // 載入近期訂單
+        async function loadRecentOrders() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/orders/employee?limit=5', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    renderRecentOrders(result.data);
+                }
+            } catch (error) {
+                console.error('載入近期訂單失敗:', error);
+            }
+        }
+
+        // 渲染近期訂單
+        function renderRecentOrders(orders) {
+            const container = document.getElementById('recentOrders');
+            
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div class="text-muted text-center py-3">
+                        <i class="fas fa-receipt fa-2x mb-2"></i>
+                        <p class="small">尚無訂單記錄</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = orders.slice(0, 3).map(order => {
+                const orderDate = new Date(order.created_at).toLocaleDateString('zh-TW');
+                const statusIcon = order.status === 'pending' ? 'fas fa-clock text-warning' : 'fas fa-check-circle text-success';
+                
+                return `
+                    <div class="border-bottom py-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-muted">#${order.id}</small><br>
+                                <strong>$${order.total_amount}</strong>
+                            </div>
+                            <div class="text-end">
+                                <i class="${statusIcon}"></i><br>
+                                <small class="text-muted">${orderDate}</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 檢查低庫存商品
+        async function checkLowStock() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/products/low-stock', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.data.length > 0) {
+                    showLowStockWarning(result.data);
+                }
+            } catch (error) {
+                console.error('檢查庫存警告失敗:', error);
+            }
+        }
+
+        // 顯示庫存警告
+        function showLowStockWarning(lowStockProducts) {
+            const alertElement = document.getElementById('lowStockAlert');
+            const listElement = document.getElementById('lowStockList');
+            
+            listElement.innerHTML = lowStockProducts.map(product => 
+                `<div class="small">
+                    <i class="fas fa-exclamation-circle text-warning me-1"></i>
+                    ${product.name}：剩餘 ${product.current_stock} ${product.unit}
+                    (警戒值：${product.min_threshold})
+                </div>`
+            ).join('');
+            
+            alertElement.classList.remove('d-none');
+        }
+
+        // 庫存狀態相關工具函數
+        function getStockClass(product) {
+            if (product.current_stock <= 0) return 'out-of-stock';
+            if (product.current_stock <= product.min_threshold) return 'low-stock';
+            return '';
+        }
+
+        function getStockIcon(product) {
+            if (product.current_stock <= 0) return '<i class="fas fa-times-circle text-danger"></i>';
+            if (product.current_stock <= product.min_threshold) return '<i class="fas fa-exclamation-triangle text-warning"></i>';
+            return '<i class="fas fa-check-circle text-success"></i>';
+        }
+
+        function getStockBadgeClass(product) {
+            if (product.current_stock <= 0) return 'bg-danger';
+            if (product.current_stock <= product.min_threshold) return 'bg-warning';
+            return 'bg-success';
+        }
+
+        // 通用警告顯示函數
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.createElement('div');
+            alertContainer.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertContainer.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+            alertContainer.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(alertContainer);
+            
+            setTimeout(() => {
+                if (alertContainer.parentNode) {
+                    alertContainer.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

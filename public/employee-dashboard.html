@@ -38,6 +38,9 @@
                     <a href="#maintenance" class="list-group-item list-group-item-action" onclick="showSection('maintenance')">
                         <i class="fas fa-tools me-2"></i>維修申請
                     </a>
+                    <a href="/ordering.html" class="list-group-item list-group-item-action">
+                        <i class="fas fa-shopping-cart me-2"></i>叫貨系統
+                    </a>
                     <a href="#profile" class="list-group-item list-group-item-action" onclick="showSection('profile')">
                         <i class="fas fa-user-cog me-2"></i>個人資料
                     </a>
@@ -85,6 +88,46 @@
                                     <i class="fas fa-wrench fa-2x mb-2"></i>
                                     <h5>維修申請</h5>
                                     <button class="btn btn-light btn-sm" onclick="showSection('maintenance')">前往申請</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 第二排快速操作 -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card bg-info text-white h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-shopping-cart fa-2x mb-2"></i>
+                                    <h5>叫貨系統</h5>
+                                    <button class="btn btn-light btn-sm" onclick="window.location.href='/ordering.html'">前往叫貨</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card bg-secondary text-white h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-chart-line fa-2x mb-2"></i>
+                                    <h5>營收分析</h5>
+                                    <button class="btn btn-light btn-sm" onclick="showSection('revenue')">檢視數據</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card bg-dark text-white h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-calendar-check fa-2x mb-2"></i>
+                                    <h5>請假申請</h5>
+                                    <button class="btn btn-light btn-sm" onclick="alert('功能開發中...')">申請請假</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card bg-purple text-white h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-boxes fa-2x mb-2"></i>
+                                    <h5>庫存查詢</h5>
+                                    <button class="btn btn-light btn-sm" onclick="checkInventory()">查看庫存</button>
                                 </div>
                             </div>
                         </div>
@@ -1189,6 +1232,126 @@
                     alerts[alerts.length - 1].remove();
                 }
             }, 5000);
+        }
+
+        // 庫存查詢功能
+        async function checkInventory() {
+            try {
+                const token = localStorage.getItem('token');
+                
+                // 創建模態框
+                const modalHtml = `
+                    <div class="modal fade" id="inventoryModal" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">
+                                        <i class="fas fa-boxes me-2"></i>庫存查詢
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="text-center py-4">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">載入中...</span>
+                                        </div>
+                                        <p class="mt-2">正在載入庫存資料...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                const modal = new bootstrap.Modal(document.getElementById('inventoryModal'));
+                modal.show();
+                
+                // 獲取商品庫存
+                const [productsResponse, lowStockResponse] = await Promise.all([
+                    fetch('/api/products', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }),
+                    fetch('/api/products/low-stock', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    })
+                ]);
+                
+                const productsResult = await productsResponse.json();
+                const lowStockResult = await lowStockResponse.json();
+                
+                if (productsResult.success) {
+                    const products = productsResult.data;
+                    const lowStockProducts = lowStockResult.success ? lowStockResult.data : [];
+                    
+                    // 更新模態框內容
+                    document.querySelector('#inventoryModal .modal-body').innerHTML = `
+                        ${lowStockProducts.length > 0 ? `
+                            <div class="alert alert-warning">
+                                <h6><i class="fas fa-exclamation-triangle me-2"></i>低庫存警告</h6>
+                                ${lowStockProducts.map(p => 
+                                    `<div class="small">• ${p.name}：剩餘 ${p.current_stock} ${p.unit} (警戒值：${p.min_threshold})</div>`
+                                ).join('')}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>商品名稱</th>
+                                        <th>分類</th>
+                                        <th>目前庫存</th>
+                                        <th>警戒值</th>
+                                        <th>狀態</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${products.map(product => {
+                                        const stockStatus = product.current_stock <= 0 ? 
+                                            '<span class="badge bg-danger">缺貨</span>' :
+                                            product.current_stock <= product.min_threshold ?
+                                            '<span class="badge bg-warning">低庫存</span>' :
+                                            '<span class="badge bg-success">正常</span>';
+                                        
+                                        return `
+                                            <tr>
+                                                <td>${product.name}</td>
+                                                <td><span class="badge bg-secondary">${product.category}</span></td>
+                                                <td>${product.current_stock} ${product.unit}</td>
+                                                <td>${product.min_threshold} ${product.unit}</td>
+                                                <td>${stockStatus}</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="text-center mt-3">
+                            <button class="btn btn-primary" onclick="window.location.href='/ordering.html'">
+                                <i class="fas fa-shopping-cart me-2"></i>前往叫貨系統
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    document.querySelector('#inventoryModal .modal-body').innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            載入庫存資料失敗：${productsResult.message}
+                        </div>
+                    `;
+                }
+                
+                // 模態框關閉時移除元素
+                document.getElementById('inventoryModal').addEventListener('hidden.bs.modal', function() {
+                    this.remove();
+                });
+                
+            } catch (error) {
+                console.error('庫存查詢失敗:', error);
+                showAlert('庫存查詢失敗：' + error.message, 'error');
+            }
         }
         
         // 修改密碼
