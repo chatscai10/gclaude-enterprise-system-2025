@@ -1256,10 +1256,31 @@
                         if (data.data.clock_in_time && !data.data.clock_out_time) {
                             document.getElementById('clockInBtn').disabled = true;
                             document.getElementById('clockOutBtn').disabled = false;
-                            clockInTime = new Date(data.data.clock_in_time);
-                            console.log('📋 載入已存在的打卡記錄:', clockInTime);
-                            // 啟動工作時數計時器
-                            startWorkingTimer();
+                            
+                            // 安全的時間解析
+                            try {
+                                const clockInTimeStr = data.data.clock_in_time;
+                                clockInTime = new Date(clockInTimeStr);
+                                
+                                // 驗證時間是否有效
+                                if (isNaN(clockInTime.getTime())) {
+                                    console.warn('⚠️ 打卡時間格式無效:', clockInTimeStr);
+                                    clockInTime = null;
+                                    // 重置狀態
+                                    document.getElementById('clockInBtn').disabled = false;
+                                    document.getElementById('clockOutBtn').disabled = true;
+                                    document.getElementById('workingHours').textContent = '時間錯誤';
+                                    return;
+                                }
+                                
+                                console.log('📋 載入已存在的打卡記錄:', clockInTime);
+                                // 啟動工作時數計時器
+                                startWorkingTimer();
+                            } catch (error) {
+                                console.error('❌ 時間解析錯誤:', error);
+                                clockInTime = null;
+                                document.getElementById('workingHours').textContent = '解析錯誤';
+                            }
                         } else {
                             // 確保清理狀態
                             stopWorkingTimer();
@@ -1545,14 +1566,31 @@
                             const statusClass = record.status === 'pending' ? 'warning' : 
                                               record.status === 'approved' ? 'success' : 'danger';
                             
-                            // 解析revenue_items和expense_items
+                            // 安全解析revenue_items和expense_items
                             let revenueItems = [];
                             let expenseItems = [];
                             try {
-                                revenueItems = record.revenue_items ? JSON.parse(record.revenue_items) : [];
-                                expenseItems = record.expense_items ? JSON.parse(record.expense_items) : [];
+                                // 檢查並安全解析營收項目
+                                if (record.revenue_items && typeof record.revenue_items === 'string' && record.revenue_items.trim()) {
+                                    revenueItems = JSON.parse(record.revenue_items);
+                                } else if (Array.isArray(record.revenue_items)) {
+                                    revenueItems = record.revenue_items;
+                                }
+                                
+                                // 檢查並安全解析支出項目
+                                if (record.expense_items && typeof record.expense_items === 'string' && record.expense_items.trim()) {
+                                    expenseItems = JSON.parse(record.expense_items);
+                                } else if (Array.isArray(record.expense_items)) {
+                                    expenseItems = record.expense_items;
+                                }
                             } catch (e) {
-                                console.error('解析記錄數據失敗:', e);
+                                console.warn('⚠️ 營收數據解析失敗，使用默認值:', {
+                                    error: e.message,
+                                    revenue_items: record.revenue_items,
+                                    expense_items: record.expense_items
+                                });
+                                revenueItems = [];
+                                expenseItems = [];
                             }
                             
                             const totalRevenue = revenueItems.reduce((sum, item) => sum + (item.amount || 0), 0);

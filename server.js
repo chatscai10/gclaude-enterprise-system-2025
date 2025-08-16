@@ -290,6 +290,143 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
+// 員工專用登入端點
+app.post('/api/employee/login', async (req, res) => {
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+        return res.status(400).json({
+            success: false,
+            message: '請提供姓名和身分證號碼'
+        });
+    }
+    
+    try {
+        // 使用系統邏輯要求：姓名當帳號，身分證當密碼
+        const user = await db.getUserByNameAndIdCard(username, password);
+        
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: '姓名或身分證號碼錯誤'
+            });
+        }
+        
+        // 檢查是否為員工角色
+        if (user.role === 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: '請使用管理員登入頁面'
+            });
+        }
+
+        const token = jwt.sign(
+            { 
+                id: user.id,
+                username: user.username,
+                role: user.role,
+                employee_id: user.employee_id,
+                store_id: user.store_id
+            },
+            JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        res.json({
+            success: true,
+            data: {
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    role: user.role,
+                    name: user.employee_name,
+                    store_name: user.store_name
+                },
+                token,
+                redirectUrl: '/employee-dashboard'
+            },
+            message: '員工登入成功'
+        });
+
+    } catch (error) {
+        console.error('Employee login error:', error);
+        res.status(500).json({
+            success: false,
+            message: '員工登入過程發生錯誤'
+        });
+    }
+});
+
+// 管理員專用登入端點
+app.post('/api/admin/login', async (req, res) => {
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+        return res.status(400).json({
+            success: false,
+            message: '請提供管理員帳號和密碼'
+        });
+    }
+    
+    try {
+        // 管理員可以使用姓名+身分證或username+password
+        let user = await db.getUserByNameAndIdCard(username, password);
+        
+        if (!user) {
+            user = await db.getUserByUsername(username);
+            if (!user || password !== user.password) {
+                return res.status(401).json({
+                    success: false,
+                    message: '管理員帳號或密碼錯誤'
+                });
+            }
+        }
+        
+        // 檢查是否為管理員角色
+        if (user.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: '您沒有管理員權限，請使用員工登入'
+            });
+        }
+
+        const token = jwt.sign(
+            { 
+                id: user.id,
+                username: user.username,
+                role: user.role,
+                employee_id: user.employee_id,
+                store_id: user.store_id
+            },
+            JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        res.json({
+            success: true,
+            data: {
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    role: user.role,
+                    name: user.employee_name || user.username,
+                    store_name: user.store_name
+                },
+                token,
+                redirectUrl: '/admin-dashboard'
+            },
+            message: '管理員登入成功'
+        });
+
+    } catch (error) {
+        console.error('Admin login error:', error);
+        res.status(500).json({
+            success: false,
+            message: '管理員登入過程發生錯誤'
+        });
+    }
+});
+
 // Token驗證
 app.post('/api/auth/verify', authenticateToken, async (req, res) => {
     try {
