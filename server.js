@@ -2185,6 +2185,188 @@ app.get('/employee', (req, res) => {
     res.redirect('/dashboard');
 });
 
+// 員工登入頁面路由
+app.get('/employee-login', (req, res) => {
+    res.send(`
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>員工登入 - GClaude Enterprise System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; display: flex; align-items: center; }
+        .login-card { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card login-card">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold text-primary">員工登入</h2>
+                            <p class="text-muted">GClaude Enterprise System</p>
+                        </div>
+                        <form id="loginForm">
+                            <div class="mb-3">
+                                <label for="employee-username" class="form-label">用戶名</label>
+                                <input type="text" class="form-control" id="employee-username" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="employee-password" class="form-label">密碼</label>
+                                <input type="password" class="form-control" id="employee-password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">登入</button>
+                        </form>
+                        <div class="text-center mt-3">
+                            <small class="text-muted">測試帳號: testuser / password123</small>
+                        </div>
+                        <div class="text-center mt-2">
+                            <a href="/" class="text-decoration-none">返回首頁</a> | 
+                            <a href="/admin-login" class="text-decoration-none">管理員登入</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('employee-username').value;
+            const password = document.getElementById('employee-password').value;
+            
+            try {
+                const response = await fetch('/api/employee/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('jwt_token', data.token);
+                    window.location.href = '/employee-dashboard';
+                } else {
+                    alert('登入失敗: ' + data.message);
+                }
+            } catch (error) {
+                alert('登入錯誤: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
+    `);
+});
+
+// 管理員登入頁面路由
+app.get('/admin-login', (req, res) => {
+    res.send(`
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理員登入 - GClaude Enterprise System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); height: 100vh; display: flex; align-items: center; }
+        .login-card { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card login-card">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold text-danger">管理員登入</h2>
+                            <p class="text-muted">GClaude Enterprise System</p>
+                        </div>
+                        <form id="adminLoginForm">
+                            <div class="mb-3">
+                                <label for="admin-username" class="form-label">管理員帳號</label>
+                                <input type="text" class="form-control" id="admin-username" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="admin-password" class="form-label">密碼</label>
+                                <input type="password" class="form-control" id="admin-password" required>
+                            </div>
+                            <button type="submit" class="btn btn-danger w-100">登入</button>
+                        </form>
+                        <div class="text-center mt-3">
+                            <small class="text-muted">測試帳號: admin / admin123</small>
+                        </div>
+                        <div class="text-center mt-2">
+                            <a href="/" class="text-decoration-none">返回首頁</a> | 
+                            <a href="/employee-login" class="text-decoration-none">員工登入</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('admin-username').value;
+            const password = document.getElementById('admin-password').value;
+            
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('jwt_token', data.token);
+                    window.location.href = '/admin-dashboard';
+                } else {
+                    alert('登入失敗: ' + data.message);
+                }
+            } catch (error) {
+                alert('登入錯誤: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
+    `);
+});
+
+// 員工儀表板路由
+app.get('/employee-dashboard', (req, res) => {
+    const dashboardPath = path.join(__dirname, 'public', 'unified-employee-dashboard.html');
+    if (fs.existsSync(dashboardPath)) {
+        res.sendFile(dashboardPath);
+    } else {
+        res.redirect('/dashboard');
+    }
+});
+
+// 管理員儀表板路由
+app.get('/admin-dashboard', (req, res) => {
+    const adminPath = path.join(__dirname, 'public', 'unified-admin-dashboard.html');
+    if (fs.existsSync(adminPath)) {
+        res.sendFile(adminPath);
+    } else {
+        res.redirect('/admin');
+    }
+});
+
 // ==================== 管理員設定APIs ====================
 
 // 獲取所有員工資料
