@@ -1,4 +1,5 @@
-const fetch = require('node-fetch');
+// Node.js 18+ 內建支援fetch，但提供fallback以確保相容性
+const fetch = globalThis.fetch || require('node-fetch');
 
 class TelegramNotifier {
     constructor() {
