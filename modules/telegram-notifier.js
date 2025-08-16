@@ -485,6 +485,71 @@ ${clockEmoji} <b>${clockType}打卡通知</b>
         return await this.sendToBoth(bossMessage, employeeMessage);
     }
 
+    // ==================== 維修保養通知 ====================
+    async notifyMaintenance(maintenanceData) {
+        const time = new Date(maintenanceData.created_at).toLocaleString('zh-TW');
+        const priorityEmoji = this.getPriorityEmoji(maintenanceData.priority);
+        const priorityText = this.getPriorityText(maintenanceData.priority);
+        
+        // 老闆群組訊息（詳細資訊）
+        let bossMessage = `
+🔧 <b>維修申請</b>
+
+📅 <b>日期:</b> ${time}
+🏪 <b>分店:</b> ${maintenanceData.store_name}
+👤 <b>申請人:</b> ${maintenanceData.employee_name}
+🛠️ <b>設備:</b> ${maintenanceData.equipment_type}
+${priorityEmoji} <b>緊急程度:</b> ${priorityText}
+📝 <b>問題標題:</b> ${maintenanceData.title}
+
+<b>問題描述:</b>
+${maintenanceData.description}
+        `.trim();
+
+        if (maintenanceData.location) {
+            bossMessage += `\n📍 <b>設備位置:</b> ${maintenanceData.location}`;
+        }
+
+        if (maintenanceData.contact_phone) {
+            bossMessage += `\n📞 <b>聯絡電話:</b> ${maintenanceData.contact_phone}`;
+        }
+
+        if (maintenanceData.photo_count > 0) {
+            bossMessage += `\n📷 <b>問題照片:</b> ${maintenanceData.photo_count} 張`;
+        }
+
+        // 員工群組訊息（簡化資訊）
+        let employeeMessage = `
+🔧 <b>維修申請</b>
+
+📅 <b>日期:</b> ${time}
+🏪 <b>分店:</b> ${maintenanceData.store_name}
+🛠️ <b>設備:</b> ${maintenanceData.equipment_type}
+${priorityEmoji} <b>緊急程度:</b> ${priorityText}
+❗ <b>原因:</b> ${maintenanceData.title}
+        `.trim();
+
+        return await this.sendToBoth(bossMessage, employeeMessage);
+    }
+
+    getPriorityEmoji(priority) {
+        const priorityMap = {
+            'low': '🟢',
+            'medium': '🟡', 
+            'high': '🔴'
+        };
+        return priorityMap[priority] || '⚪';
+    }
+
+    getPriorityText(priority) {
+        const priorityMap = {
+            'low': '低',
+            'medium': '中',
+            'high': '高'
+        };
+        return priorityMap[priority] || '未知';
+    }
+
     // ==================== 測試通知 ====================
     async testNotification() {
         const testMessage = `

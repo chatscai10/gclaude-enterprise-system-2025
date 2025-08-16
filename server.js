@@ -11,6 +11,7 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
 require('dotenv').config();
 
 // 使用JSON檔案資料庫而非SQLite
@@ -26,6 +27,24 @@ const JWT_SECRET = process.env.JWT_SECRET || 'gclaude-enterprise-secret-key';
 // 初始化資料庫和通知系統
 const db = new DatabaseOperations();
 const telegramNotifier = new TelegramNotifier();
+
+// 配置multer用於檔案上傳
+const storage = multer.memoryStorage(); // 使用記憶體存儲，雲端環境友好
+const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB限制
+        files: 5 // 最多5個檔案
+    },
+    fileFilter: (req, file, cb) => {
+        // 只允許圖片檔案
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('只能上傳圖片檔案'), false);
+        }
+    }
+});
 
 // ==================== 中間件設定 ====================
 
@@ -525,20 +544,54 @@ app.get('/api/revenue/employee', authenticateToken, async (req, res) => {
 
 // ==================== 維修申請API ====================
 
-app.post('/api/maintenance', authenticateToken, async (req, res) => {
+app.post('/api/maintenance', authenticateToken, upload.array('photos', 5), async (req, res) => {
     try {
+        // 處理上傳的照片
+        let photoData = [];
+        if (req.files && req.files.length > 0) {
+            photoData = req.files.map(file => ({
+                filename: `maintenance_${Date.now()}_${Math.random().toString(36).substring(7)}.${file.mimetype.split('/')[1]}`,
+                originalname: file.originalname,
+                mimetype: file.mimetype,
+                size: file.size,
+                data: file.buffer.toString('base64') // 轉換為Base64存儲
+            }));
+        }
+
         const maintenanceData = {
             employee_id: req.user.employee_id,
             store_id: req.user.store_id,
             equipment_type: req.body.equipment_type,
             title: req.body.title,
             description: req.body.description,
-            location: req.body.location,
-            contact_phone: req.body.contact_phone,
-            priority: req.body.priority
+            location: req.body.location || '',
+            contact_phone: req.body.contact_phone || '',
+            priority: req.body.priority,
+            photos: photoData
         };
         
-        const result = await db.createMaintenance(maintenanceData);
+        const result = await db.createMaintenanceWithPhotos(maintenanceData);
+        
+        // 發送Telegram通知
+        try {
+            const notificationData = {
+                employee_name: req.user.name || '未知員工',
+                store_name: req.user.store_name || '未知分店',
+                equipment_type: req.body.equipment_type,
+                title: req.body.title,
+                description: req.body.description,
+                location: req.body.location || '',
+                priority: req.body.priority,
+                contact_phone: req.body.contact_phone || '',
+                photo_count: photoData.length,
+                created_at: new Date().toISOString()
+            };
+            
+            await telegramNotifier.notifyMaintenance(notificationData);
+        } catch (notificationError) {
+            console.error('Telegram維修通知發送失敗:', notificationError);
+            // 不影響主要業務流程
+        }
         
         res.json({
             success: true,
@@ -546,11 +599,13 @@ app.post('/api/maintenance', authenticateToken, async (req, res) => {
                 id: result.id,
                 ...maintenanceData,
                 status: 'pending',
-                created_at: new Date().toISOString()
+                created_at: new Date().toISOString(),
+                photo_count: photoData.length
             },
             message: '維修申請已提交，將於24小時內處理'
         });
     } catch (error) {
+        console.error('維修申請提交失敗:', error);
         res.status(500).json({
             success: false,
             message: '維修申請提交失敗: ' + error.message

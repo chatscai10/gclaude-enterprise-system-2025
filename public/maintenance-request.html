@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>設備維修申請 - GClaude 企業管理系統</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #2196F3 0%, #00BCD4 100%);
+            --primary-color: #2196F3;
+            --secondary-color: #00BCD4;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .maintenance-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .maintenance-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 1.5rem;
+        }
+
+        .header-card {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .header-card h1 {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select, .form-check-input {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25);
+        }
+
+        .equipment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .equipment-card {
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .equipment-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .equipment-card.selected {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(0, 188, 212, 0.1) 100%);
+        }
+
+        .equipment-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .priority-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .priority-btn {
+            flex: 1;
+            border: 2px solid;
+            border-radius: 10px;
+            padding: 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .priority-low {
+            border-color: var(--success-color);
+            color: var(--success-color);
+            background: white;
+        }
+
+        .priority-low.selected {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .priority-medium {
+            border-color: var(--warning-color);
+            color: var(--warning-color);
+            background: white;
+        }
+
+        .priority-medium.selected {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .priority-high {
+            border-color: var(--danger-color);
+            color: var(--danger-color);
+            background: white;
+        }
+
+        .priority-high.selected {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .photo-upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 1rem 0;
+        }
+
+        .photo-upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(33, 150, 243, 0.05);
+        }
+
+        .photo-upload-area.dragover {
+            border-color: var(--primary-color);
+            background-color: rgba(33, 150, 243, 0.1);
+        }
+
+        .photo-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .photo-item {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .photo-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(220, 53, 69, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 15px;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .error-alert, .success-alert {
+            display: none;
+            margin-bottom: 1rem;
+        }
+
+        .history-card {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-processing {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        @media (max-width: 576px) {
+            .maintenance-container {
+                padding: 0.5rem;
+            }
+            
+            .maintenance-card {
+                padding: 1.5rem;
+            }
+            
+            .equipment-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+            
+            .priority-buttons {
+                flex-direction: column;
+            }
+        }
+
+        /* 動畫效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .submit-active {
+            animation: pulse 0.6s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="maintenance-container">
+        <!-- 錯誤/成功提示 -->
+        <div class="alert alert-danger error-alert" id="error-alert" role="alert">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span id="error-message">發生錯誤</span>
+        </div>
+
+        <div class="alert alert-success success-alert" id="success-alert" role="alert">
+            <i class="bi bi-check-circle"></i>
+            <span id="success-message">操作成功</span>
+        </div>
+
+        <!-- 標題卡片 -->
+        <div class="maintenance-card header-card fade-in">
+            <h1><i class="bi bi-tools"></i> 設備維修申請</h1>
+            <p class="text-muted mb-0">回報設備問題，我們會盡快處理</p>
+        </div>
+
+        <!-- 維修申請表單 -->
+        <div class="maintenance-card fade-in">
+            <form id="maintenance-form">
+                <!-- 設備選擇 -->
+                <div class="mb-4">
+                    <label class="form-label">
+                        <i class="bi bi-gear"></i> 請選擇故障設備 *
+                    </label>
+                    <div class="equipment-grid" id="equipment-grid">
+                        <div class="equipment-card" data-equipment="冷凍櫃">
+                            <i class="bi bi-snow equipment-icon"></i>
+                            <div>冷凍櫃</div>
+                        </div>
+                        <div class="equipment-card" data-equipment="冷藏櫃">
+                            <i class="bi bi-thermometer-snow equipment-icon"></i>
+                            <div>冷藏櫃</div>
+                        </div>
+                        <div class="equipment-card" data-equipment="油炸機">
+                            <i class="bi bi-fire equipment-icon"></i>
+                            <div>油炸機</div>
+                        </div>
+                        <div class="equipment-card" data-equipment="烤箱">
+                            <i class="bi bi-oven equipment-icon"></i>
+                            <div>烤箱</div>
+                        </div>
+                        <div class="equipment-card" data-equipment="收銀機">
+                            <i class="bi bi-cash-register equipment-icon"></i>
+                            <div>收銀機</div>
+                        </div>
+                        <div class="equipment-card" data-equipment="空調設備">
+                            <i class="bi bi-wind equipment-icon"></i>
+                            <div>空調設備</div>
+                        </div>
+                        <div class="equipment-card" data-equipment="照明設備">
+                            <i class="bi bi-lightbulb equipment-icon"></i>
+                            <div>照明設備</div>
+                        </div>
+                        <div class="equipment-card" data-equipment="其他設備">
+                            <i class="bi bi-tools equipment-icon"></i>
+                            <div>其他設備</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="selected-equipment" name="equipment_type" required>
+                </div>
+
+                <!-- 問題標題 -->
+                <div class="mb-3">
+                    <label for="problem-title" class="form-label">
+                        <i class="bi bi-card-text"></i> 問題標題 *
+                    </label>
+                    <input type="text" class="form-control" id="problem-title" name="title" 
+                           placeholder="請簡短描述問題，例如：冷凍櫃不制冷" required>
+                </div>
+
+                <!-- 緊急程度 -->
+                <div class="mb-4">
+                    <label class="form-label">
+                        <i class="bi bi-exclamation-triangle"></i> 緊急程度 *
+                    </label>
+                    <div class="priority-buttons">
+                        <div class="priority-btn priority-low" data-priority="low">
+                            <i class="bi bi-check-circle"></i><br>
+                            低<br>
+                            <small>不影響營業</small>
+                        </div>
+                        <div class="priority-btn priority-medium" data-priority="medium">
+                            <i class="bi bi-exclamation-circle"></i><br>
+                            中<br>
+                            <small>影響部分功能</small>
+                        </div>
+                        <div class="priority-btn priority-high" data-priority="high">
+                            <i class="bi bi-exclamation-triangle"></i><br>
+                            高<br>
+                            <small>嚴重影響營業</small>
+                        </div>
+                    </div>
+                    <input type="hidden" id="selected-priority" name="priority" required>
+                </div>
+
+                <!-- 問題描述 -->
+                <div class="mb-3">
+                    <label for="problem-description" class="form-label">
+                        <i class="bi bi-chat-left-text"></i> 詳細問題描述 *
+                    </label>
+                    <textarea class="form-control" id="problem-description" name="description" rows="4" 
+                              placeholder="請詳細描述設備問題，包括：&#10;1. 什麼時候發現問題&#10;2. 問題的具體表現&#10;3. 是否有異常聲音、氣味等&#10;4. 嘗試過什麼解決方法" required></textarea>
+                </div>
+
+                <!-- 設備位置 -->
+                <div class="mb-3">
+                    <label for="equipment-location" class="form-label">
+                        <i class="bi bi-geo-alt"></i> 設備具體位置
+                    </label>
+                    <input type="text" class="form-control" id="equipment-location" name="location" 
+                           placeholder="例如：廚房左側、收銀台旁、二樓辦公室">
+                </div>
+
+                <!-- 聯絡電話 -->
+                <div class="mb-3">
+                    <label for="contact-phone" class="form-label">
+                        <i class="bi bi-telephone"></i> 聯絡電話
+                    </label>
+                    <input type="tel" class="form-control" id="contact-phone" name="contact_phone" 
+                           placeholder="維修人員聯絡用電話">
+                </div>
+
+                <!-- 照片上傳 -->
+                <div class="mb-4">
+                    <label class="form-label">
+                        <i class="bi bi-camera"></i> 上傳問題照片 (可選)
+                    </label>
+                    <div class="photo-upload-area" id="photo-upload-area">
+                        <i class="bi bi-cloud-upload" style="font-size: 2rem; color: #6c757d;"></i>
+                        <p class="mt-2 mb-0">點擊或拖拽照片到這裡</p>
+                        <small class="text-muted">支援 JPG、PNG 格式，最多 5 張照片</small>
+                        <input type="file" id="photo-input" accept="image/*" multiple style="display: none;">
+                    </div>
+                    <div class="photo-preview" id="photo-preview"></div>
+                </div>
+
+                <!-- 提交按鈕 -->
+                <button type="submit" class="submit-btn" id="submit-btn">
+                    <i class="bi bi-send"></i> 提交維修申請
+                </button>
+
+                <div class="loading-spinner" id="loading-spinner">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">提交中...</span>
+                    </div>
+                    <div class="mt-2">正在提交申請，請稍候...</div>
+                </div>
+            </form>
+        </div>
+
+        <!-- 我的維修記錄 -->
+        <div class="maintenance-card fade-in">
+            <h5 class="mb-3">
+                <i class="bi bi-clock-history"></i> 我的維修記錄
+                <button class="btn btn-outline-primary btn-sm ms-2" onclick="refreshHistory()">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+            </h5>
+            <div class="history-card" id="maintenance-history">
+                <div class="text-center py-3 text-muted">
+                    載入維修記錄中...
+                </div>
+            </div>
+        </div>
+
+        <!-- 返回按鈕 -->
+        <div class="text-center mt-3">
+            <a href="employee-dashboard.html" class="btn btn-outline-light">
+                <i class="bi bi-arrow-left"></i> 返回主頁
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ==================== 全域變數 ====================
+        let selectedEquipment = null;
+        let selectedPriority = null;
+        let uploadedPhotos = [];
+        let maxPhotos = 5;
+
+        // ==================== 初始化 ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeMaintenanceForm();
+            loadMaintenanceHistory();
+        });
+
+        function initializeMaintenanceForm() {
+            // 設備選擇事件
+            document.querySelectorAll('.equipment-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    selectEquipment(this);
+                });
+            });
+
+            // 緊急程度選擇事件
+            document.querySelectorAll('.priority-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    selectPriority(this);
+                });
+            });
+
+            // 照片上傳事件
+            setupPhotoUpload();
+
+            // 表單提交事件
+            document.getElementById('maintenance-form').addEventListener('submit', submitMaintenanceRequest);
+        }
+
+        // ==================== 設備選擇 ====================
+        function selectEquipment(card) {
+            // 移除所有選中狀態
+            document.querySelectorAll('.equipment-card').forEach(c => {
+                c.classList.remove('selected');
+            });
+
+            // 選中當前設備
+            card.classList.add('selected');
+            selectedEquipment = card.dataset.equipment;
+            document.getElementById('selected-equipment').value = selectedEquipment;
+
+            console.log('選中設備:', selectedEquipment);
+        }
+
+        // ==================== 緊急程度選擇 ====================
+        function selectPriority(btn) {
+            // 移除所有選中狀態
+            document.querySelectorAll('.priority-btn').forEach(b => {
+                b.classList.remove('selected');
+            });
+
+            // 選中當前優先級
+            btn.classList.add('selected');
+            selectedPriority = btn.dataset.priority;
+            document.getElementById('selected-priority').value = selectedPriority;
+
+            console.log('選中優先級:', selectedPriority);
+        }
+
+        // ==================== 照片上傳功能 ====================
+        function setupPhotoUpload() {
+            const uploadArea = document.getElementById('photo-upload-area');
+            const photoInput = document.getElementById('photo-input');
+
+            // 點擊上傳
+            uploadArea.addEventListener('click', function() {
+                photoInput.click();
+            });
+
+            // 檔案選擇
+            photoInput.addEventListener('change', function(e) {
+                handlePhotoSelection(e.target.files);
+            });
+
+            // 拖拽上傳
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                handlePhotoSelection(e.dataTransfer.files);
+            });
+        }
+
+        function handlePhotoSelection(files) {
+            const newPhotos = Array.from(files).slice(0, maxPhotos - uploadedPhotos.length);
+            
+            newPhotos.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        addPhotoPreview(e.target.result, file);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            if (files.length > maxPhotos - uploadedPhotos.length) {
+                showError(`最多只能上傳 ${maxPhotos} 張照片`);
+            }
+        }
+
+        function addPhotoPreview(src, file) {
+            if (uploadedPhotos.length >= maxPhotos) {
+                showError(`最多只能上傳 ${maxPhotos} 張照片`);
+                return;
+            }
+
+            const photoItem = document.createElement('div');
+            photoItem.className = 'photo-item';
+            photoItem.innerHTML = `
+                <img src="${src}" alt="設備照片">
+                <button type="button" class="photo-remove" onclick="removePhoto(this)">
+                    <i class="bi bi-x"></i>
+                </button>
+            `;
+
+            document.getElementById('photo-preview').appendChild(photoItem);
+            uploadedPhotos.push({
+                file: file,
+                src: src,
+                element: photoItem
+            });
+
+            console.log('新增照片，目前總數:', uploadedPhotos.length);
+        }
+
+        function removePhoto(btn) {
+            const photoItem = btn.parentElement;
+            const index = Array.from(photoItem.parentElement.children).indexOf(photoItem);
+            
+            photoItem.remove();
+            uploadedPhotos.splice(index, 1);
+
+            console.log('移除照片，目前總數:', uploadedPhotos.length);
+        }
+
+        // ==================== 表單提交 ====================
+        async function submitMaintenanceRequest(e) {
+            e.preventDefault();
+
+            if (!validateForm()) {
+                return;
+            }
+
+            try {
+                showLoading(true);
+
+                const formData = new FormData();
+                
+                // 基本資料
+                formData.append('equipment_type', selectedEquipment);
+                formData.append('title', document.getElementById('problem-title').value);
+                formData.append('description', document.getElementById('problem-description').value);
+                formData.append('location', document.getElementById('equipment-location').value);
+                formData.append('contact_phone', document.getElementById('contact-phone').value);
+                formData.append('priority', selectedPriority);
+
+                // 照片檔案
+                uploadedPhotos.forEach((photo, index) => {
+                    formData.append(`photos`, photo.file);
+                });
+
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    throw new Error('請先登入');
+                }
+
+                const response = await fetch('/api/maintenance', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || '提交失敗');
+                }
+
+                // 提交成功
+                showSuccess('維修申請提交成功！我們會盡快安排處理。');
+                resetForm();
+                loadMaintenanceHistory();
+
+                // 按鈕動畫
+                document.getElementById('submit-btn').classList.add('submit-active');
+                setTimeout(() => {
+                    document.getElementById('submit-btn').classList.remove('submit-active');
+                }, 600);
+
+            } catch (error) {
+                console.error('維修申請提交失敗:', error);
+                showError(error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function validateForm() {
+            if (!selectedEquipment) {
+                showError('請選擇故障設備');
+                return false;
+            }
+
+            if (!selectedPriority) {
+                showError('請選擇緊急程度');
+                return false;
+            }
+
+            const title = document.getElementById('problem-title').value.trim();
+            if (!title) {
+                showError('請填寫問題標題');
+                return false;
+            }
+
+            const description = document.getElementById('problem-description').value.trim();
+            if (!description) {
+                showError('請填寫詳細問題描述');
+                return false;
+            }
+
+            return true;
+        }
+
+        function resetForm() {
+            // 重置設備選擇
+            document.querySelectorAll('.equipment-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            selectedEquipment = null;
+            document.getElementById('selected-equipment').value = '';
+
+            // 重置優先級選擇
+            document.querySelectorAll('.priority-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            selectedPriority = null;
+            document.getElementById('selected-priority').value = '';
+
+            // 重置表單欄位
+            document.getElementById('maintenance-form').reset();
+
+            // 清空照片
+            uploadedPhotos = [];
+            document.getElementById('photo-preview').innerHTML = '';
+        }
+
+        // ==================== 維修記錄載入 ====================
+        async function loadMaintenanceHistory() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) return;
+
+                const response = await fetch('/api/maintenance/employee', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('獲取維修記錄失敗');
+                }
+
+                const result = await response.json();
+                displayMaintenanceHistory(result.data);
+
+            } catch (error) {
+                console.error('載入維修記錄失敗:', error);
+                document.getElementById('maintenance-history').innerHTML = 
+                    '<div class="text-center py-3 text-muted">載入維修記錄失敗</div>';
+            }
+        }
+
+        function displayMaintenanceHistory(records) {
+            const container = document.getElementById('maintenance-history');
+            
+            if (!records || records.length === 0) {
+                container.innerHTML = '<div class="text-center py-3 text-muted">尚無維修記錄</div>';
+                return;
+            }
+
+            const html = records.map(record => {
+                const createdAt = new Date(record.created_at);
+                const statusClass = getStatusClass(record.status);
+                const statusText = getStatusText(record.status);
+                const priorityIcon = getPriorityIcon(record.priority);
+                
+                return `
+                    <div class="history-item">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-gear me-2"></i>
+                                <strong>${record.equipment_type}</strong>
+                                ${priorityIcon}
+                            </div>
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </div>
+                        <h6 class="mb-1">${record.title}</h6>
+                        <p class="text-muted mb-2" style="font-size: 0.9rem;">
+                            ${record.description.length > 100 ? 
+                                record.description.substring(0, 100) + '...' : 
+                                record.description
+                            }
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="bi bi-calendar"></i> ${createdAt.toLocaleDateString('zh-TW')}
+                                <i class="bi bi-clock ms-2"></i> ${createdAt.toLocaleTimeString('zh-TW')}
+                            </small>
+                            ${record.location ? `<small class="text-muted"><i class="bi bi-geo-alt"></i> ${record.location}</small>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        }
+
+        function getStatusClass(status) {
+            const statusMap = {
+                'pending': 'status-pending',
+                'processing': 'status-processing',
+                'completed': 'status-completed',
+                'cancelled': 'status-cancelled'
+            };
+            return statusMap[status] || 'status-pending';
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': '待處理',
+                'processing': '處理中',
+                'completed': '已完成',
+                'cancelled': '已取消'
+            };
+            return statusMap[status] || '未知狀態';
+        }
+
+        function getPriorityIcon(priority) {
+            const priorityMap = {
+                'low': '<i class="bi bi-check-circle text-success ms-2" title="低優先級"></i>',
+                'medium': '<i class="bi bi-exclamation-circle text-warning ms-2" title="中優先級"></i>',
+                'high': '<i class="bi bi-exclamation-triangle text-danger ms-2" title="高優先級"></i>'
+            };
+            return priorityMap[priority] || '';
+        }
+
+        function refreshHistory() {
+            loadMaintenanceHistory();
+        }
+
+        // ==================== UI輔助函數 ====================
+        function showLoading(show) {
+            const spinner = document.getElementById('loading-spinner');
+            const submitBtn = document.getElementById('submit-btn');
+            
+            if (show) {
+                spinner.style.display = 'block';
+                submitBtn.disabled = true;
+            } else {
+                spinner.style.display = 'none';
+                submitBtn.disabled = false;
+            }
+        }
+
+        function showError(message) {
+            const errorAlert = document.getElementById('error-alert');
+            const errorMessage = document.getElementById('error-message');
+            
+            errorMessage.textContent = message;
+            errorAlert.style.display = 'block';
+            
+            setTimeout(() => {
+                errorAlert.style.display = 'none';
+            }, 5000);
+
+            // 滾動到頂部顯示錯誤
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showSuccess(message) {
+            const successAlert = document.getElementById('success-alert');
+            const successMessage = document.getElementById('success-message');
+            
+            successMessage.textContent = message;
+            successAlert.style.display = 'block';
+            
+            setTimeout(() => {
+                successAlert.style.display = 'none';
+            }, 5000);
+
+            // 滾動到頂部顯示成功
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

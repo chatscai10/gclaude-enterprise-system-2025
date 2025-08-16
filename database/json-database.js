@@ -767,6 +767,56 @@ class JsonDatabase {
         return { id: newRecord.id };
     }
 
+    async createMaintenanceWithPhotos(maintenanceData) {
+        const maintenance = await this.readTable('maintenance');
+        const newRecord = {
+            id: Date.now(),
+            employee_id: maintenanceData.employee_id,
+            store_id: maintenanceData.store_id,
+            equipment_type: maintenanceData.equipment_type,
+            title: maintenanceData.title,
+            description: maintenanceData.description,
+            location: maintenanceData.location,
+            contact_phone: maintenanceData.contact_phone,
+            priority: maintenanceData.priority,
+            photos: maintenanceData.photos || [],
+            status: 'pending',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+        
+        maintenance.push(newRecord);
+        await this.writeTable('maintenance', maintenance);
+        return { id: newRecord.id };
+    }
+
+    async updateMaintenanceStatus(maintenanceId, status, notes = '') {
+        const maintenance = await this.readTable('maintenance');
+        const index = maintenance.findIndex(record => record.id === parseInt(maintenanceId));
+        
+        if (index === -1) {
+            throw new Error('維修記錄不存在');
+        }
+        
+        maintenance[index].status = status;
+        maintenance[index].admin_notes = notes;
+        maintenance[index].updated_at = new Date().toISOString();
+        
+        if (status === 'completed') {
+            maintenance[index].completed_at = new Date().toISOString();
+        }
+        
+        await this.writeTable('maintenance', maintenance);
+        return { id: maintenanceId, status, notes };
+    }
+
+    async getAllMaintenanceRecords(limit = 50, offset = 0) {
+        const maintenance = await this.readTable('maintenance');
+        return maintenance
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+            .slice(offset, offset + limit);
+    }
+
     async getMaintenanceByEmployee(employeeId) {
         const maintenance = await this.readTable('maintenance');
         return maintenance
