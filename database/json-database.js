@@ -1925,6 +1925,158 @@ class JsonDatabase {
         };
     }
 
+    // ==================== 管理員設定相關方法 ====================
+    
+    async getAllEmployees() {
+        const employees = await this.readTable('employees');
+        const stores = await this.readTable('stores');
+        
+        // 合併員工和分店資料
+        return employees.map(employee => {
+            const store = stores.find(s => s.id === employee.store_id);
+            return {
+                ...employee,
+                store_name: store ? store.name : '未知分店'
+            };
+        });
+    }
+
+    async saveStoreSettings(storesData) {
+        try {
+            // 驗證和清理資料
+            const validStores = storesData.map((store, index) => ({
+                id: store.id || (index + 1),
+                name: store.name || '未命名分店',
+                people: parseInt(store.people) || 2,
+                open: store.open || '1500-0200',
+                latitude: parseFloat(store.latitude) || 25.0330,
+                longitude: parseFloat(store.longitude) || 121.5654,
+                radius: parseInt(store.radius) || 100,
+                address: store.address || '地址待設定',
+                created_at: store.created_at || new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            }));
+
+            await this.writeTable('stores', validStores);
+            return validStores;
+        } catch (error) {
+            console.error('儲存分店設定失敗:', error);
+            throw error;
+        }
+    }
+
+    async saveScheduleSettings(scheduleSettings) {
+        try {
+            const settings = {
+                id: 1,
+                max_leave: parseInt(scheduleSettings.maxLeave) || 8,
+                max_daily_leave: parseInt(scheduleSettings.maxDailyLeave) || 2,
+                max_weekend_leave: parseInt(scheduleSettings.maxWeekendLeave) || 3,
+                schedule_time_limit: parseInt(scheduleSettings.scheduleTimeLimit) || 5,
+                system_open_day: parseInt(scheduleSettings.systemOpenDay) || 16,
+                system_close_day: parseInt(scheduleSettings.systemCloseDay) || 21,
+                forbidden_dates: scheduleSettings.forbiddenDates || '{}',
+                holiday_dates: scheduleSettings.holidayDates || '{}',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+
+            const existingSettings = await this.readTable('schedule_settings');
+            let updatedSettings;
+            
+            if (existingSettings.length > 0) {
+                // 更新現有設定
+                updatedSettings = existingSettings.map(s => s.id === 1 ? settings : s);
+            } else {
+                // 新增設定
+                updatedSettings = [settings];
+            }
+
+            await this.writeTable('schedule_settings', updatedSettings);
+            return settings;
+        } catch (error) {
+            console.error('儲存排班設定失敗:', error);
+            throw error;
+        }
+    }
+
+    async savePositionSettings(positionsData) {
+        try {
+            const validPositions = positionsData.map((position, index) => ({
+                id: position.id || (index + 1),
+                level: position.level || '未命名職位',
+                salary: parseInt(position.salary) || 25000,
+                bonus_rate: parseFloat(position.bonusRate) || 0.5,
+                quota: parseInt(position.quota) || 1,
+                required_days: parseInt(position.requiredDays) || 30,
+                cooldown_days: parseInt(position.cooldownDays) || 30,
+                approval_rate: parseFloat(position.approvalRate) || 0.6,
+                voting_days: parseInt(position.votingDays) || 5,
+                late_limit: parseInt(position.lateLimit) || 120,
+                punishment: position.punishment || '警告',
+                notes: position.notes || '',
+                created_at: position.created_at || new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            }));
+
+            await this.writeTable('positions', validPositions);
+            return validPositions;
+        } catch (error) {
+            console.error('儲存職位設定失敗:', error);
+            throw error;
+        }
+    }
+
+    async saveProductSettings(productsData) {
+        try {
+            const validProducts = productsData.map((product, index) => ({
+                id: product.id || (index + 1),
+                category: product.category || '未分類',
+                name: product.name || '未命名產品',
+                supplier: product.supplier || '未知供應商',
+                price: parseFloat(product.price) || 0,
+                cost: parseFloat(product.cost) || 0,
+                unit: product.unit || '個',
+                anomaly_days: parseInt(product.anomalyDays) || 2,
+                status: product.status || '上架',
+                created_at: product.created_at || new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            }));
+
+            await this.writeTable('products', validProducts);
+            return validProducts;
+        } catch (error) {
+            console.error('儲存產品設定失敗:', error);
+            throw error;
+        }
+    }
+
+    async saveSystemSettings(systemSettings) {
+        try {
+            const settings = {
+                id: 1,
+                telegram_bot_token: systemSettings.telegramBotToken || '',
+                telegram_boss_group: systemSettings.telegramBossGroup || '',
+                telegram_employee_group: systemSettings.telegramEmployeeGroup || '',
+                backup_interval: parseInt(systemSettings.backupInterval) || 5,
+                backup_email: systemSettings.backupEmail || '',
+                backup_scope: systemSettings.backupScope || 'all',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+
+            // 可以保存到獨立的設定檔案或系統設定表
+            // 這裡先保存到一個系統設定JSON檔案
+            const settingsPath = path.join(this.dataDir, 'system_settings.json');
+            await fs.writeFile(settingsPath, JSON.stringify([settings], null, 2), 'utf8');
+            
+            return settings;
+        } catch (error) {
+            console.error('儲存系統設定失敗:', error);
+            throw error;
+        }
+    }
+
     close() {
         console.log('JSON資料庫連接已關閉');
     }

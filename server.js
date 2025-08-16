@@ -1601,6 +1601,208 @@ app.get('/employee', (req, res) => {
     }
 });
 
+// ==================== 管理員設定APIs ====================
+
+// 獲取所有員工資料
+app.get('/api/admin/employees', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const employees = await db.getAllEmployees();
+        
+        res.json({
+            success: true,
+            data: employees,
+            message: '員工資料獲取成功'
+        });
+    } catch (error) {
+        console.error('獲取員工資料失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '獲取員工資料失敗: ' + error.message
+        });
+    }
+});
+
+// Telegram連線測試
+app.post('/api/telegram/test', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const result = await telegramNotifier.testNotification();
+        
+        res.json({
+            success: true,
+            message: 'Telegram連線測試成功',
+            data: result
+        });
+    } catch (error) {
+        console.error('Telegram測試失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Telegram連線測試失敗: ' + error.message
+        });
+    }
+});
+
+// 儲存分店設定
+app.post('/api/admin/stores/save', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const storesData = req.body;
+        
+        // 驗證資料格式
+        if (!Array.isArray(storesData)) {
+            return res.status(400).json({
+                success: false,
+                message: '分店資料格式錯誤'
+            });
+        }
+
+        // 保存到設定檔案或資料庫
+        await db.saveStoreSettings(storesData);
+        
+        res.json({
+            success: true,
+            message: '分店設定已成功儲存',
+            data: storesData
+        });
+    } catch (error) {
+        console.error('儲存分店設定失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '儲存分店設定失敗: ' + error.message
+        });
+    }
+});
+
+// 儲存排班參數設定
+app.post('/api/admin/schedule/save-settings', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const scheduleSettings = req.body;
+        
+        // 驗證JSON格式
+        try {
+            if (scheduleSettings.forbiddenDates) {
+                JSON.parse(scheduleSettings.forbiddenDates);
+            }
+            if (scheduleSettings.holidayDates) {
+                JSON.parse(scheduleSettings.holidayDates);
+            }
+        } catch (e) {
+            return res.status(400).json({
+                success: false,
+                message: 'JSON格式錯誤，請檢查禁休日期和公休日期設定'
+            });
+        }
+
+        // 保存設定
+        await db.saveScheduleSettings(scheduleSettings);
+        
+        res.json({
+            success: true,
+            message: '排班參數設定已成功儲存',
+            data: scheduleSettings
+        });
+    } catch (error) {
+        console.error('儲存排班設定失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '儲存排班設定失敗: ' + error.message
+        });
+    }
+});
+
+// 儲存職位階級設定
+app.post('/api/admin/positions/save', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const positionsData = req.body;
+        
+        // 驗證資料格式
+        if (!Array.isArray(positionsData)) {
+            return res.status(400).json({
+                success: false,
+                message: '職位資料格式錯誤'
+            });
+        }
+
+        // 保存職位設定
+        await db.savePositionSettings(positionsData);
+        
+        res.json({
+            success: true,
+            message: '職位階級設定已成功儲存',
+            data: positionsData
+        });
+    } catch (error) {
+        console.error('儲存職位設定失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '儲存職位設定失敗: ' + error.message
+        });
+    }
+});
+
+// 儲存產品設定
+app.post('/api/admin/products/save', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const productsData = req.body;
+        
+        // 驗證資料格式
+        if (!Array.isArray(productsData)) {
+            return res.status(400).json({
+                success: false,
+                message: '產品資料格式錯誤'
+            });
+        }
+
+        // 保存產品設定
+        await db.saveProductSettings(productsData);
+        
+        res.json({
+            success: true,
+            message: '產品設定已成功儲存',
+            data: productsData
+        });
+    } catch (error) {
+        console.error('儲存產品設定失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '儲存產品設定失敗: ' + error.message
+        });
+    }
+});
+
+// 儲存系統全域設定
+app.post('/api/admin/system/save', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const systemSettings = req.body;
+        
+        // 保存系統設定
+        await db.saveSystemSettings(systemSettings);
+        
+        res.json({
+            success: true,
+            message: '系統設定已成功儲存',
+            data: systemSettings
+        });
+    } catch (error) {
+        console.error('儲存系統設定失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '儲存系統設定失敗: ' + error.message
+        });
+    }
+});
+
+// 管理員設定頁面路由
+app.get('/admin-settings', (req, res) => {
+    const settingsPath = path.join(__dirname, 'public', 'admin-settings.html');
+    if (fs.existsSync(settingsPath)) {
+        res.sendFile(settingsPath);
+    } else {
+        res.status(404).json({
+            success: false,
+            message: '管理員設定頁面不存在'
+        });
+    }
+});
+
 // ==================== 錯誤處理 ====================
 
 app.use('*', (req, res) => {

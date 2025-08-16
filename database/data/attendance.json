@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "id": 1755310768372,
+    "employee_id": 2,
+    "store_id": 1,
+    "date": "2025-08-16",
+    "clock_in": "2025-08-16T02:19:28.372Z",
+    "clock_in_time": "上午10:19:28",
+    "clock_out": null,
+    "clock_out_time": null,
+    "location": "台北市信義區",
+    "latitude": 25.033,
+    "longitude": 121.5654,
+    "gps_accuracy": 10,
+    "device_fingerprint": "canvas_test_12345_Chrome_1920x1080",
+    "ip_address": "127.0.0.1",
+    "user_agent": "curl/8.14.1",
+    "status": "checked_in",
+    "created_at": "2025-08-16T02:19:28.372Z",
+    "updated_at": "2025-08-16T02:19:28.372Z"
+  }
+]

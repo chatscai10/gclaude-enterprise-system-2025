@@ -1,13 +1,26 @@
 [
   {
     "id": 1,
-    "name": "總公司",
-    "address": "台北市信義區",
-    "phone": "02-12345678",
-    "latitude": 25.033,
-    "longitude": 121.5654,
-    "gps_range": 100,
-    "is_active": true,
-    "created_at": "2025-08-15T17:34:45.123Z"
+    "name": "內壢忠孝店",
+    "people": 2,
+    "open": "1500-0200",
+    "latitude": 24.9748412,
+    "longitude": 121.2556713,
+    "radius": 100,
+    "address": "桃園市中壢區忠孝路93-1號",
+    "created_at": "2025-08-16T02:27:38.211Z",
+    "updated_at": "2025-08-16T02:27:38.211Z"
+  },
+  {
+    "id": 2,
+    "name": "桃園龍安店",
+    "people": 3,
+    "open": "1400-0100",
+    "latitude": 24.9880023,
+    "longitude": 121.2812737,
+    "radius": 150,
+    "address": "桃園市桃園區龍安街某號",
+    "created_at": "2025-08-16T02:27:38.211Z",
+    "updated_at": "2025-08-16T02:27:38.211Z"
   }
 ]

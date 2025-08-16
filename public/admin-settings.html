@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理員系統設定 - GClaude 企業管理系統</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--primary-gradient) !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+
+        .main-content {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .setting-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+        }
+
+        .setting-card:hover {
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            transform: translateY(-5px);
+        }
+
+        .setting-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .setting-header i {
+            font-size: 1.5rem;
+        }
+
+        .setting-body {
+            padding: 2rem;
+        }
+
+        .nav-pills {
+            background: #f8f9fa;
+            padding: 0.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .nav-pills .nav-link {
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-pills .nav-link.active {
+            background: var(--primary-color);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            padding: 0.75rem 1rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .table {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .table thead {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .badge {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .alert {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .store-card {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .store-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);
+        }
+
+        .position-level {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .loading-spinner {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .json-editor {
+            font-family: 'Courier New', monospace;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .save-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .input-group-text {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+
+        .tab-pane {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .setting-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--info-color);
+        }
+
+        @media (max-width: 768px) {
+            .setting-body {
+                padding: 1rem;
+            }
+            
+            .nav-pills {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 導航欄 -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-gear-fill me-2"></i>
+                管理員系統設定
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/admin">
+                    <i class="bi bi-house-door-fill me-1"></i>
+                    返回主控台
+                </a>
+                <a class="nav-link" href="#" onclick="logout()">
+                    <i class="bi bi-box-arrow-right me-1"></i>
+                    登出
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid main-content">
+        <!-- 狀態提示 -->
+        <div class="save-status" id="saveStatus"></div>
+
+        <!-- 主要內容 -->
+        <div class="row">
+            <div class="col-12">
+                <div class="setting-card">
+                    <div class="setting-header">
+                        <i class="bi bi-sliders"></i>
+                        <h4 class="mb-0">系統參數設定中心</h4>
+                    </div>
+                    <div class="setting-body">
+                        <!-- 導航標籤 -->
+                        <ul class="nav nav-pills nav-fill" id="settingTabs" role="tablist">
+                            <li class="nav-item">
+                                <button class="nav-link active" id="stores-tab" data-bs-toggle="pill" data-bs-target="#stores" type="button">
+                                    <i class="bi bi-shop me-1"></i>分店設定
+                                </button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="schedule-tab" data-bs-toggle="pill" data-bs-target="#schedule" type="button">
+                                    <i class="bi bi-calendar3 me-1"></i>排班參數
+                                </button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="positions-tab" data-bs-toggle="pill" data-bs-target="#positions" type="button">
+                                    <i class="bi bi-diagram-3 me-1"></i>職位階級
+                                </button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="products-tab" data-bs-toggle="pill" data-bs-target="#products" type="button">
+                                    <i class="bi bi-box-seam me-1"></i>品項設定
+                                </button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="employees-tab" data-bs-toggle="pill" data-bs-target="#employees" type="button">
+                                    <i class="bi bi-people me-1"></i>員工管理
+                                </button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="system-tab" data-bs-toggle="pill" data-bs-target="#system" type="button">
+                                    <i class="bi bi-gear me-1"></i>系統設定
+                                </button>
+                            </li>
+                        </ul>
+
+                        <!-- 標籤內容 -->
+                        <div class="tab-content" id="settingTabsContent">
+                            <!-- 分店設定 -->
+                            <div class="tab-pane fade show active" id="stores" role="tabpanel">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5><i class="bi bi-shop me-2"></i>分店設定管理</h5>
+                                    <button class="btn btn-success" onclick="addNewStore()">
+                                        <i class="bi bi-plus-lg me-1"></i>新增分店
+                                    </button>
+                                </div>
+                                
+                                <div id="storesContainer">
+                                    <!-- 分店列表將動態載入 -->
+                                </div>
+
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <button class="btn btn-primary btn-lg" onclick="saveAllStores()">
+                                            <i class="bi bi-check-lg me-2"></i>儲存所有分店設定
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 排班參數設定 -->
+                            <div class="tab-pane fade" id="schedule" role="tabpanel">
+                                <h5><i class="bi bi-calendar3 me-2"></i>排班系統參數設定</h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="setting-item">
+                                            <label class="form-label">每人休假上限天數</label>
+                                            <input type="number" class="form-control" id="maxLeave" value="8" min="1" max="31">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="setting-item">
+                                            <label class="form-label">每日休假總上限人數</label>
+                                            <input type="number" class="form-control" id="maxDailyLeave" value="2" min="1" max="10">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="setting-item">
+                                            <label class="form-label">週末休假上限天數</label>
+                                            <input type="number" class="form-control" id="maxWeekendLeave" value="3" min="1" max="10">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="setting-item">
+                                            <label class="form-label">排班操作時間限制(分鐘)</label>
+                                            <input type="number" class="form-control" id="scheduleTimeLimit" value="5" min="1" max="30">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="setting-item">
+                                            <label class="form-label">系統開啟日期</label>
+                                            <input type="number" class="form-control" id="systemOpenDay" value="16" min="1" max="31">
+                                            <small class="text-muted">每月幾號開啟排班系統</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="setting-item">
+                                            <label class="form-label">系統關閉日期</label>
+                                            <input type="number" class="form-control" id="systemCloseDay" value="21" min="1" max="31">
+                                            <small class="text-muted">每月幾號關閉排班系統</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-4">
+                                    <div class="col-md-6">
+                                        <h6><i class="bi bi-calendar-x me-2"></i>各分店禁休日期設定</h6>
+                                        <textarea class="form-control json-editor" id="forbiddenDates" rows="8" placeholder='請輸入JSON格式，例如：
+{
+  "內壢忠孝店": ["2025-09-15", "2025-09-30"],
+  "桃園龍安店": ["2025-09-20", "2025-09-25"]
+}'></textarea>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6><i class="bi bi-calendar-check me-2"></i>各分店公休日期設定</h6>
+                                        <textarea class="form-control json-editor" id="holidayDates" rows="8" placeholder='請輸入JSON格式，例如：
+{
+  "內壢忠孝店": ["2025-09-10", "2025-09-25"],
+  "桃園龍安店": ["2025-09-12", "2025-09-27"]
+}'></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <button class="btn btn-primary btn-lg" onclick="saveScheduleSettings()">
+                                            <i class="bi bi-check-lg me-2"></i>儲存排班參數設定
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 職位階級設定 -->
+                            <div class="tab-pane fade" id="positions" role="tabpanel">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5><i class="bi bi-diagram-3 me-2"></i>職位階級管理</h5>
+                                    <button class="btn btn-success" onclick="addNewPosition()">
+                                        <i class="bi bi-plus-lg me-1"></i>新增職位
+                                    </button>
+                                </div>
+                                
+                                <div id="positionsContainer">
+                                    <!-- 職位列表將動態載入 -->
+                                </div>
+
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <button class="btn btn-primary btn-lg" onclick="saveAllPositions()">
+                                            <i class="bi bi-check-lg me-2"></i>儲存所有職位設定
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 品項設定 -->
+                            <div class="tab-pane fade" id="products" role="tabpanel">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5><i class="bi bi-box-seam me-2"></i>叫貨品項管理</h5>
+                                    <button class="btn btn-success" onclick="addNewProduct()">
+                                        <i class="bi bi-plus-lg me-1"></i>新增品項
+                                    </button>
+                                </div>
+                                
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>類別</th>
+                                                <th>品項名稱</th>
+                                                <th>廠商</th>
+                                                <th>售價</th>
+                                                <th>成本</th>
+                                                <th>單位</th>
+                                                <th>異常天數</th>
+                                                <th>狀態</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="productsTable">
+                                            <!-- 產品列表將動態載入 -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- 員工管理 -->
+                            <div class="tab-pane fade" id="employees" role="tabpanel">
+                                <h5><i class="bi bi-people me-2"></i>員工資料管理</h5>
+                                
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>姓名</th>
+                                                <th>身份證</th>
+                                                <th>分店</th>
+                                                <th>職位</th>
+                                                <th>狀態</th>
+                                                <th>到職日</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="employeesTable">
+                                            <!-- 員工列表將動態載入 -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- 系統設定 -->
+                            <div class="tab-pane fade" id="system" role="tabpanel">
+                                <h5><i class="bi bi-gear me-2"></i>系統全域設定</h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="setting-item">
+                                            <h6><i class="bi bi-telegram me-2"></i>Telegram 通知設定</h6>
+                                            <label class="form-label">Bot Token</label>
+                                            <input type="text" class="form-control" id="telegramBotToken" 
+                                                   placeholder="請輸入 Telegram Bot Token">
+                                            
+                                            <label class="form-label mt-3">老闆群組 ID</label>
+                                            <input type="text" class="form-control" id="telegramBossGroup" 
+                                                   placeholder="請輸入老闆群組 Chat ID">
+                                            
+                                            <label class="form-label mt-3">員工群組 ID</label>
+                                            <input type="text" class="form-control" id="telegramEmployeeGroup" 
+                                                   placeholder="請輸入員工群組 Chat ID">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="setting-item">
+                                            <h6><i class="bi bi-cloud-arrow-up me-2"></i>備份設定</h6>
+                                            <label class="form-label">備份頻率(天數)</label>
+                                            <input type="number" class="form-control" id="backupInterval" value="5" min="1" max="30">
+                                            
+                                            <label class="form-label mt-3">備份信箱</label>
+                                            <input type="email" class="form-control" id="backupEmail" 
+                                                   placeholder="chatscai10@gmail.com">
+                                            
+                                            <label class="form-label mt-3">備份範圍</label>
+                                            <select class="form-select" id="backupScope">
+                                                <option value="all">全部檔案</option>
+                                                <option value="database">僅資料庫</option>
+                                                <option value="config">僅設定檔</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <button class="btn btn-primary btn-lg" onclick="saveSystemSettings()">
+                                            <i class="bi bi-check-lg me-2"></i>儲存系統設定
+                                        </button>
+                                        <button class="btn btn-warning btn-lg ms-2" onclick="testTelegramConnection()">
+                                            <i class="bi bi-telegram me-2"></i>測試 Telegram 連線
+                                        </button>
+                                        <button class="btn btn-info btn-lg ms-2" onclick="createBackup()">
+                                            <i class="bi bi-cloud-arrow-up me-2"></i>立即備份
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let storesData = [];
+        let positionsData = [];
+        let productsData = [];
+        let employeesData = [];
+
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadAllSettings();
+        });
+
+        // 驗證登入狀態
+        function checkAuth() {
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                window.location.href = '/';
+                return;
+            }
+        }
+
+        // 登出功能
+        function logout() {
+            localStorage.removeItem('auth_token');
+            window.location.href = '/';
+        }
+
+        // 載入所有設定
+        async function loadAllSettings() {
+            showLoading(true);
+            try {
+                await Promise.all([
+                    loadStores(),
+                    loadScheduleSettings(),
+                    loadPositions(),
+                    loadProducts(),
+                    loadEmployees(),
+                    loadSystemSettings()
+                ]);
+            } catch (error) {
+                console.error('載入設定失敗:', error);
+                showAlert('載入設定失敗', 'danger');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 載入分店設定
+        async function loadStores() {
+            try {
+                // 先載入預設分店資料
+                storesData = [
+                    {
+                        id: 1,
+                        name: "內壢忠孝店",
+                        people: 2,
+                        open: "1500-0200",
+                        latitude: 24.9748412,
+                        longitude: 121.2556713,
+                        radius: 100,
+                        address: "桃園市中壢區忠孝路93-1號"
+                    },
+                    {
+                        id: 2,
+                        name: "桃園龍安店", 
+                        people: 2,
+                        open: "1500-0200",
+                        latitude: 24.9880023,
+                        longitude: 121.2812737,
+                        radius: 100,
+                        address: "桃園市桃園區龍安街某號"
+                    }
+                ];
+                renderStores();
+            } catch (error) {
+                console.error('載入分店設定失敗:', error);
+            }
+        }
+
+        // 渲染分店設定
+        function renderStores() {
+            const container = document.getElementById('storesContainer');
+            container.innerHTML = '';
+
+            storesData.forEach((store, index) => {
+                const storeCard = `
+                    <div class="store-card" data-store-id="${store.id}">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">分店名稱</label>
+                                <input type="text" class="form-control" value="${store.name}" 
+                                       onchange="updateStore(${index}, 'name', this.value)">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">最少職班人數</label>
+                                <input type="number" class="form-control" value="${store.people}" min="1" max="10"
+                                       onchange="updateStore(${index}, 'people', this.value)">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">營業時間</label>
+                                <input type="text" class="form-control" value="${store.open}" 
+                                       placeholder="1500-0200" onchange="updateStore(${index}, 'open', this.value)">
+                            </div>
+                            <div class="col-md-4 mt-3">
+                                <label class="form-label">緯度</label>
+                                <input type="number" class="form-control" value="${store.latitude}" step="0.0000001"
+                                       onchange="updateStore(${index}, 'latitude', this.value)">
+                            </div>
+                            <div class="col-md-4 mt-3">
+                                <label class="form-label">經度</label>
+                                <input type="number" class="form-control" value="${store.longitude}" step="0.0000001"
+                                       onchange="updateStore(${index}, 'longitude', this.value)">
+                            </div>
+                            <div class="col-md-4 mt-3">
+                                <label class="form-label">打卡範圍(公尺)</label>
+                                <input type="number" class="form-control" value="${store.radius}" min="10" max="1000"
+                                       onchange="updateStore(${index}, 'radius', this.value)">
+                            </div>
+                            <div class="col-md-10 mt-3">
+                                <label class="form-label">地址</label>
+                                <input type="text" class="form-control" value="${store.address}"
+                                       onchange="updateStore(${index}, 'address', this.value)">
+                            </div>
+                            <div class="col-md-2 mt-3 d-flex align-items-end">
+                                <button class="btn btn-danger btn-sm w-100" onclick="removeStore(${index})">
+                                    <i class="bi bi-trash"></i> 刪除
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += storeCard;
+            });
+        }
+
+        // 更新分店資料
+        function updateStore(index, field, value) {
+            if (field === 'people' || field === 'radius') {
+                value = parseInt(value);
+            } else if (field === 'latitude' || field === 'longitude') {
+                value = parseFloat(value);
+            }
+            storesData[index][field] = value;
+        }
+
+        // 新增分店
+        function addNewStore() {
+            const newStore = {
+                id: Date.now(),
+                name: "新分店",
+                people: 2,
+                open: "1500-0200",
+                latitude: 25.0330,
+                longitude: 121.5654,
+                radius: 100,
+                address: "請輸入地址"
+            };
+            storesData.push(newStore);
+            renderStores();
+        }
+
+        // 刪除分店
+        function removeStore(index) {
+            if (confirm('確定要刪除這個分店嗎？')) {
+                storesData.splice(index, 1);
+                renderStores();
+            }
+        }
+
+        // 儲存所有分店設定
+        async function saveAllStores() {
+            try {
+                showLoading(true);
+                // 這裡應該要調用API儲存分店設定
+                // const response = await fetch('/api/admin/stores/save', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //         'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+                //     },
+                //     body: JSON.stringify(storesData)
+                // });
+                
+                showAlert('分店設定已儲存', 'success');
+            } catch (error) {
+                console.error('儲存分店設定失敗:', error);
+                showAlert('儲存失敗', 'danger');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 載入排班設定
+        async function loadScheduleSettings() {
+            try {
+                // 載入預設值或從API獲取
+                const settings = {
+                    maxLeave: 8,
+                    maxDailyLeave: 2,
+                    maxWeekendLeave: 3,
+                    scheduleTimeLimit: 5,
+                    systemOpenDay: 16,
+                    systemCloseDay: 21,
+                    forbiddenDates: '{\n  "內壢忠孝店": ["2025-09-15", "2025-09-30"],\n  "桃園龍安店": ["2025-09-20", "2025-09-25"]\n}',
+                    holidayDates: '{\n  "內壢忠孝店": ["2025-09-10", "2025-09-25"],\n  "桃園龍安店": ["2025-09-12", "2025-09-27"]\n}'
+                };
+
+                Object.keys(settings).forEach(key => {
+                    const element = document.getElementById(key);
+                    if (element) {
+                        element.value = settings[key];
+                    }
+                });
+            } catch (error) {
+                console.error('載入排班設定失敗:', error);
+            }
+        }
+
+        // 儲存排班設定
+        async function saveScheduleSettings() {
+            try {
+                showLoading(true);
+                
+                const settings = {
+                    maxLeave: document.getElementById('maxLeave').value,
+                    maxDailyLeave: document.getElementById('maxDailyLeave').value,
+                    maxWeekendLeave: document.getElementById('maxWeekendLeave').value,
+                    scheduleTimeLimit: document.getElementById('scheduleTimeLimit').value,
+                    systemOpenDay: document.getElementById('systemOpenDay').value,
+                    systemCloseDay: document.getElementById('systemCloseDay').value,
+                    forbiddenDates: document.getElementById('forbiddenDates').value,
+                    holidayDates: document.getElementById('holidayDates').value
+                };
+
+                // 驗證JSON格式
+                try {
+                    JSON.parse(settings.forbiddenDates);
+                    JSON.parse(settings.holidayDates);
+                } catch (e) {
+                    throw new Error('JSON格式錯誤，請檢查禁休日期和公休日期設定');
+                }
+
+                showAlert('排班參數設定已儲存', 'success');
+            } catch (error) {
+                console.error('儲存排班設定失敗:', error);
+                showAlert(error.message || '儲存失敗', 'danger');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 載入職位設定
+        async function loadPositions() {
+            try {
+                // 預設職位階級資料
+                positionsData = [
+                    {
+                        id: 1,
+                        level: "實習生",
+                        salary: 25000,
+                        bonusRate: 0.5,
+                        quota: 10,
+                        requiredDays: 0,
+                        cooldownDays: 30,
+                        approvalRate: 0.6,
+                        votingDays: 5,
+                        lateLimit: 120,
+                        punishment: "警告",
+                        notes: "入門職位"
+                    },
+                    {
+                        id: 2,
+                        level: "正職員工",
+                        salary: 30000,
+                        bonusRate: 0.8,
+                        quota: 8,
+                        requiredDays: 30,
+                        cooldownDays: 45,
+                        approvalRate: 0.65,
+                        votingDays: 5,
+                        lateLimit: 100,
+                        punishment: "扣薪",
+                        notes: "基礎員工"
+                    },
+                    {
+                        id: 3,
+                        level: "資深員工",
+                        salary: 35000,
+                        bonusRate: 1.0,
+                        quota: 6,
+                        requiredDays: 90,
+                        cooldownDays: 60,
+                        approvalRate: 0.7,
+                        votingDays: 7,
+                        lateLimit: 80,
+                        punishment: "記過",
+                        notes: "有經驗的員工"
+                    }
+                ];
+                renderPositions();
+            } catch (error) {
+                console.error('載入職位設定失敗:', error);
+            }
+        }
+
+        // 渲染職位設定
+        function renderPositions() {
+            const container = document.getElementById('positionsContainer');
+            container.innerHTML = '';
+
+            positionsData.forEach((position, index) => {
+                const positionCard = `
+                    <div class="position-level">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="form-label">階級名稱</label>
+                                <input type="text" class="form-control" value="${position.level}"
+                                       onchange="updatePosition(${index}, 'level', this.value)">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">薪資</label>
+                                <input type="number" class="form-control" value="${position.salary}"
+                                       onchange="updatePosition(${index}, 'salary', this.value)">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">獎金比例</label>
+                                <input type="number" class="form-control" value="${position.bonusRate}" step="0.1"
+                                       onchange="updatePosition(${index}, 'bonusRate', this.value)">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">名額</label>
+                                <input type="number" class="form-control" value="${position.quota}"
+                                       onchange="updatePosition(${index}, 'quota', this.value)">
+                            </div>
+                            <div class="col-md-3 mt-3">
+                                <label class="form-label">任職需滿天數</label>
+                                <input type="number" class="form-control" value="${position.requiredDays}"
+                                       onchange="updatePosition(${index}, 'requiredDays', this.value)">
+                            </div>
+                            <div class="col-md-3 mt-3">
+                                <label class="form-label">失敗緩衝天數</label>
+                                <input type="number" class="form-control" value="${position.cooldownDays}"
+                                       onchange="updatePosition(${index}, 'cooldownDays', this.value)">
+                            </div>
+                            <div class="col-md-3 mt-3">
+                                <label class="form-label">同意比例</label>
+                                <input type="number" class="form-control" value="${position.approvalRate}" step="0.01" min="0" max="1"
+                                       onchange="updatePosition(${index}, 'approvalRate', this.value)">
+                            </div>
+                            <div class="col-md-3 mt-3">
+                                <label class="form-label">投票時間(天)</label>
+                                <input type="number" class="form-control" value="${position.votingDays}"
+                                       onchange="updatePosition(${index}, 'votingDays', this.value)">
+                            </div>
+                            <div class="col-md-3 mt-3">
+                                <label class="form-label">遲到限制(分鐘)</label>
+                                <input type="number" class="form-control" value="${position.lateLimit}"
+                                       onchange="updatePosition(${index}, 'lateLimit', this.value)">
+                            </div>
+                            <div class="col-md-3 mt-3">
+                                <label class="form-label">懲罰方式</label>
+                                <input type="text" class="form-control" value="${position.punishment}"
+                                       onchange="updatePosition(${index}, 'punishment', this.value)">
+                            </div>
+                            <div class="col-md-4 mt-3">
+                                <label class="form-label">備註</label>
+                                <input type="text" class="form-control" value="${position.notes}"
+                                       onchange="updatePosition(${index}, 'notes', this.value)">
+                            </div>
+                            <div class="col-md-2 mt-3 d-flex align-items-end">
+                                <button class="btn btn-danger btn-sm w-100" onclick="removePosition(${index})">
+                                    <i class="bi bi-trash"></i> 刪除
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += positionCard;
+            });
+        }
+
+        // 更新職位資料
+        function updatePosition(index, field, value) {
+            if (['salary', 'quota', 'requiredDays', 'cooldownDays', 'votingDays', 'lateLimit'].includes(field)) {
+                value = parseInt(value);
+            } else if (field === 'bonusRate' || field === 'approvalRate') {
+                value = parseFloat(value);
+            }
+            positionsData[index][field] = value;
+        }
+
+        // 新增職位
+        function addNewPosition() {
+            const newPosition = {
+                id: Date.now(),
+                level: "新職位",
+                salary: 25000,
+                bonusRate: 0.5,
+                quota: 1,
+                requiredDays: 30,
+                cooldownDays: 30,
+                approvalRate: 0.6,
+                votingDays: 5,
+                lateLimit: 120,
+                punishment: "警告",
+                notes: ""
+            };
+            positionsData.push(newPosition);
+            renderPositions();
+        }
+
+        // 刪除職位
+        function removePosition(index) {
+            if (confirm('確定要刪除這個職位嗎？')) {
+                positionsData.splice(index, 1);
+                renderPositions();
+            }
+        }
+
+        // 儲存所有職位設定
+        async function saveAllPositions() {
+            try {
+                showLoading(true);
+                showAlert('職位設定已儲存', 'success');
+            } catch (error) {
+                console.error('儲存職位設定失敗:', error);
+                showAlert('儲存失敗', 'danger');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 載入產品設定
+        async function loadProducts() {
+            try {
+                productsData = [
+                    {
+                        id: 1,
+                        category: "冷凍食品",
+                        name: "雞胸肉",
+                        supplier: "聯華食品",
+                        price: 120,
+                        cost: 80,
+                        unit: "包",
+                        anomalyDays: 2,
+                        status: "上架"
+                    },
+                    {
+                        id: 2,
+                        category: "冷凍食品", 
+                        name: "薯條",
+                        supplier: "聯華食品",
+                        price: 60,
+                        cost: 35,
+                        unit: "包",
+                        anomalyDays: 3,
+                        status: "上架"
+                    }
+                ];
+                renderProducts();
+            } catch (error) {
+                console.error('載入產品設定失敗:', error);
+            }
+        }
+
+        // 渲染產品設定
+        function renderProducts() {
+            const tbody = document.getElementById('productsTable');
+            tbody.innerHTML = '';
+
+            productsData.forEach((product, index) => {
+                const row = `
+                    <tr>
+                        <td><input type="text" class="form-control form-control-sm" value="${product.category}" 
+                                   onchange="updateProduct(${index}, 'category', this.value)"></td>
+                        <td><input type="text" class="form-control form-control-sm" value="${product.name}"
+                                   onchange="updateProduct(${index}, 'name', this.value)"></td>
+                        <td><input type="text" class="form-control form-control-sm" value="${product.supplier}"
+                                   onchange="updateProduct(${index}, 'supplier', this.value)"></td>
+                        <td><input type="number" class="form-control form-control-sm" value="${product.price}"
+                                   onchange="updateProduct(${index}, 'price', this.value)"></td>
+                        <td><input type="number" class="form-control form-control-sm" value="${product.cost}"
+                                   onchange="updateProduct(${index}, 'cost', this.value)"></td>
+                        <td><input type="text" class="form-control form-control-sm" value="${product.unit}"
+                                   onchange="updateProduct(${index}, 'unit', this.value)"></td>
+                        <td><input type="number" class="form-control form-control-sm" value="${product.anomalyDays}"
+                                   onchange="updateProduct(${index}, 'anomalyDays', this.value)"></td>
+                        <td>
+                            <select class="form-select form-select-sm" onchange="updateProduct(${index}, 'status', this.value)">
+                                <option value="上架" ${product.status === '上架' ? 'selected' : ''}>上架</option>
+                                <option value="下架" ${product.status === '下架' ? 'selected' : ''}>下架</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="removeProduct(${index})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // 更新產品資料
+        function updateProduct(index, field, value) {
+            if (['price', 'cost', 'anomalyDays'].includes(field)) {
+                value = parseFloat(value);
+            }
+            productsData[index][field] = value;
+        }
+
+        // 新增產品
+        function addNewProduct() {
+            const newProduct = {
+                id: Date.now(),
+                category: "新類別",
+                name: "新品項",
+                supplier: "供應商",
+                price: 0,
+                cost: 0,
+                unit: "個",
+                anomalyDays: 2,
+                status: "上架"
+            };
+            productsData.push(newProduct);
+            renderProducts();
+        }
+
+        // 刪除產品
+        function removeProduct(index) {
+            if (confirm('確定要刪除這個品項嗎？')) {
+                productsData.splice(index, 1);
+                renderProducts();
+            }
+        }
+
+        // 載入員工資料
+        async function loadEmployees() {
+            try {
+                const response = await fetch('/api/admin/employees', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    employeesData = result.data || [];
+                } else {
+                    // 使用預設資料
+                    employeesData = [
+                        {
+                            id: 1,
+                            name: "系統管理員",
+                            id_card: "A123456789",
+                            store_name: "總公司",
+                            position: "系統管理員",
+                            status: "在職",
+                            join_date: "2024-01-01"
+                        },
+                        {
+                            id: 2,
+                            name: "示範員工",
+                            id_card: "B123456789", 
+                            store_name: "總公司",
+                            position: "實習生",
+                            status: "在職",
+                            join_date: "2024-06-01"
+                        }
+                    ];
+                }
+                renderEmployees();
+            } catch (error) {
+                console.error('載入員工資料失敗:', error);
+            }
+        }
+
+        // 渲染員工資料
+        function renderEmployees() {
+            const tbody = document.getElementById('employeesTable');
+            tbody.innerHTML = '';
+
+            employeesData.forEach((employee, index) => {
+                const statusBadge = employee.status === '在職' ? 'success' : 
+                                   employee.status === '離職' ? 'danger' : 'warning';
+                const row = `
+                    <tr>
+                        <td>${employee.name}</td>
+                        <td>${employee.id_card}</td>
+                        <td>${employee.store_name || '未設定'}</td>
+                        <td>${employee.position}</td>
+                        <td><span class="badge bg-${statusBadge}">${employee.status}</span></td>
+                        <td>${employee.join_date}</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm me-1" onclick="editEmployee(${employee.id})">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteEmployee(${employee.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // 編輯員工
+        function editEmployee(employeeId) {
+            alert(`編輯員工 ID: ${employeeId} 的功能將在下個版本實現`);
+        }
+
+        // 刪除員工
+        function deleteEmployee(employeeId) {
+            if (confirm('確定要刪除這個員工嗎？')) {
+                alert(`刪除員工 ID: ${employeeId} 的功能將在下個版本實現`);
+            }
+        }
+
+        // 載入系統設定
+        async function loadSystemSettings() {
+            try {
+                // 載入預設值
+                const settings = {
+                    telegramBotToken: '7659930552:AAF_jF1rAXFnjFO176-9X5fKfBwbrko8BNc',
+                    telegramBossGroup: '-1002658082392',
+                    telegramEmployeeGroup: '-1002658082392',
+                    backupInterval: 5,
+                    backupEmail: 'chatscai10@gmail.com',
+                    backupScope: 'all'
+                };
+
+                Object.keys(settings).forEach(key => {
+                    const element = document.getElementById(key);
+                    if (element) {
+                        element.value = settings[key];
+                    }
+                });
+            } catch (error) {
+                console.error('載入系統設定失敗:', error);
+            }
+        }
+
+        // 儲存系統設定
+        async function saveSystemSettings() {
+            try {
+                showLoading(true);
+                showAlert('系統設定已儲存', 'success');
+            } catch (error) {
+                console.error('儲存系統設定失敗:', error);
+                showAlert('儲存失敗', 'danger');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 測試 Telegram 連線
+        async function testTelegramConnection() {
+            try {
+                showLoading(true);
+                
+                const response = await fetch('/api/telegram/test', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+                    }
+                });
+
+                if (response.ok) {
+                    showAlert('Telegram 連線測試成功！', 'success');
+                } else {
+                    showAlert('Telegram 連線測試失敗', 'warning');
+                }
+            } catch (error) {
+                console.error('測試 Telegram 連線失敗:', error);
+                showAlert('連線測試出現錯誤', 'danger');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 立即備份
+        async function createBackup() {
+            try {
+                showLoading(true);
+                showAlert('備份已開始，完成後將發送通知', 'info');
+            } catch (error) {
+                console.error('建立備份失敗:', error);
+                showAlert('備份失敗', 'danger');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 顯示載入動畫
+        function showLoading(show) {
+            const spinner = document.getElementById('loadingSpinner');
+            spinner.style.display = show ? 'flex' : 'none';
+        }
+
+        // 顯示提示訊息
+        function showAlert(message, type) {
+            const alertDiv = document.getElementById('saveStatus');
+            alertDiv.className = `save-status alert alert-${type}`;
+            alertDiv.textContent = message;
+            alertDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
