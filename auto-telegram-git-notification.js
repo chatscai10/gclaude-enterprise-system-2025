@@ -18,11 +18,24 @@ class AutoTelegramGitNotification {
     }
 
     async sendTelegramNotification(message) {
+        console.log('📤 準備發送Telegram通知...');
+        console.log('📝 消息內容長度:', message.length);
+        
+        if (!message || message.trim().length === 0) {
+            throw new Error('消息內容為空');
+        }
+        
         return new Promise((resolve, reject) => {
             const data = JSON.stringify({
                 chat_id: this.telegramChatId,
                 text: message,
-                parse_mode: 'Markdown'
+                parse_mode: 'HTML' // 改用HTML解析模式
+            });
+            
+            console.log('📊 發送數據:', { 
+                chat_id: this.telegramChatId, 
+                textLength: message.length,
+                dataLength: data.length 
             });
 
             const options = {
@@ -32,7 +45,7 @@ class AutoTelegramGitNotification {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Content-Length': data.length
+                    'Content-Length': Buffer.byteLength(data, 'utf8')
                 }
             };
 
@@ -42,6 +55,9 @@ class AutoTelegramGitNotification {
                     responseData += chunk;
                 });
                 res.on('end', () => {
+                    console.log(`📡 響應狀態: ${res.statusCode}`);
+                    console.log('📄 響應內容:', responseData);
+                    
                     if (res.statusCode === 200) {
                         console.log('✅ Telegram通知發送成功');
                         resolve(JSON.parse(responseData));
