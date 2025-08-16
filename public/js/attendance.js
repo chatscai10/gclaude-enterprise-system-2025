@@ -294,7 +294,7 @@ async function loadAttendanceStats() {
 async function loadAttendance() {
     showLoading(true);
     
-    const attendance = await apiRequest('/api/attendance');
+    const attendance = await apiRequest('/api/attendance/history');
     if (attendance) {
         currentAttendance = attendance;
         filteredAttendance = [...attendance];
@@ -445,19 +445,31 @@ function formatTime(timeString) {
 
 // 計算工作時數
 function calculateWorkHours(clockIn, clockOut) {
-    if (!clockIn || !clockOut) return '--';
+    if (!clockIn || !clockOut) return '-- 小時';
     
-    const inTime = new Date(clockIn);
-    const outTime = new Date(clockOut);
-    const diffMs = outTime - inTime;
-    const diffHours = diffMs / (1000 * 60 * 60);
-    
-    if (diffHours < 0) return '--';
-    
-    const hours = Math.floor(diffHours);
-    const minutes = Math.round((diffHours - hours) * 60);
-    
-    return `${hours}:${minutes.toString().padStart(2, '0')}`;
+    try {
+        const inTime = new Date(clockIn);
+        const outTime = new Date(clockOut);
+        
+        // 驗證日期對象
+        if (isNaN(inTime.getTime()) || isNaN(outTime.getTime())) {
+            console.error('Invalid date objects:', { clockIn, clockOut });
+            return '-- 小時';
+        }
+        
+        const diffMs = outTime - inTime;
+        const diffHours = diffMs / (1000 * 60 * 60);
+        
+        if (diffHours < 0) return '-- 小時';
+        
+        const hours = Math.floor(diffHours);
+        const minutes = Math.round((diffHours - hours) * 60);
+        
+        return `${hours}:${minutes.toString().padStart(2, '0')}`;
+    } catch (error) {
+        console.error('Error calculating work hours:', error, { clockIn, clockOut });
+        return '-- 小時';
+    }
 }
 
 // 篩選出勤記錄

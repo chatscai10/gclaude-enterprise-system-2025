@@ -666,6 +666,15 @@
                                 載入營收統計中...
                             </div>
                         </div>
+                        
+                        <!-- 我的營收記錄 -->
+                        <h4 class="mb-3">我的營收記錄</h4>
+                        <div id="revenueHistory">
+                            <div class="alert alert-custom alert-info border-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                載入營收記錄中...
+                            </div>
+                        </div>
                     </div>
 
                     <!-- 維修申請 -->
@@ -1248,6 +1257,15 @@
                             document.getElementById('clockInBtn').disabled = true;
                             document.getElementById('clockOutBtn').disabled = false;
                             clockInTime = new Date(data.data.clock_in_time);
+                            console.log('📋 載入已存在的打卡記錄:', clockInTime);
+                            // 啟動工作時數計時器
+                            startWorkingTimer();
+                        } else {
+                            // 確保清理狀態
+                            stopWorkingTimer();
+                            clockInTime = null;
+                            document.getElementById('clockInBtn').disabled = false;
+                            document.getElementById('clockOutBtn').disabled = true;
                         }
                     } else {
                         recordsContainer.innerHTML = `
@@ -1296,6 +1314,11 @@
 
                 if (data.success) {
                     showAlert('上班打卡成功！', 'success');
+                    // 設定上班時間並啟動計時器
+                    clockInTime = new Date();
+                    document.getElementById('clockInBtn').disabled = true;
+                    document.getElementById('clockOutBtn').disabled = false;
+                    startWorkingTimer();
                     await loadAttendanceData();
                 } else {
                     showAlert(data.message || '打卡失敗', 'danger');
@@ -1341,6 +1364,12 @@
 
                 if (data.success) {
                     showAlert('下班打卡成功！', 'success');
+                    // 停止計時器並清除上班時間
+                    stopWorkingTimer();
+                    clockInTime = null;
+                    document.getElementById('clockInBtn').disabled = false;
+                    document.getElementById('clockOutBtn').disabled = true;
+                    document.getElementById('workingHours').textContent = '未開始';
                     await loadAttendanceData();
                 } else {
                     showAlert(data.message || '打卡失敗', 'danger');
@@ -1383,11 +1412,28 @@
         async function handleRevenueSubmit(e) {
             e.preventDefault();
             
-            const formData = new FormData(e.target);
+            const category = document.getElementById('revenueCategory').value;
+            const amount = parseFloat(document.getElementById('revenueAmount').value);
+            const notes = document.getElementById('revenueNotes').value;
+            
+            // 構建符合新API格式的數據
             const revenueData = {
-                category: document.getElementById('revenueCategory').value,
-                amount: parseFloat(document.getElementById('revenueAmount').value),
-                notes: document.getElementById('revenueNotes').value
+                date: new Date().toISOString().split('T')[0], // 當前日期
+                store_id: 1, // 預設分店ID
+                bonus_type: '平日獎金', // 預設獎金類型
+                order_count: 1,
+                revenue_items: [
+                    {
+                        name: category,
+                        amount: amount,
+                        serviceFee: 0
+                    }
+                ],
+                expense_items: [],
+                total_revenue: amount,
+                total_expense: 0,
+                net_revenue: amount,
+                notes: notes
             };
 
             try {
@@ -1405,7 +1451,8 @@
                 if (data.success) {
                     showAlert('營收記錄新增成功！', 'success');
                     e.target.reset();
-                    await loadRevenueData();
+                    // 重新載入營收記錄
+                    await loadMyRevenueRecords();
                 } else {
                     showAlert(data.message || '新增失敗', 'danger');
                 }
@@ -1465,6 +1512,144 @@
                     營收統計功能已準備就緒
                 </div>
             `;
+            
+            // 載入我的營收記錄
+            await loadMyRevenueRecords();
+        }
+        
+        // 載入我的營收記錄
+        async function loadMyRevenueRecords() {
+            try {
+                const response = await fetch('/api/revenue/records', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    const records = result.data;
+                    let html = '';
+                    
+                    if (records.length === 0) {
+                        html = `
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>暫無營收記錄
+                            </div>
+                        `;
+                    } else {
+                        records.forEach(record => {
+                            const status = record.status === 'pending' ? '待審核' : 
+                                         record.status === 'approved' ? '已審核' : '已拒絕';
+                            const statusClass = record.status === 'pending' ? 'warning' : 
+                                              record.status === 'approved' ? 'success' : 'danger';
+                            
+                            // 解析revenue_items和expense_items
+                            let revenueItems = [];
+                            let expenseItems = [];
+                            try {
+                                revenueItems = record.revenue_items ? JSON.parse(record.revenue_items) : [];
+                                expenseItems = record.expense_items ? JSON.parse(record.expense_items) : [];
+                            } catch (e) {
+                                console.error('解析記錄數據失敗:', e);
+                            }
+                            
+                            const totalRevenue = revenueItems.reduce((sum, item) => sum + (item.amount || 0), 0);
+                            const totalExpense = expenseItems.reduce((sum, item) => sum + (item.amount || 0), 0);
+                            
+                            html += `
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <h6 class="card-title">營收記錄 - ${record.revenue_date}</h6>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <p class="card-text text-muted mb-2">
+                                                            <strong>狀態:</strong> <span class="badge bg-${statusClass}">${status}</span><br>
+                                                            <strong>總收入:</strong> $${totalRevenue.toLocaleString()}<br>
+                                                            <strong>總支出:</strong> $${totalExpense.toLocaleString()}<br>
+                                                            <strong>淨利:</strong> $${(totalRevenue - totalExpense).toLocaleString()}
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        ${record.notes ? `<p class="card-text"><strong>備註:</strong> ${record.notes}</p>` : ''}
+                                                        <small class="text-muted">提交時間: ${new Date(record.created_at).toLocaleString('zh-TW')}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="ms-3">
+                                                ${record.status === 'pending' ? `
+                                                    <button class="btn btn-sm btn-outline-danger" onclick="voidRevenueRecord(${record.id})">
+                                                        <i class="fas fa-trash me-1"></i>作廢
+                                                    </button>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                    
+                    // 找到營收記錄容器並顯示
+                    const container = document.getElementById('revenueHistory') || 
+                                    document.querySelector('[data-section="revenue"] .revenue-records');
+                    if (container) {
+                        container.innerHTML = html;
+                    }
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('載入營收記錄失敗:', error);
+                const container = document.getElementById('revenueHistory') || 
+                                document.querySelector('[data-section="revenue"] .revenue-records');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>載入營收記錄失敗: ${error.message}
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // 作廢營收記錄
+        async function voidRevenueRecord(recordId) {
+            if (!confirm('確定要作廢此營收記錄嗎？')) {
+                return;
+            }
+            
+            const reason = prompt('請輸入作廢原因：');
+            if (!reason || !reason.trim()) {
+                showAlert('請輸入作廢原因', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/revenue/${recordId}/void`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ reason: reason.trim() })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('記錄作廢成功', 'success');
+                    await loadMyRevenueRecords(); // 重新載入記錄
+                } else {
+                    showAlert(result.message || '作廢失敗', 'danger');
+                }
+            } catch (error) {
+                console.error('作廢記錄失敗:', error);
+                showAlert('作廢失敗，請稍後再試', 'danger');
+            }
         }
 
         async function loadMaintenanceData() {
@@ -1539,14 +1724,67 @@
             }, 1000);
         }
 
+        // 啟動工作時數計時器
+        function startWorkingTimer() {
+            console.log('🚀 啟動工作時數計時器');
+            // 立即更新一次
+            updateWorkingHours();
+            // 確保定期更新已啟動
+            if (!window.workingTimerInterval) {
+                window.workingTimerInterval = setInterval(() => {
+                    if (clockInTime && currentSection === 'attendance') {
+                        updateWorkingHours();
+                    }
+                }, 1000);
+            }
+        }
+
+        // 停止工作時數計時器
+        function stopWorkingTimer() {
+            if (window.workingTimerInterval) {
+                clearInterval(window.workingTimerInterval);
+                window.workingTimerInterval = null;
+            }
+        }
+
         // 更新工作時數
         function updateWorkingHours() {
+            const workingHoursElement = document.getElementById('workingHours');
+            if (!workingHoursElement) {
+                console.warn('⚠️ workingHours 元素未找到');
+                return;
+            }
+
             if (clockInTime) {
-                const now = new Date();
-                const diff = now - clockInTime;
-                const hours = Math.floor(diff / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                document.getElementById('workingHours').textContent = `${hours}小時${minutes}分鐘`;
+                try {
+                    const now = new Date();
+                    const diff = now - clockInTime;
+                    
+                    // 檢查時間差值是否有效
+                    if (isNaN(diff) || diff < 0) {
+                        console.warn('⚠️ 時間計算異常:', { clockInTime, now, diff });
+                        workingHoursElement.textContent = '計算中...';
+                        return;
+                    }
+                    
+                    const hours = Math.floor(diff / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    
+                    // 檢查計算結果是否有效
+                    if (isNaN(hours) || isNaN(minutes)) {
+                        console.warn('⚠️ 時間格式異常:', { hours, minutes });
+                        workingHoursElement.textContent = '格式錯誤';
+                        return;
+                    }
+                    
+                    workingHoursElement.textContent = `${hours}小時${minutes}分鐘`;
+                    console.log(`⏰ 工作時數更新: ${hours}小時${minutes}分鐘`);
+                } catch (error) {
+                    console.error('❌ 工作時數計算錯誤:', error);
+                    workingHoursElement.textContent = '計算錯誤';
+                }
+            } else {
+                workingHoursElement.textContent = '未開始';
             }
         }
 
@@ -1597,17 +1835,17 @@
                             <div class="col-md-6">
                                 <ul class="list-unstyled">
                                     <li><i class="fas fa-calendar-week text-primary me-2"></i><strong>排班月份:</strong> ${settings.schedule_month}</li>
-                                    <li><i class="fas fa-user-times text-warning me-2"></i><strong>每人休假上限:</strong> ${settings.max_leave_days}天</li>
-                                    <li><i class="fas fa-users text-info me-2"></i><strong>每日休假總上限:</strong> ${settings.daily_leave_limit}人</li>
-                                    <li><i class="fas fa-store text-success me-2"></i><strong>同店每日休假上限:</strong> ${settings.store_daily_leave_limit}人</li>
+                                    <li><i class="fas fa-user-times text-warning me-2"></i><strong>每人休假上限:</strong> ${settings.max_leave_days_per_person}天</li>
+                                    <li><i class="fas fa-users text-info me-2"></i><strong>每日休假總上限:</strong> ${settings.max_leave_people_per_day}人</li>
+                                    <li><i class="fas fa-store text-success me-2"></i><strong>同店每日休假上限:</strong> ${settings.max_same_store_leave_per_day}人</li>
                                 </ul>
                             </div>
                             <div class="col-md-6">
                                 <ul class="list-unstyled">
-                                    <li><i class="fas fa-weekend text-danger me-2"></i><strong>假日休假上限:</strong> ${settings.weekend_leave_limit}天</li>
-                                    <li><i class="fas fa-clock text-warning me-2"></i><strong>操作時間限制:</strong> ${settings.operation_time_limit}分鐘</li>
-                                    <li><i class="fas fa-calendar-plus text-primary me-2"></i><strong>開啟時間:</strong> 每月${settings.open_day}號 ${settings.open_time}</li>
-                                    <li><i class="fas fa-calendar-minus text-danger me-2"></i><strong>關閉時間:</strong> 每月${settings.close_day}號 ${settings.close_time}</li>
+                                    <li><i class="fas fa-weekend text-danger me-2"></i><strong>假日休假上限:</strong> ${settings.max_weekend_leave_days}天</li>
+                                    <li><i class="fas fa-clock text-warning me-2"></i><strong>操作時間限制:</strong> ${settings.operation_time_minutes}分鐘</li>
+                                    <li><i class="fas fa-calendar-plus text-primary me-2"></i><strong>開啟時間:</strong> 每月${settings.system_open_date.split('-')[2]}號 ${settings.system_open_time}</li>
+                                    <li><i class="fas fa-calendar-minus text-danger me-2"></i><strong>關閉時間:</strong> 每月${settings.system_close_date.split('-')[2]}號 ${settings.system_close_time}</li>
                                 </ul>
                             </div>
                         </div>

@@ -21,7 +21,7 @@ const DatabaseOperations = require('./database/json-database');
 const TelegramNotifier = require('./modules/telegram-notifier');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3010;
 const JWT_SECRET = process.env.JWT_SECRET || 'gclaude-enterprise-secret-key';
 
 // 初始化資料庫和通知系統
@@ -1463,6 +1463,54 @@ app.get('/api/admin/promotions', authenticateToken, requireAdmin, async (req, re
 const scheduleAPI = require('./routes/schedule-api');
 app.use('/api/schedule', scheduleAPI);
 
+// 添加排班提交API別名，兼容前端調用
+app.post('/api/schedule/submit', authenticateToken, async (req, res) => {
+    try {
+        // 重定向到實際的排班保存API
+        const result = await db.saveSchedule(req.user.employee_id, req.body);
+        res.json({
+            success: true,
+            data: result,
+            message: '排班提交成功'
+        });
+    } catch (error) {
+        console.error('排班提交錯誤:', error);
+        res.status(500).json({
+            success: false,
+            message: '排班提交失敗'
+        });
+    }
+});
+
+// 添加營收提交API別名，兼容前端調用
+app.post('/api/revenue/submit', authenticateToken, async (req, res) => {
+    try {
+        const revenueData = {
+            employee_id: req.user.employee_id,
+            amount: req.body.amount,
+            description: req.body.description || req.body.note,
+            date: req.body.date || new Date().toISOString().split('T')[0],
+            time: req.body.time || new Date().toTimeString().slice(0, 8),
+            category: req.body.category || 'general',
+            payment_method: req.body.payment_method || 'cash',
+            store_id: req.user.store_id || 1
+        };
+        
+        const result = await db.addRevenue(revenueData);
+        res.json({
+            success: true,
+            data: result,
+            message: '營收記錄提交成功'
+        });
+    } catch (error) {
+        console.error('營收提交錯誤:', error);
+        res.status(500).json({
+            success: false,
+            message: '營收提交失敗'
+        });
+    }
+});
+
 // 獲取排班設定和狀態
 app.get('/api/schedule/settings', authenticateToken, async (req, res) => {
     try {
@@ -2114,12 +2162,8 @@ app.get('/admin', (req, res) => {
     if (fs.existsSync(unifiedAdminPath)) {
         res.sendFile(unifiedAdminPath);
     } else {
-        res.json({
-            page: 'admin',
-            message: '管理員頁面',
-            status: 'ready',
-            loginInfo: 'username: admin, password: admin123'
-        });
+        // 如果管理員頁面不存在，重定向到主頁面
+        res.redirect('/dashboard?role=admin');
     }
 });
 

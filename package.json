@@ -1,15 +1,15 @@
 {
   "name": "gclaude-enterprise-management-system",
   "version": "2.0.0",
-  "description": "GClaude相容企業員工管理系統 - 強化版 (基於D:0809專案)",
+  "description": "GClaude Enterprise Management System - 企業級管理系統",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "start:simple": "node simple-server.js",
     "start:complete": "node enterprise-server.js",
-    "dev": "nodemon enterprise-server.js",
+    "dev": "NODE_ENV=development node server.js",
     "build": "echo 'No build step required'",
-    "test": "jest",
+    "test": "node test-server.js",
     "deploy:gclaude": "node scripts/gclaude-deploy.js",
     "deploy:test": "node scripts/test-deployment.js",
     "browser:verify": "node scripts/intelligent-browser-verification.js",
@@ -26,17 +26,19 @@
     "test:performance": "node tests/performance/lighthouse-test.js",
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
-    "test:ci": "jest --ci --coverage --watchAll=false"
+    "test:ci": "jest --ci --coverage --watchAll=false",
+    "prod": "NODE_ENV=production node server.js",
+    "deploy:render": "echo \"Deploying to Render...\" && npm run prod",
+    "deploy:railway": "echo \"Deploying to Railway...\" && npm run prod",
+    "deploy:vercel": "echo \"Deploying to Vercel...\" && npm run prod",
+    "health-check": "curl -f http://localhost:$PORT/health || exit 1"
   },
   "keywords": [
-    "gclaude-compatible",
-    "enterprise-management",
-    "employee-system",
+    "enterprise",
+    "management",
     "nodejs",
     "express",
-    "intelligent-deployment",
-    "telegram-integration",
-    "browser-automation"
+    "system"
   ],
   "author": "Claude Code AI System",
   "license": "MIT",
@@ -74,7 +76,7 @@
   },
   "engines": {
     "node": ">=18.0.0",
-    "npm": ">=9.0.0"
+    "npm": ">=8.0.0"
   },
   "gclaude": {
     "compatible": true,
@@ -120,5 +122,6 @@
     "setupFilesAfterEnv": [
       "<rootDir>/tests/helpers/setup.js"
     ]
-  }
+  },
+  "homepage": "https://github.com/gclaude/enterprise-system"
 }
