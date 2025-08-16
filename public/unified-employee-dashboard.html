@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GClaude 企業管理系統 - 員工工作台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            padding: 20px;
+            margin-bottom: 20px;
+            position: sticky;
+            top: 20px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+        
+        .main-content {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin-bottom: 20px;
+            min-height: calc(100vh - 120px);
+        }
+        
+        .nav-item {
+            margin-bottom: 8px;
+        }
+        
+        .nav-link {
+            border-radius: 10px;
+            color: #495057;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+            border: none;
+            text-align: left;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-link:hover {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+        
+        .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+        
+        .section-content {
+            display: none;
+        }
+        
+        .section-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .quick-action-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        
+        .quick-action-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+        }
+        
+        .quick-action-card i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .status-online { background-color: var(--success-color); }
+        .status-busy { background-color: var(--warning-color); }
+        .status-offline { background-color: var(--danger-color); }
+        
+        .btn-gradient {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            padding: 10px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        
+        .content-header {
+            border-bottom: 3px solid #e9ecef;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .content-header h2 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .alert-custom {
+            border: none;
+            border-radius: 10px;
+            border-left: 4px solid;
+        }
+        
+        .mobile-nav {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .mobile-nav {
+                display: block;
+                background: white;
+                border-radius: 15px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+                margin-bottom: 20px;
+                padding: 15px;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .quick-action-card {
+                padding: 20px;
+            }
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-briefcase me-2"></i>
+                <span id="systemTitle">GClaude 企業管理系統</span>
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">
+                    <span class="status-indicator status-online"></span>
+                    歡迎，<span id="employeeName">載入中...</span>
+                </span>
+                <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                    <i class="fas fa-sign-out-alt me-1"></i>登出
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- 桌面版側邊欄 -->
+            <div class="col-lg-3 col-md-4">
+                <div class="sidebar">
+                    <h5 class="mb-3">
+                        <i class="fas fa-user-tie me-2"></i>
+                        員工功能選單
+                    </h5>
+                    <nav class="nav flex-column">
+                        <button class="nav-link active" data-section="dashboard">
+                            <i class="fas fa-home"></i>工作台首頁
+                        </button>
+                        <button class="nav-link" data-section="attendance">
+                            <i class="fas fa-clock"></i>打卡系統
+                        </button>
+                        <button class="nav-link" data-section="schedule">
+                            <i class="fas fa-calendar-alt"></i>排班系統
+                        </button>
+                        <button class="nav-link" data-section="revenue">
+                            <i class="fas fa-dollar-sign"></i>營收管理
+                        </button>
+                        <button class="nav-link" data-section="maintenance">
+                            <i class="fas fa-tools"></i>維修申請
+                        </button>
+                        <button class="nav-link" data-section="ordering">
+                            <i class="fas fa-shopping-cart"></i>叫貨系統
+                        </button>
+                        <button class="nav-link" data-section="promotion">
+                            <i class="fas fa-vote-yea"></i>升遷投票
+                        </button>
+                        <button class="nav-link" data-section="profile">
+                            <i class="fas fa-user-cog"></i>個人資料
+                        </button>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- 手機版導航 -->
+            <div class="col-12">
+                <div class="mobile-nav">
+                    <select class="form-select" id="mobileNavSelect">
+                        <option value="dashboard">🏠 工作台首頁</option>
+                        <option value="attendance">🕒 打卡系統</option>
+                        <option value="schedule">📅 排班系統</option>
+                        <option value="revenue">💰 營收管理</option>
+                        <option value="maintenance">🔧 維修申請</option>
+                        <option value="ordering">🛒 叫貨系統</option>
+                        <option value="promotion">🗳️ 升遷投票</option>
+                        <option value="profile">👤 個人資料</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 主要內容區域 -->
+            <div class="col-lg-9 col-md-8">
+                <div class="main-content">
+                    
+                    <!-- 工作台首頁 -->
+                    <div id="dashboard" class="section-content active">
+                        <div class="content-header">
+                            <h2><i class="fas fa-home me-2"></i>工作台首頁</h2>
+                            <p class="text-muted mb-0">歡迎使用企業管理系統，以下是您的工作概況</p>
+                        </div>
+
+                        <!-- 統計卡片 -->
+                        <div class="row mb-4">
+                            <div class="col-md-3 col-sm-6">
+                                <div class="stat-card">
+                                    <h3 id="todayAttendance">--</h3>
+                                    <p class="mb-0">今日出勤</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="stat-card">
+                                    <h3 id="monthlyRevenue">--</h3>
+                                    <p class="mb-0">本月營收</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="stat-card">
+                                    <h3 id="pendingTasks">--</h3>
+                                    <p class="mb-0">待處理任務</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="stat-card">
+                                    <h3 id="systemStatus">正常</h3>
+                                    <p class="mb-0">系統狀態</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 快速操作 -->
+                        <h4 class="mb-3">快速操作</h4>
+                        <div class="row">
+                            <div class="col-lg-2 col-md-4 col-sm-6">
+                                <div class="quick-action-card" onclick="showSection('attendance')">
+                                    <i class="fas fa-clock"></i>
+                                    <h6>GPS打卡</h6>
+                                    <small class="text-muted">上下班打卡</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6">
+                                <div class="quick-action-card" onclick="showSection('revenue')">
+                                    <i class="fas fa-dollar-sign"></i>
+                                    <h6>營收登記</h6>
+                                    <small class="text-muted">記錄營收</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6">
+                                <div class="quick-action-card" onclick="showSection('maintenance')">
+                                    <i class="fas fa-tools"></i>
+                                    <h6>維修申請</h6>
+                                    <small class="text-muted">設備維修</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6">
+                                <div class="quick-action-card" onclick="showSection('ordering')">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    <h6>叫貨系統</h6>
+                                    <small class="text-muted">進貨申請</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6">
+                                <div class="quick-action-card" onclick="showSection('schedule')">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <h6>排班系統</h6>
+                                    <small class="text-muted">查看班表</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6">
+                                <div class="quick-action-card" onclick="showSection('promotion')">
+                                    <i class="fas fa-vote-yea"></i>
+                                    <h6>升遷投票</h6>
+                                    <small class="text-muted">參與投票</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 最近動態 -->
+                        <h4 class="mb-3">最近動態</h4>
+                        <div id="recentActivities">
+                            <div class="alert alert-custom alert-info border-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                正在載入最近動態...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 打卡系統 -->
+                    <div id="attendance" class="section-content">
+                        <div class="content-header">
+                            <h2><i class="fas fa-clock me-2"></i>GPS打卡系統</h2>
+                            <p class="text-muted mb-0">使用GPS定位進行精準打卡</p>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <h4 class="card-title">上班打卡</h4>
+                                        <p class="text-muted">當前時間：<span id="currentTime">--:--:--</span></p>
+                                        <button class="btn btn-gradient btn-lg" id="clockInBtn" onclick="handleClockIn()">
+                                            <i class="fas fa-play me-2"></i>上班打卡
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <h4 class="card-title">下班打卡</h4>
+                                        <p class="text-muted">工作時數：<span id="workingHours">未開始</span></p>
+                                        <button class="btn btn-outline-secondary btn-lg" id="clockOutBtn" onclick="handleClockOut()" disabled>
+                                            <i class="fas fa-stop me-2"></i>下班打卡
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 打卡記錄 -->
+                        <h4 class="mt-4 mb-3">今日打卡記錄</h4>
+                        <div id="attendanceRecords">
+                            <div class="alert alert-custom alert-info border-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                載入打卡記錄中...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 排班系統 -->
+                    <div id="schedule" class="section-content">
+                        <div class="content-header">
+                            <h2><i class="fas fa-calendar-alt me-2"></i>排班系統</h2>
+                            <p class="text-muted mb-0">查看和管理您的工作排班</p>
+                        </div>
+
+                        <!-- 本週班表 -->
+                        <h4 class="mb-3">本週班表</h4>
+                        <div id="weeklySchedule">
+                            <div class="alert alert-custom alert-info border-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                載入排班資料中...
+                            </div>
+                        </div>
+
+                        <!-- 排班操作 -->
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <button class="btn btn-gradient w-100" onclick="enterScheduleSystem()">
+                                    <i class="fas fa-edit me-2"></i>進入排班系統
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-outline-danger w-100" onclick="exitScheduleSystem()">
+                                    <i class="fas fa-times me-2"></i>退出排班系統
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 營收管理 -->
+                    <div id="revenue" class="section-content">
+                        <div class="content-header">
+                            <h2><i class="fas fa-dollar-sign me-2"></i>營收管理</h2>
+                            <p class="text-muted mb-0">記錄和查看營收資料</p>
+                        </div>
+
+                        <!-- 營收登記表單 -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">新增營收記錄</h5>
+                                <form id="revenueForm">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">營收類別</label>
+                                                <select class="form-select" id="revenueCategory" required>
+                                                    <option value="">請選擇類別</option>
+                                                    <option value="food">餐飲銷售</option>
+                                                    <option value="retail">零售商品</option>
+                                                    <option value="service">服務收入</option>
+                                                    <option value="other">其他收入</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">金額</label>
+                                                <input type="number" class="form-control" id="revenueAmount" min="0" step="0.01" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">備註說明</label>
+                                        <textarea class="form-control" id="revenueNotes" rows="3"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-gradient">
+                                        <i class="fas fa-plus me-2"></i>新增記錄
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- 今日營收統計 -->
+                        <h4 class="mb-3">今日營收統計</h4>
+                        <div id="todayRevenueStats">
+                            <div class="alert alert-custom alert-info border-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                載入營收統計中...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 維修申請 -->
+                    <div id="maintenance" class="section-content">
+                        <div class="content-header">
+                            <h2><i class="fas fa-tools me-2"></i>設備維修申請</h2>
+                            <p class="text-muted mb-0">報告設備故障並申請維修</p>
+                        </div>
+
+                        <!-- 維修申請表單 -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">新增維修申請</h5>
+                                <form id="maintenanceForm">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">設備類型</label>
+                                                <select class="form-select" id="equipmentType" required>
+                                                    <option value="">請選擇設備</option>
+                                                    <option value="refrigeration">冷凍設備</option>
+                                                    <option value="electrical">電器設備</option>
+                                                    <option value="plumbing">水電設備</option>
+                                                    <option value="hvac">空調設備</option>
+                                                    <option value="cleaning">清潔設備</option>
+                                                    <option value="other">其他設備</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">緊急程度</label>
+                                                <select class="form-select" id="maintenancePriority" required>
+                                                    <option value="low">低 - 不影響營運</option>
+                                                    <option value="medium">中 - 輕微影響</option>
+                                                    <option value="high">高 - 嚴重影響</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">問題標題</label>
+                                        <input type="text" class="form-control" id="maintenanceTitle" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">問題描述</label>
+                                        <textarea class="form-control" id="maintenanceDescription" rows="4" required></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">設備位置</label>
+                                        <input type="text" class="form-control" id="maintenanceLocation" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">聯絡電話</label>
+                                        <input type="tel" class="form-control" id="maintenancePhone" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-gradient">
+                                        <i class="fas fa-paper-plane me-2"></i>提交申請
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- 我的維修申請 -->
+                        <h4 class="mb-3">我的維修申請</h4>
+                        <div id="maintenanceHistory">
+                            <div class="alert alert-custom alert-info border-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                載入維修記錄中...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 叫貨系統 -->
+                    <div id="ordering" class="section-content">
+                        <div class="content-header">
+                            <h2><i class="fas fa-shopping-cart me-2"></i>叫貨系統</h2>
+                            <p class="text-muted mb-0">管理庫存並提交進貨申請</p>
+                        </div>
+
+                        <div class="alert alert-custom alert-warning border-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            此功能需要跳轉到專門的叫貨頁面進行操作
+                        </div>
+
+                        <button class="btn btn-gradient btn-lg" onclick="window.open('/ordering.html', '_blank')">
+                            <i class="fas fa-external-link-alt me-2"></i>開啟叫貨系統
+                        </button>
+                    </div>
+
+                    <!-- 升遷投票 -->
+                    <div id="promotion" class="section-content">
+                        <div class="content-header">
+                            <h2><i class="fas fa-vote-yea me-2"></i>升遷投票系統</h2>
+                            <p class="text-muted mb-0">參與同事升遷投票</p>
+                        </div>
+
+                        <div class="alert alert-custom alert-info border-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            此功能需要跳轉到專門的投票頁面進行操作
+                        </div>
+
+                        <button class="btn btn-gradient btn-lg" onclick="window.open('/promotion.html', '_blank')">
+                            <i class="fas fa-external-link-alt me-2"></i>開啟升遷投票系統
+                        </button>
+                    </div>
+
+                    <!-- 個人資料 -->
+                    <div id="profile" class="section-content">
+                        <div class="content-header">
+                            <h2><i class="fas fa-user-cog me-2"></i>個人資料</h2>
+                            <p class="text-muted mb-0">查看和編輯您的個人資訊</p>
+                        </div>
+
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3 text-center">
+                                        <div class="mb-3">
+                                            <img src="https://via.placeholder.com/150" alt="員工照片" class="rounded-circle" width="120" height="120">
+                                        </div>
+                                        <button class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-camera me-1"></i>更換照片
+                                        </button>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div id="employeeProfile">
+                                            <div class="alert alert-custom alert-info border-info">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                載入個人資料中...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 全域變數
+        let currentUser = null;
+        let currentSection = 'dashboard';
+        let clockInTime = null;
+
+        // 頁面載入完成後初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 統一員工工作台載入完成');
+            initializeApp();
+        });
+
+        // 應用初始化
+        async function initializeApp() {
+            showLoading(true);
+            
+            try {
+                // 檢查登入狀態
+                await checkAuthStatus();
+                
+                // 綁定事件監聽器
+                bindEventListeners();
+                
+                // 載入初始資料
+                await loadDashboardData();
+                
+                // 開始定時更新
+                startPeriodicUpdate();
+                
+            } catch (error) {
+                console.error('應用初始化失敗:', error);
+                showAlert('系統初始化失敗，請重新登入', 'danger');
+                setTimeout(() => {
+                    window.location.href = '/login.html';
+                }, 2000);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 檢查認證狀態
+        async function checkAuthStatus() {
+            const token = localStorage.getItem('jwt_token');
+            if (!token) {
+                throw new Error('未找到認證token');
+            }
+
+            try {
+                const response = await fetch('/api/auth/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Token驗證失敗');
+                }
+
+                const data = await response.json();
+                if (data.success) {
+                    currentUser = data.user;
+                    updateUserInfo();
+                } else {
+                    throw new Error('用戶驗證失敗');
+                }
+            } catch (error) {
+                console.error('認證檢查失敗:', error);
+                localStorage.removeItem('jwt_token');
+                localStorage.removeItem('user_data');
+                throw error;
+            }
+        }
+
+        // 更新用戶資訊顯示
+        function updateUserInfo() {
+            if (currentUser) {
+                document.getElementById('employeeName').textContent = currentUser.name || '員工';
+                document.getElementById('systemTitle').textContent = `GClaude 企業管理系統 - ${currentUser.role === 'admin' ? '管理員' : '員工'}`;
+            }
+        }
+
+        // 綁定事件監聽器
+        function bindEventListeners() {
+            // 桌面版導航
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.getAttribute('data-section');
+                    showSection(section);
+                });
+            });
+
+            // 手機版導航
+            const mobileSelect = document.getElementById('mobileNavSelect');
+            if (mobileSelect) {
+                mobileSelect.addEventListener('change', function() {
+                    showSection(this.value);
+                });
+            }
+
+            // 表單提交事件
+            bindFormEvents();
+        }
+
+        // 綁定表單事件
+        function bindFormEvents() {
+            // 營收表單
+            const revenueForm = document.getElementById('revenueForm');
+            if (revenueForm) {
+                revenueForm.addEventListener('submit', handleRevenueSubmit);
+            }
+
+            // 維修申請表單
+            const maintenanceForm = document.getElementById('maintenanceForm');
+            if (maintenanceForm) {
+                maintenanceForm.addEventListener('submit', handleMaintenanceSubmit);
+            }
+        }
+
+        // 顯示指定區段
+        function showSection(sectionName) {
+            // 隱藏所有區段
+            document.querySelectorAll('.section-content').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // 顯示目標區段
+            const targetSection = document.getElementById(sectionName);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                currentSection = sectionName;
+
+                // 更新導航狀態
+                updateNavigation(sectionName);
+
+                // 載入區段特定資料
+                loadSectionData(sectionName);
+            }
+        }
+
+        // 更新導航狀態
+        function updateNavigation(sectionName) {
+            // 桌面版導航
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-section') === sectionName) {
+                    link.classList.add('active');
+                }
+            });
+
+            // 手機版導航
+            const mobileSelect = document.getElementById('mobileNavSelect');
+            if (mobileSelect) {
+                mobileSelect.value = sectionName;
+            }
+        }
+
+        // 載入區段資料
+        async function loadSectionData(sectionName) {
+            switch (sectionName) {
+                case 'dashboard':
+                    await loadDashboardData();
+                    break;
+                case 'attendance':
+                    await loadAttendanceData();
+                    break;
+                case 'schedule':
+                    await loadScheduleData();
+                    break;
+                case 'revenue':
+                    await loadRevenueData();
+                    break;
+                case 'maintenance':
+                    await loadMaintenanceData();
+                    break;
+                case 'profile':
+                    await loadProfileData();
+                    break;
+            }
+        }
+
+        // 載入工作台資料
+        async function loadDashboardData() {
+            try {
+                // 載入統計資料
+                await Promise.all([
+                    loadTodayAttendance(),
+                    loadMonthlyRevenue(),
+                    loadPendingTasks(),
+                    loadRecentActivities()
+                ]);
+            } catch (error) {
+                console.error('載入工作台資料失敗:', error);
+            }
+        }
+
+        // 載入今日出勤
+        async function loadTodayAttendance() {
+            try {
+                const response = await fetch('/api/attendance/today', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('todayAttendance').textContent = 
+                        data.data ? data.data.status : '未打卡';
+                }
+            } catch (error) {
+                console.error('載入今日出勤失敗:', error);
+            }
+        }
+
+        // 載入本月營收
+        async function loadMonthlyRevenue() {
+            try {
+                const response = await fetch('/api/revenue/monthly', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('monthlyRevenue').textContent = 
+                        `$${data.data ? data.data.total.toLocaleString() : '0'}`;
+                }
+            } catch (error) {
+                console.error('載入本月營收失敗:', error);
+            }
+        }
+
+        // 載入待處理任務
+        async function loadPendingTasks() {
+            document.getElementById('pendingTasks').textContent = '0';
+        }
+
+        // 載入最近動態
+        async function loadRecentActivities() {
+            const activitiesContainer = document.getElementById('recentActivities');
+            activitiesContainer.innerHTML = `
+                <div class="alert alert-custom alert-success border-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    歡迎使用統一員工工作台！
+                </div>
+            `;
+        }
+
+        // 載入出勤資料
+        async function loadAttendanceData() {
+            updateCurrentTime();
+            await loadTodayAttendanceRecords();
+        }
+
+        // 更新當前時間
+        function updateCurrentTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = 
+                now.toLocaleTimeString('zh-TW');
+        }
+
+        // 載入今日打卡記錄
+        async function loadTodayAttendanceRecords() {
+            try {
+                const response = await fetch('/api/attendance/today', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const recordsContainer = document.getElementById('attendanceRecords');
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.data) {
+                        recordsContainer.innerHTML = `
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h6>上班時間：${data.data.clock_in_time || '未打卡'}</h6>
+                                    <h6>下班時間：${data.data.clock_out_time || '尚未下班'}</h6>
+                                    <h6>工作地點：${data.data.location || '未知'}</h6>
+                                </div>
+                            </div>
+                        `;
+
+                        // 更新打卡按鈕狀態
+                        if (data.data.clock_in_time && !data.data.clock_out_time) {
+                            document.getElementById('clockInBtn').disabled = true;
+                            document.getElementById('clockOutBtn').disabled = false;
+                            clockInTime = new Date(data.data.clock_in_time);
+                        }
+                    } else {
+                        recordsContainer.innerHTML = `
+                            <div class="alert alert-custom alert-info border-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                今日尚未打卡
+                            </div>
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error('載入打卡記錄失敗:', error);
+            }
+        }
+
+        // 處理上班打卡
+        async function handleClockIn() {
+            if (!navigator.geolocation) {
+                showAlert('您的瀏覽器不支援GPS定位', 'warning');
+                return;
+            }
+
+            showLoading(true);
+
+            try {
+                const position = await getCurrentPosition();
+                
+                const response = await fetch('/api/attendance/clock-in', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        location: '工作地點',
+                        device_fingerprint: generateDeviceFingerprint(),
+                        accuracy: position.coords.accuracy,
+                        gps_coords: {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                        }
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('上班打卡成功！', 'success');
+                    await loadAttendanceData();
+                } else {
+                    showAlert(data.message || '打卡失敗', 'danger');
+                }
+            } catch (error) {
+                console.error('上班打卡失敗:', error);
+                showAlert('打卡失敗，請稍後再試', 'danger');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 處理下班打卡
+        async function handleClockOut() {
+            if (!navigator.geolocation) {
+                showAlert('您的瀏覽器不支援GPS定位', 'warning');
+                return;
+            }
+
+            showLoading(true);
+
+            try {
+                const position = await getCurrentPosition();
+                
+                const response = await fetch('/api/attendance/clock-out', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        location: '工作地點',
+                        device_fingerprint: generateDeviceFingerprint(),
+                        accuracy: position.coords.accuracy,
+                        gps_coords: {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                        }
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('下班打卡成功！', 'success');
+                    await loadAttendanceData();
+                } else {
+                    showAlert(data.message || '打卡失敗', 'danger');
+                }
+            } catch (error) {
+                console.error('下班打卡失敗:', error);
+                showAlert('打卡失敗，請稍後再試', 'danger');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 獲取GPS位置
+        function getCurrentPosition() {
+            return new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 60000
+                });
+            });
+        }
+
+        // 生成設備指紋
+        function generateDeviceFingerprint() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.textBaseline = 'top';
+            ctx.font = '14px Arial';
+            ctx.fillText('Device fingerprint', 2, 2);
+            
+            return btoa(
+                navigator.userAgent + 
+                screen.width + screen.height + 
+                canvas.toDataURL()
+            ).substring(0, 32);
+        }
+
+        // 處理營收提交
+        async function handleRevenueSubmit(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const revenueData = {
+                category: document.getElementById('revenueCategory').value,
+                amount: parseFloat(document.getElementById('revenueAmount').value),
+                notes: document.getElementById('revenueNotes').value
+            };
+
+            try {
+                const response = await fetch('/api/revenue', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(revenueData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('營收記錄新增成功！', 'success');
+                    e.target.reset();
+                    await loadRevenueData();
+                } else {
+                    showAlert(data.message || '新增失敗', 'danger');
+                }
+            } catch (error) {
+                console.error('營收提交失敗:', error);
+                showAlert('提交失敗，請稍後再試', 'danger');
+            }
+        }
+
+        // 處理維修申請提交
+        async function handleMaintenanceSubmit(e) {
+            e.preventDefault();
+            
+            const maintenanceData = {
+                equipment_type: document.getElementById('equipmentType').value,
+                priority: document.getElementById('maintenancePriority').value,
+                title: document.getElementById('maintenanceTitle').value,
+                description: document.getElementById('maintenanceDescription').value,
+                location: document.getElementById('maintenanceLocation').value,
+                contact_phone: document.getElementById('maintenancePhone').value
+            };
+
+            try {
+                const response = await fetch('/api/maintenance', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(maintenanceData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('維修申請提交成功！', 'success');
+                    e.target.reset();
+                    await loadMaintenanceData();
+                } else {
+                    showAlert(data.message || '提交失敗', 'danger');
+                }
+            } catch (error) {
+                console.error('維修申請失敗:', error);
+                showAlert('提交失敗，請稍後再試', 'danger');
+            }
+        }
+
+        // 載入其他區段資料（簡化版本）
+        async function loadScheduleData() {
+            document.getElementById('weeklySchedule').innerHTML = `
+                <div class="alert alert-custom alert-info border-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    排班功能開發中，敬請期待
+                </div>
+            `;
+        }
+
+        async function loadRevenueData() {
+            document.getElementById('todayRevenueStats').innerHTML = `
+                <div class="alert alert-custom alert-success border-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    營收統計功能已準備就緒
+                </div>
+            `;
+        }
+
+        async function loadMaintenanceData() {
+            document.getElementById('maintenanceHistory').innerHTML = `
+                <div class="alert alert-custom alert-info border-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    載入維修申請記錄中...
+                </div>
+            `;
+        }
+
+        async function loadProfileData() {
+            if (currentUser) {
+                document.getElementById('employeeProfile').innerHTML = `
+                    <h5>${currentUser.name}</h5>
+                    <p class="text-muted">${currentUser.role === 'admin' ? '管理員' : '員工'}</p>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-4"><strong>用戶名：</strong></div>
+                        <div class="col-sm-8">${currentUser.username}</div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-4"><strong>角色：</strong></div>
+                        <div class="col-sm-8">${currentUser.role}</div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-4"><strong>最後登入：</strong></div>
+                        <div class="col-sm-8">${new Date().toLocaleString('zh-TW')}</div>
+                    </div>
+                `;
+            }
+        }
+
+        // 工具函數
+        function showLoading(show) {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.style.display = show ? 'flex' : 'none';
+        }
+
+        function showAlert(message, type) {
+            // 簡化的提醒顯示
+            const alertClass = type === 'success' ? 'alert-success' : 
+                             type === 'warning' ? 'alert-warning' : 'alert-danger';
+            
+            const alertHtml = `
+                <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+                     style="top: 20px; right: 20px; z-index: 9999;">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', alertHtml);
+            
+            // 3秒後自動關閉
+            setTimeout(() => {
+                const alerts = document.querySelectorAll('.alert-dismissible');
+                alerts.forEach(alert => {
+                    const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+                    bsAlert.close();
+                });
+            }, 3000);
+        }
+
+        // 定期更新
+        function startPeriodicUpdate() {
+            setInterval(() => {
+                if (currentSection === 'attendance') {
+                    updateCurrentTime();
+                    updateWorkingHours();
+                }
+            }, 1000);
+        }
+
+        // 更新工作時數
+        function updateWorkingHours() {
+            if (clockInTime) {
+                const now = new Date();
+                const diff = now - clockInTime;
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                document.getElementById('workingHours').textContent = `${hours}小時${minutes}分鐘`;
+            }
+        }
+
+        // 登出功能
+        function logout() {
+            localStorage.removeItem('jwt_token');
+            localStorage.removeItem('user_data');
+            window.location.href = '/login.html';
+        }
+
+        // 排班系統功能
+        function enterScheduleSystem() {
+            showAlert('進入排班系統功能開發中', 'info');
+        }
+
+        function exitScheduleSystem() {
+            showAlert('退出排班系統功能開發中', 'info');
+        }
+    </script>
+</body>
+</html>

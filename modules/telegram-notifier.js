@@ -182,21 +182,21 @@ ${orderData.items.map(item =>
 
         // 老闆詳細通知
         const bossMessage = `
-👋 <b>新員工資料登入</b>
+🟟 <b>新員工資料登入</b>
 
-📅 <b>日期:</b> ${date}
-👤 <b>姓名:</b> ${employeeData.name}
-🆔 <b>身份證:</b> ${employeeData.id_card}
-🎂 <b>生日:</b> ${employeeData.birth_date}
-⚥ <b>性別:</b> ${employeeData.gender}
-🚗 <b>駕照:</b> ${employeeData.has_license ? '有' : '無'}
-📞 <b>電話:</b> ${employeeData.phone}
-🏠 <b>地址:</b> ${employeeData.address}
-🆘 <b>緊急聯絡人:</b> ${employeeData.emergency_contact} (${employeeData.emergency_relationship})
-📱 <b>緊急電話:</b> ${employeeData.emergency_phone}
-📅 <b>到職日:</b> ${employeeData.join_date}
-🏪 <b>分店:</b> ${employeeData.store_name}
-💼 <b>職位:</b> ${employeeData.position}
+🟟 <b>日期:</b> ${date}
+🟟 <b>姓名:</b> ${employeeData.name || '未填寫'}
+🟟 <b>身份證:</b> ${employeeData.id_card || '未填寫'}
+🟟 <b>生日:</b> ${employeeData.birth_date || '未填寫'}
+⚥ <b>性別:</b> ${this.getGenderText(employeeData.gender)}
+🟟 <b>駕照:</b> ${employeeData.license_number ? '有' : '無'}
+🟟 <b>電話:</b> ${employeeData.phone || '未填寫'}
+🟟 <b>地址:</b> ${employeeData.address || '未填寫'}
+🟟 <b>緊急聯絡人:</b> ${employeeData.emergency_contact_name || '未填寫'} (${this.getRelationText(employeeData.emergency_contact_relation)})
+🟟 <b>緊急電話:</b> ${employeeData.emergency_contact_phone || '未填寫'}
+🟟 <b>到職日:</b> ${employeeData.join_date || '待安排'}
+🟟 <b>分店:</b> ${employeeData.store_name || '待分配'}
+🟟 <b>職位:</b> ${employeeData.position || '待分配'}
         `.trim();
 
         return await this.sendToBoth(bossMessage, employeeMessage);
@@ -382,6 +382,28 @@ ${orderData.items.map(item =>
         `.trim();
 
         return await this.sendToBoth(bossMessage, employeeMessage);
+    }
+
+    // 輔助函數：性別文字轉換
+    getGenderText(gender) {
+        switch (gender) {
+            case 'male': return '男性';
+            case 'female': return '女性';
+            case 'other': return '其他';
+            default: return '未填寫';
+        }
+    }
+
+    // 輔助函數：關係文字轉換
+    getRelationText(relation) {
+        switch (relation) {
+            case 'parent': return '父母';
+            case 'spouse': return '配偶';
+            case 'sibling': return '兄弟姊妹';
+            case 'friend': return '朋友';
+            case 'other': return '其他';
+            default: return '未填寫';
+        }
     }
 
     // ==================== 升遷投票通知 ====================

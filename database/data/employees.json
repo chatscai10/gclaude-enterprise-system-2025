@@ -36,5 +36,52 @@
     "status": "在職",
     "is_active": true,
     "created_at": "2025-08-15T17:34:45.123Z"
+  },
+  {
+    "id": 1755320102093,
+    "name": "新員工",
+    "id_card": "B987654321",
+    "birth_date": "1992-03-15",
+    "gender": "female",
+    "phone": "0923456789",
+    "address": "高雄市前金區",
+    "emergency_contact_name": "緊急聯絡人",
+    "emergency_contact_phone": "0934567890",
+    "emergency_contact_relation": "spouse",
+    "status": "pending",
+    "created_at": "2025-08-16T04:55:02.093Z",
+    "updated_at": "2025-08-16T04:55:02.093Z"
+  },
+  {
+    "id": 1755320700031,
+    "name": "修復測試員工",
+    "id_card": "C111222333",
+    "birth_date": "1995-12-25",
+    "gender": "male",
+    "license_number": "123456789",
+    "phone": "0955666777",
+    "address": "台中市西屯區",
+    "emergency_contact_name": "測試家屬",
+    "emergency_contact_phone": "0966777888",
+    "emergency_contact_relation": "parent",
+    "status": "pending",
+    "created_at": "2025-08-16T05:05:00.031Z",
+    "updated_at": "2025-08-16T05:05:00.031Z"
+  },
+  {
+    "id": 1755320770175,
+    "name": "測試通知修復",
+    "id_card": "D999888777",
+    "birth_date": "1988-06-20",
+    "gender": "female",
+    "license_number": "DRV987654",
+    "phone": "0977888999",
+    "address": "新北市板橋區",
+    "emergency_contact_name": "測試父親",
+    "emergency_contact_phone": "0988999000",
+    "emergency_contact_relation": "parent",
+    "status": "pending",
+    "created_at": "2025-08-16T05:06:10.175Z",
+    "updated_at": "2025-08-16T05:06:10.175Z"
   }
 ]

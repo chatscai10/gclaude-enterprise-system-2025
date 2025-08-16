@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GClaude 企業管理系統 - 管理員工作台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #dc3545;
+            --secondary-color: #c82333;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            padding: 20px;
+            margin-bottom: 20px;
+            position: sticky;
+            top: 20px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+        
+        .main-content {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin-bottom: 20px;
+            min-height: calc(100vh - 120px);
+        }
+        
+        .nav-item {
+            margin-bottom: 8px;
+        }
+        
+        .nav-link {
+            border-radius: 10px;
+            color: #495057;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+            border: none;
+            text-align: left;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-link:hover {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+        
+        .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+        
+        .section-content {
+            display: none;
+        }
+        
+        .section-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .admin-action-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        
+        .admin-action-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(220, 53, 69, 0.15);
+        }
+        
+        .admin-action-card i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .btn-admin {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            padding: 10px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-admin:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
+            color: white;
+        }
+        
+        .content-header {
+            border-bottom: 3px solid #e9ecef;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .content-header h2 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .employee-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .table th {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-approved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .mobile-nav {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .mobile-nav {
+                display: block;
+                background: white;
+                border-radius: 15px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+                margin-bottom: 20px;
+                padding: 15px;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .admin-action-card {
+                padding: 20px;
+            }
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-crown me-2"></i>
+                <span id="systemTitle">GClaude 企業管理系統 - 管理員</span>
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">
+                    <i class="fas fa-shield-alt me-1"></i>
+                    管理員，<span id="adminName">載入中...</span>
+                </span>
+                <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                    <i class="fas fa-sign-out-alt me-1"></i>登出
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- 桌面版側邊欄 -->
+            <div class="col-lg-3 col-md-4">
+                <div class="sidebar">
+                    <h5 class="mb-3">
+                        <i class="fas fa-cogs me-2"></i>
+                        管理員控制台
+                    </h5>
+                    <nav class="nav flex-column">
+                        <button class="nav-link active" data-section="dashboard">
+                            <i class="fas fa-tachometer-alt"></i>管理總覽
+                        </button>
+                        <button class="nav-link" data-section="employees">
+                            <i class="fas fa-users"></i>員工管理
+                        </button>
+                        <button class="nav-link" data-section="stores">
+                            <i class="fas fa-store"></i>分店管理
+                        </button>
+                        <button class="nav-link" data-section="attendance">
+                            <i class="fas fa-clock"></i>出勤管理
+                        </button>
+                        <button class="nav-link" data-section="revenue">
+                            <i class="fas fa-chart-line"></i>營收分析
+                        </button>
+                        <button class="nav-link" data-section="maintenance">
+                            <i class="fas fa-tools"></i>維修管理
+                        </button>
+                        <button class="nav-link" data-section="orders">
+                            <i class="fas fa-shopping-cart"></i>訂單管理
+                        </button>
+                        <button class="nav-link" data-section="promotions">
+                            <i class="fas fa-vote-yea"></i>升遷管理
+                        </button>
+                        <button class="nav-link" data-section="settings">
+                            <i class="fas fa-cog"></i>系統設定
+                        </button>
+                        <button class="nav-link" data-section="reports">
+                            <i class="fas fa-chart-bar"></i>報表分析
+                        </button>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- 手機版導航 -->
+            <div class="col-12">
+                <div class="mobile-nav">
+                    <select class="form-select" id="mobileNavSelect">
+                        <option value="dashboard">📊 管理總覽</option>
+                        <option value="employees">👥 員工管理</option>
+                        <option value="stores">🏪 分店管理</option>
+                        <option value="attendance">🕒 出勤管理</option>
+                        <option value="revenue">📈 營收分析</option>
+                        <option value="maintenance">🔧 維修管理</option>
+                        <option value="orders">🛒 訂單管理</option>
+                        <option value="promotions">🗳️ 升遷管理</option>
+                        <option value="settings">⚙️ 系統設定</option>
+                        <option value="reports">📊 報表分析</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 主要內容區域 -->
+            <div class="col-lg-9 col-md-8">
+                <div class="main-content">
+                    
+                    <!-- 管理總覽 -->
+                    <div id="dashboard" class="section-content active">
+                        <div class="content-header">
+                            <h2><i class="fas fa-tachometer-alt me-2"></i>管理總覽</h2>
+                            <p class="text-muted mb-0">企業營運狀況一覽</p>
+                        </div>
+
+                        <!-- 統計卡片 -->
+                        <div class="row mb-4">
+                            <div class="col-lg-3 col-md-6">
+                                <div class="stat-card">
+                                    <h3 id="totalEmployees">--</h3>
+                                    <p class="mb-0">總員工數</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="stat-card">
+                                    <h3 id="totalStores">--</h3>
+                                    <p class="mb-0">分店數量</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="stat-card">
+                                    <h3 id="todayRevenue">--</h3>
+                                    <p class="mb-0">今日營收</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="stat-card">
+                                    <h3 id="pendingIssues">--</h3>
+                                    <p class="mb-0">待處理事項</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 管理功能 -->
+                        <h4 class="mb-3">快速管理</h4>
+                        <div class="row">
+                            <div class="col-lg-2 col-md-4 col-sm-6">
+                                <div class="admin-action-card" onclick="showSection('employees')">
+                                    <i class="fas fa-users"></i>
+                                    <h6>員工管理</h6>
+                                    <small class="text-muted">新增、編輯員工</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6">
+                                <div class="admin-action-card" onclick="showSection('stores')">
+                                    <i class="fas fa-store"></i>
+                                    <h6>分店管理</h6>
+                                    <small class="text-muted">分店設定</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6">
+                                <div class="admin-action-card" onclick="showSection('revenue')">
+                                    <i class="fas fa-chart-line"></i>
+                                    <h6>營收分析</h6>
+                                    <small class="text-muted">查看報表</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6">
+                                <div class="admin-action-card" onclick="showSection('maintenance')">
+                                    <i class="fas fa-tools"></i>
+                                    <h6>維修管理</h6>
+                                    <small class="text-muted">處理申請</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6">
+                                <div class="admin-action-card" onclick="openAdminSettings()">
+                                    <i class="fas fa-cog"></i>
+                                    <h6>系統設定</h6>
+                                    <small class="text-muted">參數配置</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6">
+                                <div class="admin-action-card" onclick="showSection('reports')">
+                                    <i class="fas fa-chart-bar"></i>
+                                    <h6>報表分析</h6>
+                                    <small class="text-muted">統計數據</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 最新動態 -->
+                        <h4 class="mb-3">系統動態</h4>
+                        <div id="recentActivities">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                正在載入最新動態...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 員工管理 -->
+                    <div id="employees" class="section-content">
+                        <div class="content-header">
+                            <h2><i class="fas fa-users me-2"></i>員工管理</h2>
+                            <p class="text-muted mb-0">管理所有員工資料和狀態</p>
+                        </div>
+
+                        <!-- 員工統計 -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body text-center">
+                                        <h4 id="activeEmployees">--</h4>
+                                        <p class="mb-0">在職員工</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-warning text-white">
+                                    <div class="card-body text-center">
+                                        <h4 id="pendingEmployees">--</h4>
+                                        <p class="mb-0">待審核</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body text-center">
+                                        <h4 id="onlineEmployees">--</h4>
+                                        <p class="mb-0">在線員工</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-danger text-white">
+                                    <div class="card-body text-center">
+                                        <h4 id="offlineEmployees">--</h4>
+                                        <p class="mb-0">離線員工</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 員工列表 -->
+                        <div class="employee-table">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>員工編號</th>
+                                            <th>姓名</th>
+                                            <th>身分證號</th>
+                                            <th>聯絡電話</th>
+                                            <th>狀態</th>
+                                            <th>註冊時間</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="employeeTableBody">
+                                        <tr>
+                                            <td colspan="7" class="text-center py-4">
+                                                <i class="fas fa-spinner fa-spin me-2"></i>載入員工資料中...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 分店管理 -->
+                    <div id="stores" class="section-content">
+                        <div class="content-header">
+                            <h2><i class="fas fa-store me-2"></i>分店管理</h2>
+                            <p class="text-muted mb-0">管理各分店基本資訊和營運參數</p>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            此功能需要跳轉到專門的設定頁面進行操作
+                        </div>
+
+                        <button class="btn btn-admin btn-lg" onclick="openAdminSettings('stores')">
+                            <i class="fas fa-external-link-alt me-2"></i>開啟分店設定
+                        </button>
+                    </div>
+
+                    <!-- 出勤管理 -->
+                    <div id="attendance" class="section-content">
+                        <div class="content-header">
+                            <h2><i class="fas fa-clock me-2"></i>出勤管理</h2>
+                            <p class="text-muted mb-0">監控員工出勤狀況和異常</p>
+                        </div>
+
+                        <div id="attendanceManagement">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                載入出勤管理資料中...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 營收分析 -->
+                    <div id="revenue" class="section-content">
+                        <div class="content-header">
+                            <h2><i class="fas fa-chart-line me-2"></i>營收分析</h2>
+                            <p class="text-muted mb-0">查看各分店營收表現和趨勢</p>
+                        </div>
+
+                        <div id="revenueAnalysis">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                載入營收分析資料中...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 維修管理 -->
+                    <div id="maintenance" class="section-content">
+                        <div class="content-header">
+                            <h2><i class="fas fa-tools me-2"></i>維修管理</h2>
+                            <p class="text-muted mb-0">處理設備維修申請和狀態追蹤</p>
+                        </div>
+
+                        <div id="maintenanceManagement">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                載入維修管理資料中...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 訂單管理 -->
+                    <div id="orders" class="section-content">
+                        <div class="content-header">
+                            <h2><i class="fas fa-shopping-cart me-2"></i>訂單管理</h2>
+                            <p class="text-muted mb-0">管理進貨訂單和庫存狀況</p>
+                        </div>
+
+                        <div id="orderManagement">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                載入訂單管理資料中...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 升遷管理 -->
+                    <div id="promotions" class="section-content">
+                        <div class="content-header">
+                            <h2><i class="fas fa-vote-yea me-2"></i>升遷管理</h2>
+                            <p class="text-muted mb-0">管理員工升遷投票和審核</p>
+                        </div>
+
+                        <div id="promotionManagement">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                載入升遷管理資料中...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 系統設定 -->
+                    <div id="settings" class="section-content">
+                        <div class="content-header">
+                            <h2><i class="fas fa-cog me-2"></i>系統設定</h2>
+                            <p class="text-muted mb-0">配置系統參數和業務規則</p>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            此功能需要跳轉到專門的設定頁面進行操作
+                        </div>
+
+                        <button class="btn btn-admin btn-lg" onclick="openAdminSettings()">
+                            <i class="fas fa-external-link-alt me-2"></i>開啟系統設定
+                        </button>
+                    </div>
+
+                    <!-- 報表分析 -->
+                    <div id="reports" class="section-content">
+                        <div class="content-header">
+                            <h2><i class="fas fa-chart-bar me-2"></i>報表分析</h2>
+                            <p class="text-muted mb-0">綜合營運數據統計分析</p>
+                        </div>
+
+                        <div id="reportsAnalysis">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                載入報表分析資料中...
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 全域變數
+        let currentUser = null;
+        let currentSection = 'dashboard';
+
+        // 頁面載入完成後初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 統一管理員工作台載入完成');
+            initializeApp();
+        });
+
+        // 應用初始化
+        async function initializeApp() {
+            showLoading(true);
+            
+            try {
+                // 檢查登入狀態
+                await checkAuthStatus();
+                
+                // 檢查管理員權限
+                if (!currentUser || currentUser.role !== 'admin') {
+                    throw new Error('需要管理員權限');
+                }
+                
+                // 綁定事件監聽器
+                bindEventListeners();
+                
+                // 載入初始資料
+                await loadDashboardData();
+                
+            } catch (error) {
+                console.error('應用初始化失敗:', error);
+                showAlert('需要管理員權限或登入已過期', 'danger');
+                setTimeout(() => {
+                    window.location.href = '/login.html';
+                }, 2000);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 檢查認證狀態
+        async function checkAuthStatus() {
+            const token = localStorage.getItem('jwt_token');
+            if (!token) {
+                throw new Error('未找到認證token');
+            }
+
+            try {
+                const response = await fetch('/api/auth/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Token驗證失敗');
+                }
+
+                const data = await response.json();
+                if (data.success) {
+                    currentUser = data.user;
+                    updateUserInfo();
+                } else {
+                    throw new Error('用戶驗證失敗');
+                }
+            } catch (error) {
+                console.error('認證檢查失敗:', error);
+                localStorage.removeItem('jwt_token');
+                localStorage.removeItem('user_data');
+                throw error;
+            }
+        }
+
+        // 更新用戶資訊顯示
+        function updateUserInfo() {
+            if (currentUser) {
+                document.getElementById('adminName').textContent = currentUser.name || '管理員';
+            }
+        }
+
+        // 綁定事件監聽器
+        function bindEventListeners() {
+            // 桌面版導航
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.getAttribute('data-section');
+                    showSection(section);
+                });
+            });
+
+            // 手機版導航
+            const mobileSelect = document.getElementById('mobileNavSelect');
+            if (mobileSelect) {
+                mobileSelect.addEventListener('change', function() {
+                    showSection(this.value);
+                });
+            }
+        }
+
+        // 顯示指定區段
+        function showSection(sectionName) {
+            // 隱藏所有區段
+            document.querySelectorAll('.section-content').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // 顯示目標區段
+            const targetSection = document.getElementById(sectionName);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                currentSection = sectionName;
+
+                // 更新導航狀態
+                updateNavigation(sectionName);
+
+                // 載入區段特定資料
+                loadSectionData(sectionName);
+            }
+        }
+
+        // 更新導航狀態
+        function updateNavigation(sectionName) {
+            // 桌面版導航
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-section') === sectionName) {
+                    link.classList.add('active');
+                }
+            });
+
+            // 手機版導航
+            const mobileSelect = document.getElementById('mobileNavSelect');
+            if (mobileSelect) {
+                mobileSelect.value = sectionName;
+            }
+        }
+
+        // 載入區段資料
+        async function loadSectionData(sectionName) {
+            switch (sectionName) {
+                case 'dashboard':
+                    await loadDashboardData();
+                    break;
+                case 'employees':
+                    await loadEmployeeData();
+                    break;
+                case 'stores':
+                    await loadStoreData();
+                    break;
+                case 'attendance':
+                    await loadAttendanceManagement();
+                    break;
+                case 'revenue':
+                    await loadRevenueAnalysis();
+                    break;
+                case 'maintenance':
+                    await loadMaintenanceManagement();
+                    break;
+                case 'orders':
+                    await loadOrderManagement();
+                    break;
+                case 'promotions':
+                    await loadPromotionManagement();
+                    break;
+                case 'reports':
+                    await loadReportsAnalysis();
+                    break;
+            }
+        }
+
+        // 載入工作台資料
+        async function loadDashboardData() {
+            try {
+                await Promise.all([
+                    loadTotalEmployees(),
+                    loadTotalStores(),
+                    loadTodayRevenue(),
+                    loadPendingIssues(),
+                    loadRecentActivities()
+                ]);
+            } catch (error) {
+                console.error('載入工作台資料失敗:', error);
+            }
+        }
+
+        // 載入員工總數
+        async function loadTotalEmployees() {
+            try {
+                const response = await fetch('/api/admin/employees', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('totalEmployees').textContent = 
+                        data.data ? data.data.length : '0';
+                }
+            } catch (error) {
+                console.error('載入員工總數失敗:', error);
+            }
+        }
+
+        // 載入員工資料
+        async function loadEmployeeData() {
+            try {
+                const response = await fetch('/api/admin/employees', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const tbody = document.getElementById('employeeTableBody');
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.data && data.data.length > 0) {
+                        tbody.innerHTML = data.data.map(employee => `
+                            <tr>
+                                <td>${employee.id}</td>
+                                <td>${employee.name || '未填寫'}</td>
+                                <td>${employee.id_card || '未填寫'}</td>
+                                <td>${employee.phone || '未填寫'}</td>
+                                <td>
+                                    <span class="status-badge status-${employee.status || 'pending'}">
+                                        ${getStatusText(employee.status)}
+                                    </span>
+                                </td>
+                                <td>${formatDate(employee.created_at)}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="approveEmployee(${employee.id})">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="rejectEmployee(${employee.id})">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('');
+
+                        // 更新統計
+                        updateEmployeeStats(data.data);
+                    } else {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="7" class="text-center py-4">暫無員工資料</td>
+                            </tr>
+                        `;
+                    }
+                } else {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-danger">載入失敗</td>
+                        </tr>
+                    `;
+                }
+            } catch (error) {
+                console.error('載入員工資料失敗:', error);
+            }
+        }
+
+        // 更新員工統計
+        function updateEmployeeStats(employees) {
+            const active = employees.filter(emp => emp.status === 'approved').length;
+            const pending = employees.filter(emp => emp.status === 'pending').length;
+            
+            document.getElementById('activeEmployees').textContent = active;
+            document.getElementById('pendingEmployees').textContent = pending;
+            document.getElementById('onlineEmployees').textContent = Math.floor(active * 0.7); // 模擬在線比例
+            document.getElementById('offlineEmployees').textContent = Math.ceil(active * 0.3);
+        }
+
+        // 獲取狀態文字
+        function getStatusText(status) {
+            switch (status) {
+                case 'approved': return '已核准';
+                case 'rejected': return '已拒絕';
+                default: return '待審核';
+            }
+        }
+
+        // 格式化日期
+        function formatDate(dateString) {
+            if (!dateString) return '未知';
+            return new Date(dateString).toLocaleDateString('zh-TW');
+        }
+
+        // 審核員工
+        async function approveEmployee(employeeId) {
+            if (!confirm('確定要核准此員工嗎？')) return;
+
+            try {
+                showAlert('員工審核功能開發中', 'info');
+            } catch (error) {
+                console.error('審核員工失敗:', error);
+                showAlert('審核失敗', 'danger');
+            }
+        }
+
+        // 拒絕員工
+        async function rejectEmployee(employeeId) {
+            if (!confirm('確定要拒絕此員工嗎？')) return;
+
+            try {
+                showAlert('員工拒絕功能開發中', 'info');
+            } catch (error) {
+                console.error('拒絕員工失敗:', error);
+                showAlert('操作失敗', 'danger');
+            }
+        }
+
+        // 載入其他區段資料（簡化版本）
+        async function loadTotalStores() {
+            document.getElementById('totalStores').textContent = '1';
+        }
+
+        async function loadTodayRevenue() {
+            document.getElementById('todayRevenue').textContent = '$--';
+        }
+
+        async function loadPendingIssues() {
+            document.getElementById('pendingIssues').textContent = '0';
+        }
+
+        async function loadRecentActivities() {
+            document.getElementById('recentActivities').innerHTML = `
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    管理員工作台運行正常
+                </div>
+            `;
+        }
+
+        async function loadStoreData() {
+            // 分店管理在設定頁面
+        }
+
+        async function loadAttendanceManagement() {
+            document.getElementById('attendanceManagement').innerHTML = `
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    出勤管理功能開發中
+                </div>
+            `;
+        }
+
+        async function loadRevenueAnalysis() {
+            document.getElementById('revenueAnalysis').innerHTML = `
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    營收分析功能開發中
+                </div>
+            `;
+        }
+
+        async function loadMaintenanceManagement() {
+            document.getElementById('maintenanceManagement').innerHTML = `
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    維修管理功能開發中
+                </div>
+            `;
+        }
+
+        async function loadOrderManagement() {
+            document.getElementById('orderManagement').innerHTML = `
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    訂單管理功能開發中
+                </div>
+            `;
+        }
+
+        async function loadPromotionManagement() {
+            document.getElementById('promotionManagement').innerHTML = `
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    升遷管理功能開發中
+                </div>
+            `;
+        }
+
+        async function loadReportsAnalysis() {
+            document.getElementById('reportsAnalysis').innerHTML = `
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    報表分析功能開發中
+                </div>
+            `;
+        }
+
+        // 開啟管理員設定頁面
+        function openAdminSettings(section = '') {
+            let url = '/admin-settings.html';
+            if (section) {
+                url += `#${section}`;
+            }
+            window.open(url, '_blank');
+        }
+
+        // 工具函數
+        function showLoading(show) {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.style.display = show ? 'flex' : 'none';
+        }
+
+        function showAlert(message, type) {
+            const alertClass = type === 'success' ? 'alert-success' : 
+                             type === 'warning' ? 'alert-warning' : 
+                             type === 'info' ? 'alert-info' : 'alert-danger';
+            
+            const alertHtml = `
+                <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+                     style="top: 20px; right: 20px; z-index: 9999;">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', alertHtml);
+            
+            setTimeout(() => {
+                const alerts = document.querySelectorAll('.alert-dismissible');
+                alerts.forEach(alert => {
+                    const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+                    bsAlert.close();
+                });
+            }, 3000);
+        }
+
+        // 登出功能
+        function logout() {
+            localStorage.removeItem('jwt_token');
+            localStorage.removeItem('user_data');
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

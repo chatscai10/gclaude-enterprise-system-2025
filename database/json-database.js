@@ -427,6 +427,16 @@ class JsonDatabase {
         return await this.readTable('employees');
     }
 
+    async getEmployeeByIdCard(idCard) {
+        const employees = await this.readTable('employees');
+        return employees.find(emp => emp.id_card === idCard);
+    }
+
+    async getEmployeeByName(name) {
+        const employees = await this.readTable('employees');
+        return employees.find(emp => emp.name === name);
+    }
+
     async createEmployee(employeeData) {
         const employees = await this.readTable('employees');
         const newEmployee = {

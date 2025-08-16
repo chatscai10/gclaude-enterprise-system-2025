@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>員工註冊 - GClaude 企業管理系統</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        
+        .registration-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .registration-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .registration-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .registration-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .registration-body {
+            padding: 40px 30px;
+        }
+        
+        .form-floating {
+            margin-bottom: 20px;
+        }
+        
+        .form-control, .form-select {
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-register {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        
+        .btn-login-link {
+            background: transparent;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            color: #667eea;
+            font-weight: 600;
+            padding: 10px 30px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-login-link:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .info-text {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .required-field {
+            color: #dc3545;
+        }
+        
+        .field-help {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        .photo-upload {
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .photo-upload:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .photo-preview {
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="registration-container">
+        <div class="registration-card">
+            <div class="registration-header">
+                <h1>👥 員工註冊</h1>
+                <p>加入 GClaude 企業管理系統</p>
+            </div>
+            
+            <div class="registration-body">
+                <div class="info-text">
+                    <strong>📋 註冊說明：</strong><br>
+                    • 請如實填寫所有資料，帶有 <span class="required-field">*</span> 為必填項目<br>
+                    • 註冊完成後，使用「姓名」作為帳號，「身分證號」作為密碼登入<br>
+                    • 註冊資料將自動通知管理員審核
+                </div>
+                
+                <form id="registrationForm">
+                    <!-- 基本資料 -->
+                    <h5 class="mb-3">📝 基本資料</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="name" name="name" placeholder="姓名" required>
+                                <label for="name">姓名 <span class="required-field">*</span></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="id_card" name="id_card" placeholder="身分證號" required maxlength="10">
+                                <label for="id_card">身分證號 <span class="required-field">*</span></label>
+                                <div class="field-help">格式：A123456789</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="birth_date" name="birth_date" required>
+                                <label for="birth_date">出生日期 <span class="required-field">*</span></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="gender" name="gender" required>
+                                    <option value="">請選擇</option>
+                                    <option value="male">男性</option>
+                                    <option value="female">女性</option>
+                                    <option value="other">其他</option>
+                                </select>
+                                <label for="gender">性別 <span class="required-field">*</span></label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 證照資料 -->
+                    <h5 class="mb-3 mt-4">🏆 證照資料</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="license_number" name="license_number" placeholder="證照編號">
+                                <label for="license_number">證照編號</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="license_type" name="license_type">
+                                    <option value="">請選擇證照類型</option>
+                                    <option value="food_handler">食品處理證照</option>
+                                    <option value="safety">勞工安全證照</option>
+                                    <option value="hygiene">衛生管理證照</option>
+                                    <option value="other">其他證照</option>
+                                </select>
+                                <label for="license_type">證照類型</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 聯絡資料 -->
+                    <h5 class="mb-3 mt-4">📞 聯絡資料</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="tel" class="form-control" id="phone" name="phone" placeholder="手機號碼" required pattern="[0-9]{10}">
+                                <label for="phone">手機號碼 <span class="required-field">*</span></label>
+                                <div class="field-help">格式：0912345678</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="email" class="form-control" id="email" name="email" placeholder="電子郵件">
+                                <label for="email">電子郵件</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-floating">
+                        <textarea class="form-control" id="address" name="address" placeholder="住址" style="height: 80px" required></textarea>
+                        <label for="address">住址 <span class="required-field">*</span></label>
+                    </div>
+                    
+                    <!-- 緊急聯絡人 -->
+                    <h5 class="mb-3 mt-4">🚨 緊急聯絡人</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="emergency_contact_name" name="emergency_contact_name" placeholder="緊急聯絡人姓名" required>
+                                <label for="emergency_contact_name">聯絡人姓名 <span class="required-field">*</span></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="tel" class="form-control" id="emergency_contact_phone" name="emergency_contact_phone" placeholder="緊急聯絡人電話" required pattern="[0-9]{10}">
+                                <label for="emergency_contact_phone">聯絡人電話 <span class="required-field">*</span></label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-floating">
+                        <select class="form-select" id="emergency_contact_relation" name="emergency_contact_relation" required>
+                            <option value="">請選擇關係</option>
+                            <option value="parent">父母</option>
+                            <option value="spouse">配偶</option>
+                            <option value="sibling">兄弟姊妹</option>
+                            <option value="friend">朋友</option>
+                            <option value="other">其他</option>
+                        </select>
+                        <label for="emergency_contact_relation">關係 <span class="required-field">*</span></label>
+                    </div>
+                    
+                    <!-- 照片上傳 -->
+                    <h5 class="mb-3 mt-4">📷 員工照片</h5>
+                    
+                    <div class="photo-upload" onclick="document.getElementById('photo').click()">
+                        <div id="photoUploadContent">
+                            <i class="fas fa-camera mb-2" style="font-size: 2rem; color: #6c757d;"></i>
+                            <p class="mb-0">點擊上傳員工照片</p>
+                            <small class="text-muted">支援 JPG、PNG 格式，檔案大小不超過 5MB</small>
+                        </div>
+                        <input type="file" id="photo" name="photo" accept="image/*" style="display: none;" onchange="handlePhotoUpload(this)">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-register" id="registerBtn">
+                        <span class="loading-spinner" id="loadingSpinner"></span>
+                        <span id="registerBtnText">提交註冊申請</span>
+                    </button>
+                    
+                    <button type="button" class="btn btn-login-link" onclick="window.location.href='/login.html'">
+                        已有帳號？前往登入
+                    </button>
+                    
+                    <div id="alertContainer"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+    <script>
+        let isRegistering = false;
+        let uploadedPhoto = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 員工註冊頁面載入完成');
+            bindEventListeners();
+        });
+
+        function bindEventListeners() {
+            document.getElementById('registrationForm').addEventListener('submit', handleRegistration);
+            
+            // 身分證格式驗證
+            document.getElementById('id_card').addEventListener('input', function(e) {
+                let value = e.target.value.toUpperCase();
+                // 只允許英文字母和數字
+                value = value.replace(/[^A-Z0-9]/g, '');
+                e.target.value = value;
+            });
+            
+            // 電話號碼格式驗證
+            ['phone', 'emergency_contact_phone'].forEach(id => {
+                document.getElementById(id).addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/[^0-9]/g, '');
+                    e.target.value = value;
+                });
+            });
+        }
+
+        async function handleRegistration(event) {
+            event.preventDefault();
+            
+            if (isRegistering) return;
+            
+            // 表單驗證
+            const formData = new FormData(event.target);
+            const registrationData = Object.fromEntries(formData.entries());
+            
+            // 必填欄位檢查
+            const requiredFields = ['name', 'id_card', 'birth_date', 'gender', 'phone', 'address', 'emergency_contact_name', 'emergency_contact_phone', 'emergency_contact_relation'];
+            
+            for (let field of requiredFields) {
+                if (!registrationData[field] || registrationData[field].trim() === '') {
+                    showAlert(`請填寫 ${getFieldLabel(field)}`, 'warning');
+                    return;
+                }
+            }
+            
+            // 身分證格式驗證
+            if (!validateIdCard(registrationData.id_card)) {
+                showAlert('身分證號格式不正確，請檢查', 'warning');
+                return;
+            }
+            
+            // 手機號碼格式驗證
+            if (!validatePhone(registrationData.phone)) {
+                showAlert('手機號碼格式不正確，請檢查', 'warning');
+                return;
+            }
+            
+            if (!validatePhone(registrationData.emergency_contact_phone)) {
+                showAlert('緊急聯絡人電話格式不正確，請檢查', 'warning');
+                return;
+            }
+            
+            setLoadingState(true);
+            
+            try {
+                // 添加照片資料
+                if (uploadedPhoto) {
+                    registrationData.photo = uploadedPhoto;
+                }
+                
+                const response = await fetch('/api/employee/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(registrationData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showAlert('註冊申請提交成功！請等待管理員審核並通知您登入資訊。', 'success');
+                    
+                    // 延遲跳轉到登入頁面
+                    setTimeout(() => {
+                        window.location.href = '/login.html';
+                    }, 3000);
+                    
+                } else {
+                    showAlert(data.message || '註冊失敗，請稍後再試', 'danger');
+                }
+                
+            } catch (error) {
+                showAlert('連線錯誤，請檢查網路後再試', 'danger');
+                console.error('註冊錯誤:', error);
+            } finally {
+                setLoadingState(false);
+            }
+        }
+
+        function handlePhotoUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            // 檔案大小檢查 (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showAlert('照片檔案太大，請選擇小於 5MB 的圖片', 'warning');
+                return;
+            }
+            
+            // 檔案類型檢查
+            if (!file.type.startsWith('image/')) {
+                showAlert('請選擇圖片檔案', 'warning');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                uploadedPhoto = e.target.result;
+                
+                // 顯示預覽
+                const uploadContent = document.getElementById('photoUploadContent');
+                uploadContent.innerHTML = `
+                    <img src="${e.target.result}" alt="員工照片預覽" class="photo-preview">
+                    <p class="mt-2 mb-0">照片已上傳</p>
+                    <small class="text-muted">點擊可重新選擇</small>
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function validateIdCard(idCard) {
+            // 台灣身分證號格式：1個字母 + 9個數字
+            const pattern = /^[A-Z][0-9]{9}$/;
+            return pattern.test(idCard);
+        }
+
+        function validatePhone(phone) {
+            // 台灣手機號碼格式：09開頭的10位數字
+            const pattern = /^09[0-9]{8}$/;
+            return pattern.test(phone);
+        }
+
+        function getFieldLabel(field) {
+            const labels = {
+                'name': '姓名',
+                'id_card': '身分證號',
+                'birth_date': '出生日期',
+                'gender': '性別',
+                'phone': '手機號碼',
+                'address': '住址',
+                'emergency_contact_name': '緊急聯絡人姓名',
+                'emergency_contact_phone': '緊急聯絡人電話',
+                'emergency_contact_relation': '緊急聯絡人關係'
+            };
+            return labels[field] || field;
+        }
+
+        function setLoadingState(loading) {
+            isRegistering = loading;
+            
+            const registerBtn = document.getElementById('registerBtn');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const registerBtnText = document.getElementById('registerBtnText');
+            
+            if (loading) {
+                registerBtn.disabled = true;
+                loadingSpinner.style.display = 'inline-block';
+                registerBtnText.textContent = '註冊中...';
+            } else {
+                registerBtn.disabled = false;
+                loadingSpinner.style.display = 'none';
+                registerBtnText.textContent = '提交註冊申請';
+            }
+        }
+
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+            
+            // 自動關閉成功訊息
+            if (type === 'success') {
+                setTimeout(() => {
+                    const alert = bootstrap.Alert.getOrCreateInstance(alertDiv);
+                    alert.close();
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>

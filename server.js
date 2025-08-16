@@ -159,6 +159,79 @@ app.get('/api/health', async (req, res) => {
 
 // ==================== 認證相關API ====================
 
+// 員工註冊
+app.post('/api/employee/register', async (req, res) => {
+    try {
+        const registrationData = req.body;
+        
+        // 驗證必填欄位
+        const requiredFields = ['name', 'id_card', 'birth_date', 'gender', 'phone', 'address', 
+                               'emergency_contact_name', 'emergency_contact_phone', 'emergency_contact_relation'];
+        
+        for (let field of requiredFields) {
+            if (!registrationData[field] || registrationData[field].toString().trim() === '') {
+                return res.status(400).json({
+                    success: false,
+                    message: `請填寫 ${field}`
+                });
+            }
+        }
+        
+        // 檢查身分證號是否已存在
+        const existingEmployee = await db.getEmployeeByIdCard(registrationData.id_card);
+        if (existingEmployee) {
+            return res.status(409).json({
+                success: false,
+                message: '此身分證號已註冊過，請確認資料或聯繫管理員'
+            });
+        }
+        
+        // 檢查姓名是否已存在
+        const existingName = await db.getEmployeeByName(registrationData.name);
+        if (existingName) {
+            return res.status(409).json({
+                success: false,
+                message: '此姓名已註冊過，請確認資料或聯繫管理員'
+            });
+        }
+        
+        // 新增員工資料
+        const employeeData = {
+            ...registrationData,
+            status: 'pending', // 待審核狀態
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+        
+        const result = await db.createEmployee(employeeData);
+        
+        // 發送 Telegram 通知給管理員
+        try {
+            await telegramNotifier.notifyEmployeeRegistration({
+                name: registrationData.name,
+                id_card: registrationData.id_card,
+                phone: registrationData.phone,
+                created_at: employeeData.created_at
+            });
+        } catch (notificationError) {
+            console.error('員工註冊通知發送失敗:', notificationError);
+        }
+        
+        res.status(201).json({
+            success: true,
+            data: { id: result.id },
+            message: '員工註冊申請已提交，請等待管理員審核'
+        });
+        
+    } catch (error) {
+        console.error('員工註冊錯誤:', error);
+        res.status(500).json({
+            success: false,
+            message: '註冊過程發生錯誤，請稍後再試'
+        });
+    }
+});
+
 // 用戶登入
 app.post('/api/auth/login', async (req, res) => {
     const { username, password } = req.body;
@@ -1574,9 +1647,9 @@ app.get('/', (req, res) => {
 });
 
 app.get('/admin', (req, res) => {
-    const adminPath = path.join(__dirname, 'public', 'admin-dashboard.html');
-    if (fs.existsSync(adminPath)) {
-        res.sendFile(adminPath);
+    const unifiedAdminPath = path.join(__dirname, 'public', 'unified-admin-dashboard.html');
+    if (fs.existsSync(unifiedAdminPath)) {
+        res.sendFile(unifiedAdminPath);
     } else {
         res.json({
             page: 'admin',
@@ -1587,18 +1660,22 @@ app.get('/admin', (req, res) => {
     }
 });
 
-app.get('/employee', (req, res) => {
-    const employeePath = path.join(__dirname, 'public', 'employee-dashboard.html');
-    if (fs.existsSync(employeePath)) {
-        res.sendFile(employeePath);
+// 統一工作台路由
+app.get('/dashboard', (req, res) => {
+    const unifiedDashboardPath = path.join(__dirname, 'public', 'unified-employee-dashboard.html');
+    if (fs.existsSync(unifiedDashboardPath)) {
+        res.sendFile(unifiedDashboardPath);
     } else {
         res.json({
-            page: 'employee',
-            message: '員工頁面',
-            status: 'ready',
-            loginInfo: 'username: employee, password: emp123'
+            page: 'dashboard',
+            message: '統一工作台頁面不存在'
         });
     }
+});
+
+app.get('/employee', (req, res) => {
+    // 重定向到統一工作台
+    res.redirect('/dashboard');
 });
 
 // ==================== 管理員設定APIs ====================
