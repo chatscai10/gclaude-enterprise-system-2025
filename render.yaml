@@ -8,10 +8,8 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 10000
       - key: JWT_SECRET
-        generateValue: true
+        value: gclaude-enterprise-jwt-secret-prod-2025
       - key: TELEGRAM_BOT_TOKEN
         value: 7659930552:AAF_jF1rAXFnjFO176-9X5fKfBwbrko8BNc
       - key: TELEGRAM_BOSS_GROUP_ID

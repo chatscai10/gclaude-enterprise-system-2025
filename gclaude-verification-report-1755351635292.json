@@ -1,0 +1,399 @@
+{
+  "testSummary": {
+    "totalTests": 23,
+    "passCount": 16,
+    "failCount": 4,
+    "warnCount": 3,
+    "healthScore": 70,
+    "duration": "65.08秒"
+  },
+  "systemStatus": "WARNING",
+  "detailedResults": [
+    {
+      "testName": "服務器連接測試",
+      "status": "PASS",
+      "details": "HTTP 200",
+      "timestamp": "2025-08-16T13:39:32.921Z",
+      "screenshot": "server-connectivity.png"
+    },
+    {
+      "testName": "管理員登入測試",
+      "status": "FAIL",
+      "details": "登入失敗，重定向到: http://localhost:3010/admin",
+      "timestamp": "2025-08-16T13:39:42.287Z",
+      "screenshot": null
+    },
+    {
+      "testName": "員工登入測試",
+      "status": "PASS",
+      "details": "成功登入 employee",
+      "timestamp": "2025-08-16T13:39:51.938Z",
+      "screenshot": "login-employee.png"
+    },
+    {
+      "testName": "排班系統參數顯示測試",
+      "status": "WARN",
+      "details": "未找到排班參數元素",
+      "timestamp": "2025-08-16T13:39:56.378Z",
+      "screenshot": null
+    },
+    {
+      "testName": "API端點測試: /api/revenue/monthly",
+      "status": "PASS",
+      "details": "HTTP 200 OK",
+      "timestamp": "2025-08-16T13:39:56.500Z",
+      "screenshot": null
+    },
+    {
+      "testName": "API端點測試: /api/promotion/position-levels",
+      "status": "PASS",
+      "details": "HTTP 200 OK",
+      "timestamp": "2025-08-16T13:39:56.617Z",
+      "screenshot": null
+    },
+    {
+      "testName": "API端點測試: /api/schedule/settings",
+      "status": "PASS",
+      "details": "HTTP 200 OK",
+      "timestamp": "2025-08-16T13:39:56.744Z",
+      "screenshot": null
+    },
+    {
+      "testName": "API端點測試: /api/revenue/records",
+      "status": "PASS",
+      "details": "HTTP 401 Unauthorized",
+      "timestamp": "2025-08-16T13:39:56.867Z",
+      "screenshot": null
+    },
+    {
+      "testName": "API端點測試: /api/auth/login",
+      "status": "PASS",
+      "details": "HTTP 404 Not Found",
+      "timestamp": "2025-08-16T13:39:56.996Z",
+      "screenshot": null
+    },
+    {
+      "testName": "API端點測試: /api/attendance/records",
+      "status": "PASS",
+      "details": "HTTP 404 Not Found",
+      "timestamp": "2025-08-16T13:39:57.115Z",
+      "screenshot": null
+    },
+    {
+      "testName": "API端點測試: /api/schedule/status",
+      "status": "PASS",
+      "details": "HTTP 401 Unauthorized",
+      "timestamp": "2025-08-16T13:39:57.232Z",
+      "screenshot": null
+    },
+    {
+      "testName": "API端點測試: /api/users",
+      "status": "PASS",
+      "details": "HTTP 404 Not Found",
+      "timestamp": "2025-08-16T13:39:57.359Z",
+      "screenshot": null
+    },
+    {
+      "testName": "管理員權限測試-登入驗證",
+      "status": "FAIL",
+      "details": "登入失敗，重定向到: http://localhost:3010/admin",
+      "timestamp": "2025-08-16T13:40:04.850Z",
+      "screenshot": null
+    },
+    {
+      "testName": "管理員權限測試: /revenue.html",
+      "status": "PASS",
+      "details": "成功訪問管理員頁面: 登入 - GClaude 企業管理系統",
+      "timestamp": "2025-08-16T13:40:06.991Z",
+      "screenshot": null
+    },
+    {
+      "testName": "管理員權限測試: /schedule.html",
+      "status": "PASS",
+      "details": "成功訪問管理員頁面: GClaude 企業管理系統",
+      "timestamp": "2025-08-16T13:40:09.007Z",
+      "screenshot": null
+    },
+    {
+      "testName": "管理員權限測試: /users.html",
+      "status": "PASS",
+      "details": "成功訪問管理員頁面: ",
+      "timestamp": "2025-08-16T13:40:10.863Z",
+      "screenshot": null
+    },
+    {
+      "testName": "員工出勤記錄載入測試",
+      "status": "FAIL",
+      "details": "未找到出勤記錄表格",
+      "timestamp": "2025-08-16T13:40:15.319Z",
+      "screenshot": null
+    },
+    {
+      "testName": "營業額計算邏輯測試",
+      "status": "FAIL",
+      "details": "未找到營業額相關元素",
+      "timestamp": "2025-08-16T13:40:20.196Z",
+      "screenshot": null
+    },
+    {
+      "testName": "前端動態功能測試: 主頁面",
+      "status": "WARN",
+      "details": "頁面缺少互動元素或未完全載入",
+      "timestamp": "2025-08-16T13:40:23.121Z",
+      "screenshot": null
+    },
+    {
+      "testName": "前端動態功能測試: 儀表板",
+      "status": "PASS",
+      "details": "按鈕:73, 表單:13, 輸入:110",
+      "timestamp": "2025-08-16T13:40:26.280Z",
+      "screenshot": null
+    },
+    {
+      "testName": "前端動態功能測試: 排班管理",
+      "status": "WARN",
+      "details": "頁面缺少互動元素或未完全載入",
+      "timestamp": "2025-08-16T13:40:29.262Z",
+      "screenshot": null
+    },
+    {
+      "testName": "前端動態功能測試: 營業額管理",
+      "status": "PASS",
+      "details": "按鈕:1, 表單:1, 輸入:2",
+      "timestamp": "2025-08-16T13:40:32.279Z",
+      "screenshot": null
+    },
+    {
+      "testName": "前端動態功能測試: 出勤管理",
+      "status": "PASS",
+      "details": "按鈕:1, 表單:1, 輸入:2",
+      "timestamp": "2025-08-16T13:40:35.291Z",
+      "screenshot": null
+    }
+  ],
+  "apiCallsMonitored": [
+    {
+      "url": "http://localhost:3010/api/health",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:39:32.077Z"
+    },
+    {
+      "url": "http://localhost:3010/api/health",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:39:33.574Z"
+    },
+    {
+      "url": "http://localhost:3010/api/auth/login",
+      "method": "POST",
+      "timestamp": "2025-08-16T13:39:39.845Z"
+    },
+    {
+      "url": "http://localhost:3010/api/auth/verify",
+      "method": "POST",
+      "timestamp": "2025-08-16T13:39:41.590Z"
+    },
+    {
+      "url": "http://localhost:3010/api/health",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:39:43.808Z"
+    },
+    {
+      "url": "http://localhost:3010/api/health",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:39:44.424Z"
+    },
+    {
+      "url": "http://localhost:3010/api/auth/login",
+      "method": "POST",
+      "timestamp": "2025-08-16T13:39:49.436Z"
+    },
+    {
+      "url": "http://localhost:3010/api/auth/verify",
+      "method": "POST",
+      "timestamp": "2025-08-16T13:39:51.235Z"
+    },
+    {
+      "url": "http://localhost:3010/api/attendance/today",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:39:51.299Z"
+    },
+    {
+      "url": "http://localhost:3010/api/revenue/monthly",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:39:51.300Z"
+    },
+    {
+      "url": "http://localhost:3010/api/schedule/settings",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:39:52.556Z"
+    },
+    {
+      "url": "http://localhost:3010/api/schedule/my-records",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:39:52.557Z"
+    },
+    {
+      "url": "http://localhost:3010/api/schedule/month-stats",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:39:52.558Z"
+    },
+    {
+      "url": "http://localhost:3010/api/health",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:39:52.649Z"
+    },
+    {
+      "url": "http://localhost:3010/api/auth/verify",
+      "method": "POST",
+      "timestamp": "2025-08-16T13:39:52.713Z"
+    },
+    {
+      "url": "http://localhost:3010/api/revenue/monthly",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:39:56.442Z"
+    },
+    {
+      "url": "http://localhost:3010/api/promotion/position-levels",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:39:56.554Z"
+    },
+    {
+      "url": "http://localhost:3010/api/schedule/settings",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:39:56.679Z"
+    },
+    {
+      "url": "http://localhost:3010/api/revenue/records",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:39:56.807Z"
+    },
+    {
+      "url": "http://localhost:3010/api/auth/login",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:39:56.932Z"
+    },
+    {
+      "url": "http://localhost:3010/api/attendance/records",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:39:57.057Z"
+    },
+    {
+      "url": "http://localhost:3010/api/schedule/status",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:39:57.169Z"
+    },
+    {
+      "url": "http://localhost:3010/api/users",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:39:57.296Z"
+    },
+    {
+      "url": "http://localhost:3010/api/health",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:39:57.597Z"
+    },
+    {
+      "url": "http://localhost:3010/api/auth/login",
+      "method": "POST",
+      "timestamp": "2025-08-16T13:40:02.427Z"
+    },
+    {
+      "url": "http://localhost:3010/api/auth/verify",
+      "method": "POST",
+      "timestamp": "2025-08-16T13:40:04.176Z"
+    },
+    {
+      "url": "http://localhost:3010/api/health",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:40:05.280Z"
+    },
+    {
+      "url": "http://localhost:3010/api/schedule/settings",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:40:07.199Z"
+    },
+    {
+      "url": "http://localhost:3010/api/schedule/my-records",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:40:07.199Z"
+    },
+    {
+      "url": "http://localhost:3010/api/schedule/month-stats",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:40:07.200Z"
+    },
+    {
+      "url": "http://localhost:3010/api/health",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:40:07.278Z"
+    },
+    {
+      "url": "http://localhost:3010/api/auth/verify",
+      "method": "POST",
+      "timestamp": "2025-08-16T13:40:07.342Z"
+    },
+    {
+      "url": "http://localhost:3010/api/health",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:40:11.133Z"
+    },
+    {
+      "url": "http://localhost:3010/api/health",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:40:15.608Z"
+    },
+    {
+      "url": "http://localhost:3010/api/health",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:40:20.424Z"
+    },
+    {
+      "url": "http://localhost:3010/api/auth/verify",
+      "method": "POST",
+      "timestamp": "2025-08-16T13:40:20.482Z"
+    },
+    {
+      "url": "http://localhost:3010/api/schedule/settings",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:40:26.477Z"
+    },
+    {
+      "url": "http://localhost:3010/api/schedule/my-records",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:40:26.477Z"
+    },
+    {
+      "url": "http://localhost:3010/api/schedule/month-stats",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:40:26.477Z"
+    },
+    {
+      "url": "http://localhost:3010/api/health",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:40:26.550Z"
+    },
+    {
+      "url": "http://localhost:3010/api/auth/verify",
+      "method": "POST",
+      "timestamp": "2025-08-16T13:40:26.614Z"
+    },
+    {
+      "url": "http://localhost:3010/api/health",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:40:29.581Z"
+    },
+    {
+      "url": "http://localhost:3010/api/health",
+      "method": "GET",
+      "timestamp": "2025-08-16T13:40:32.580Z"
+    }
+  ],
+  "timestamp": "2025-08-16T13:40:35.292Z",
+  "recommendations": [
+    "🔧 需要修復的問題：",
+    "- 管理員登入測試: 登入失敗，重定向到: http://localhost:3010/admin",
+    "- 管理員權限測試-登入驗證: 登入失敗，重定向到: http://localhost:3010/admin",
+    "- 員工出勤記錄載入測試: 未找到出勤記錄表格",
+    "- 營業額計算邏輯測試: 未找到營業額相關元素"
+  ]
+}

@@ -363,7 +363,7 @@
                         <button class="nav-link" data-section="maintenance">
                             <i class="fas fa-tools"></i>維修申請
                         </button>
-                        <button class="nav-link" data-section="ordering">
+                        <button class="nav-link" data-section="orders">
                             <i class="fas fa-shopping-cart"></i>叫貨系統
                         </button>
                         <button class="nav-link" data-section="promotion">
@@ -385,7 +385,7 @@
                         <option value="schedule">📅 排班系統</option>
                         <option value="revenue">💰 營收管理</option>
                         <option value="maintenance">🔧 維修申請</option>
-                        <option value="ordering">🛒 叫貨系統</option>
+                        <option value="orders">🛒 叫貨系統</option>
                         <option value="promotion">🗳️ 升遷投票</option>
                         <option value="profile">👤 個人資料</option>
                     </select>
@@ -456,7 +456,7 @@
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-4 col-sm-6">
-                                <div class="quick-action-card" onclick="showSection('ordering')">
+                                <div class="quick-action-card" onclick="showSection('orders')">
                                     <i class="fas fa-shopping-cart"></i>
                                     <h6>叫貨系統</h6>
                                     <small class="text-muted">進貨申請</small>
@@ -740,20 +740,104 @@
                     </div>
 
                     <!-- 叫貨系統 -->
-                    <div id="ordering" class="section-content">
+                    <div id="orders" class="section-content">
                         <div class="content-header">
                             <h2><i class="fas fa-shopping-cart me-2"></i>叫貨系統</h2>
                             <p class="text-muted mb-0">管理庫存並提交進貨申請</p>
                         </div>
 
-                        <div class="alert alert-custom alert-warning border-warning">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            此功能需要跳轉到專門的叫貨頁面進行操作
+                        <!-- 叫貨申請表單 -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">新增叫貨申請</h5>
+                                <form id="orderForm">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">商品類別</label>
+                                                <select class="form-select" id="orderCategory" required>
+                                                    <option value="">請選擇類別</option>
+                                                    <option value="food">食材原料</option>
+                                                    <option value="beverage">飲料用品</option>
+                                                    <option value="packaging">包裝材料</option>
+                                                    <option value="cleaning">清潔用品</option>
+                                                    <option value="equipment">設備配件</option>
+                                                    <option value="other">其他用品</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">緊急程度</label>
+                                                <select class="form-select" id="orderPriority" required>
+                                                    <option value="low">低 - 正常補貨</option>
+                                                    <option value="medium">中 - 庫存不足</option>
+                                                    <option value="high">高 - 緊急缺貨</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <div class="mb-3">
+                                                <label class="form-label">商品名稱</label>
+                                                <input type="text" class="form-control" id="orderItemName" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">申請數量</label>
+                                                <input type="number" class="form-control" id="orderQuantity" min="1" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">需求說明</label>
+                                        <textarea class="form-control" id="orderDescription" rows="3" placeholder="請說明商品規格、用途等詳細需求..."></textarea>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">預計用量時間</label>
+                                                <input type="date" class="form-control" id="orderNeededDate" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">聯絡人員</label>
+                                                <input type="text" class="form-control" id="orderContact" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" id="submitOrderBtn" class="btn btn-gradient">
+                                        <i class="fas fa-paper-plane me-2"></i>提交叫貨申請
+                                    </button>
+                                </form>
+                            </div>
                         </div>
 
-                        <button class="btn btn-gradient btn-lg" onclick="window.open('/ordering.html', '_blank')">
-                            <i class="fas fa-external-link-alt me-2"></i>開啟叫貨系統
-                        </button>
+                        <!-- 庫存狀態 -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0"><i class="fas fa-boxes me-2"></i>庫存狀態</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="inventoryStatus">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-spinner fa-spin me-2"></i>載入庫存狀態中...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 我的叫貨記錄 -->
+                        <h4 class="mb-3">我的叫貨記錄</h4>
+                        <div id="orderHistory">
+                            <div class="alert alert-custom alert-info border-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                載入叫貨記錄中...
+                            </div>
+                        </div>
                     </div>
 
                     <!-- 升遷投票 -->

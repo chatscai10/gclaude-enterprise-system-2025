@@ -2028,64 +2028,55 @@ class JsonDatabase {
     // ==================== 獎金計算邏輯 ====================
     
     calculateBonusAmount(revenueRecord) {
-        const totalRevenue = revenueRecord.total_revenue || 0;
-        const totalExpense = revenueRecord.total_expense || 0;
-        const profit = totalRevenue - totalExpense;
-        const recordDate = new Date(revenueRecord.date || revenueRecord.created_at);
-        const isHoliday = this.isHolidayOrWeekend(recordDate);
+        // 根據系統邏輯.txt的正確獎金計算方式
+        const revenueItems = revenueRecord.revenue_items ? 
+            (typeof revenueRecord.revenue_items === 'string' ? 
+                JSON.parse(revenueRecord.revenue_items) : revenueRecord.revenue_items) : [];
         
-        // 基本獎金條件檢查
-        if (profit <= 0) {
-            return { amount: 0, type: 'none', reason: '營收未達獲利標準' };
-        }
+        const bonusType = revenueRecord.bonus_type || '平日獎金';
         
-        // 獎金計算邏輯（依照系統需求）
+        // 計算調整後收入（扣除服務費）
+        let adjustedIncome = 0;
+        revenueItems.forEach(item => {
+            const amount = item.amount || 0;
+            const serviceFee = item.serviceFee || 0;
+            
+            if (item.name === '現場營業額' || serviceFee === 0) {
+                // 現場營業額不扣服務費
+                adjustedIncome += amount;
+            } else {
+                // 外送平台扣除服務費
+                adjustedIncome += amount * ((100 - serviceFee) / 100);
+            }
+        });
+        
         let bonusAmount = 0;
-        let bonusType = 'none';
         let bonusReason = '';
         
-        // 1. 基本獲利獎金：獲利的5%
-        bonusAmount = Math.floor(profit * 0.05);
-        bonusType = 'basic';
-        bonusReason = `基本獲利獎金 (獲利: $${profit.toLocaleString()})`;
-        
-        // 2. 營收達標獎金
-        if (totalRevenue >= 50000) {
-            bonusAmount += 1000;
-            bonusType = 'achievement';
-            bonusReason += ' + 營收達標獎金 ($50K+)';
+        if (bonusType === '平日獎金') {
+            // 平日獎金：現場+熊貓(35%服務費)+UBER(35%服務費) 大於13000的30%
+            if (adjustedIncome > 13000) {
+                bonusAmount = Math.round((adjustedIncome - 13000) * 0.30);
+                bonusReason = `平日獎金計算: 調整後收入 $${adjustedIncome.toLocaleString()} 大於 $13,000，獎金 = ($${adjustedIncome.toLocaleString()} - $13,000) × 30% = $${bonusAmount.toLocaleString()}`;
+            } else {
+                const shortage = 13000 - adjustedIncome;
+                bonusReason = `平日獎金未達標: 調整後收入 $${adjustedIncome.toLocaleString()}，差距 $${shortage.toLocaleString()} 達標`;
+            }
+        } else {
+            // 假日獎金：項目總和大於等於0的38%
+            if (adjustedIncome >= 0) {
+                bonusAmount = Math.round(adjustedIncome * 0.38);
+                bonusReason = `假日獎金計算: 調整後收入 $${adjustedIncome.toLocaleString()} × 38% = $${bonusAmount.toLocaleString()}`;
+            } else {
+                bonusReason = `假日獎金計算: 調整後收入為負數 $${adjustedIncome.toLocaleString()}`;
+            }
         }
         
-        if (totalRevenue >= 100000) {
-            bonusAmount += 2000;
-            bonusType = 'high_achievement';
-            bonusReason += ' + 高額營收獎金 ($100K+)';
-        }
-        
-        // 3. 假日加成獎金
-        if (isHoliday) {
-            bonusAmount = Math.floor(bonusAmount * 1.5);
-            bonusType = 'holiday';
-            bonusReason += ' + 假日加成 (1.5倍)';
-        }
-        
-        // 4. 完美表現獎金（高營收 + 低成本）
-        const profitRatio = profit / totalRevenue;
-        if (profitRatio >= 0.7 && totalRevenue >= 30000) {
-            bonusAmount += 1500;
-            bonusType = 'perfect';
-            bonusReason += ' + 完美表現獎金 (獲利率70%+)';
-        }
-        
-        // 5. 平日表現獎金
-        if (!isHoliday && bonusType === 'basic') {
-            bonusType = 'weekday';
-        }
-        
-        return {
-            amount: Math.max(0, bonusAmount),
+        return { 
+            amount: bonusAmount,
             type: bonusType,
-            reason: bonusReason.replace(/^\s\+\s/, '') // 移除開頭的 " + "
+            reason: bonusReason,
+            adjustedIncome: adjustedIncome
         };
     }
     
@@ -2684,6 +2675,84 @@ class JsonDatabase {
             return remaining;
         } catch (error) {
             return 0;
+        }
+    }
+
+    // 提交排班請假日期
+    async submitSchedule(employeeId, scheduleData) {
+        try {
+            const schedules = await this.readTable('schedules');
+            const settings = await this.getScheduleSettings();
+            const scheduleMonth = settings?.schedule_month || new Date().toISOString().slice(0, 7);
+            
+            // 檢查是否已存在排班記錄
+            const existingIndex = schedules.findIndex(s => 
+                s.employee_id === employeeId && 
+                s.schedule_month === scheduleMonth
+            );
+            
+            const scheduleRecord = {
+                employee_id: employeeId,
+                schedule_month: scheduleMonth,
+                leave_dates: scheduleData.leaveDates || [],
+                submitted_at: new Date().toISOString(),
+                status: 'submitted'
+            };
+            
+            if (existingIndex >= 0) {
+                // 更新現有記錄
+                schedules[existingIndex] = { ...schedules[existingIndex], ...scheduleRecord };
+            } else {
+                // 新增記錄
+                scheduleRecord.id = schedules.length > 0 ? Math.max(...schedules.map(s => s.id || 0)) + 1 : 1;
+                schedules.push(scheduleRecord);
+            }
+            
+            await this.writeTable('schedules', schedules);
+            
+            return {
+                id: scheduleRecord.id || existingIndex + 1,
+                success: true,
+                message: '排班提交成功'
+            };
+        } catch (error) {
+            console.error('提交排班失敗:', error);
+            throw error;
+        }
+    }
+
+    // 獲取月營收統計
+    async getRevenueByMonth(month) {
+        try {
+            // 確保revenue_records.json文件存在
+            const path = require('path');
+            const fs = require('fs').promises;
+            const revenueFile = path.join(this.dataDir, 'revenue_records.json');
+            
+            let revenues = [];
+            try {
+                const data = await fs.readFile(revenueFile, 'utf-8');
+                revenues = JSON.parse(data) || [];
+            } catch (fileError) {
+                // 文件不存在則返回空數組
+                revenues = [];
+            }
+            
+            const monthlyRevenues = revenues.filter(revenue => {
+                return revenue.date && revenue.date.startsWith(month);
+            });
+            
+            const summary = {
+                month: month,
+                total_revenue: monthlyRevenues.reduce((sum, r) => sum + (r.total_revenue || 0), 0),
+                total_records: monthlyRevenues.length,
+                records: monthlyRevenues.slice(0, 10) // 最近10筆記錄
+            };
+            
+            return summary;
+        } catch (error) {
+            console.error('獲取月營收統計失敗:', error);
+            throw error;
         }
     }
 

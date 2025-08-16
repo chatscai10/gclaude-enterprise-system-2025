@@ -1,54 +1,18 @@
-# Vercel
-.vercel
-
-# Node.js
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Environment variables
-.env
+*.log
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-data/enterprise.db
-enterprise_system.db
-
-# Logs
-logs/
-*.log
-*.log.*
-
-# Screenshots and reports (keep some for demo, exclude large folders)
-verification-screenshots/*.png
-browser-compatibility-screenshots/
-cross-browser-screenshots/
-deep-verification-screenshots/
-enhanced-verification-screenshots/
-production-screenshots/
-
-# Generated reports
-*-reports/
-flight-reports/
-test-results/
-monitoring/
-
-# OS generated files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# IDE
 .vscode/
-.idea/
+*.sqlite
+*.db
+uploads/
+logs/
+coverage/
+test-results/
+verification-reports/

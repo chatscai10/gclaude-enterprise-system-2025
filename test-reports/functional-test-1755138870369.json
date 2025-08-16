@@ -1,0 +1,56 @@
+{
+  "timestamp": "2025-08-14T02:34:30.369Z",
+  "summary": {
+    "total": 9,
+    "passed": 9,
+    "failed": 0,
+    "successRate": "100.00%"
+  },
+  "details": [
+    {
+      "name": "登入功能",
+      "status": "PASS",
+      "details": "登入成功，頁面標題: 儀表板 - GClaude 企業管理系統"
+    },
+    {
+      "name": "導航功能",
+      "status": "PASS",
+      "details": "employees: ✅, attendance: ✅, revenue: ✅, inventory: ✅, scheduling: ✅"
+    },
+    {
+      "name": "員工管理CRUD",
+      "status": "PASS",
+      "details": "編輯按鈕數量: 4, 編輯模態框: ✅, 新增模態框: ✅"
+    },
+    {
+      "name": "營收管理",
+      "status": "PASS",
+      "details": "現場營業額輸入: ✅, 熊貓訂單輸入: ✅, 分店選擇: ✅, 分店選項數量: 4"
+    },
+    {
+      "name": "出勤管理",
+      "status": "PASS",
+      "details": "GPS打卡按鈕: ❌, 出勤記錄表格: ✅"
+    },
+    {
+      "name": "庫存管理",
+      "status": "PASS",
+      "details": "叫貨按鈕: ✅, 庫存表格: ✅"
+    },
+    {
+      "name": "排班管理",
+      "status": "PASS",
+      "details": "排班表格: ✅"
+    },
+    {
+      "name": "系統健康檢查",
+      "status": "PASS",
+      "details": "系統健康，版本: 2.0.0"
+    },
+    {
+      "name": "API端點驗證",
+      "status": "PASS",
+      "details": "/api/auth/verify: ❌, /api/employees/stats/overview: ✅, /api/health: ✅"
+    }
+  ]
+}

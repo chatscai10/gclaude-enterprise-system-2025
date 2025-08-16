@@ -1,1 +1,23 @@
-[]
+[
+  {
+    "id": 1755351162090,
+    "employee_id": 2,
+    "store_id": 1,
+    "amount": null,
+    "revenue_date": "2025-08-16",
+    "notes": "測試營業額計算",
+    "status": "pending",
+    "created_at": "2025-08-16T13:32:42.090Z",
+    "updated_at": "2025-08-16T13:32:42.090Z"
+  },
+  {
+    "id": 1755351367896,
+    "employee_id": 2,
+    "store_id": 1,
+    "amount": null,
+    "revenue_date": "2025-08-16",
+    "status": "pending",
+    "created_at": "2025-08-16T13:36:07.896Z",
+    "updated_at": "2025-08-16T13:36:07.896Z"
+  }
+]

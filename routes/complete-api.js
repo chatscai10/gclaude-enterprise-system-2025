@@ -10,6 +10,7 @@ const { v4: uuidv4 } = require('uuid');
 const database = require('../database');
 const TelegramNotificationSystem = require('../modules/telegram-notifications');
 const OrderAnomalyChecker = require('../services/order-anomaly-checker');
+const JsonSanitizer = require('../utils/json-sanitizer');
 const router = express.Router();
 
 // 初始化通知系統和異常檢查器
@@ -18,6 +19,28 @@ const anomalyChecker = new OrderAnomalyChecker();
 
 // JWT密鑰 (生產環境應該使用環境變數)
 const JWT_SECRET = process.env.JWT_SECRET || 'gclaude-enterprise-jwt-secret-key-2025';
+
+// JSON 安全序列化中間件
+function safeJsonResponse(req, res, next) {
+    const originalJson = res.json;
+    
+    res.json = function(data) {
+        try {
+            // 使用安全的 JSON 序列化
+            const cleanData = JsonSanitizer.sanitizeObject(data);
+            return originalJson.call(this, cleanData);
+        } catch (error) {
+            console.error('JSON 序列化錯誤:', error.message);
+            return originalJson.call(this, {
+                success: false,
+                message: 'JSON 序列化錯誤',
+                error: error.message
+            });
+        }
+    };
+    
+    next();
+}
 
 // JWT驗證中間件
 function authenticateToken(req, res, next) {
@@ -55,6 +78,27 @@ function requireRole(roles) {
         next();
     };
 }
+
+// JSON 請求體清理中間件
+function safeJsonRequest(req, res, next) {
+    if (req.body && typeof req.body === 'object') {
+        try {
+            req.body = JsonSanitizer.sanitizeObject(req.body);
+        } catch (error) {
+            console.error('JSON 請求體清理錯誤:', error.message);
+            return res.status(400).json({
+                success: false,
+                message: 'JSON 請求體格式錯誤',
+                error: error.message
+            });
+        }
+    }
+    next();
+}
+
+// 應用全域中間件
+router.use(safeJsonResponse);
+router.use(safeJsonRequest);
 
 // ==================== 認證相關路由 ====================
 

@@ -1,0 +1,133 @@
+{
+  "timestamp": "2025-08-16T12:07:26.447Z",
+  "baseUrl": "https://gclaude-enterprise-system-2025.onrender.com",
+  "tests": [
+    {
+      "name": "系統健康檢查",
+      "status": "PASS",
+      "details": "版本: 4.1.0, 環境: production",
+      "timestamp": "2025-08-16T12:07:26.741Z",
+      "response": {
+        "statusCode": 200,
+        "contentType": "application/json; charset=utf-8",
+        "hasBody": true
+      }
+    },
+    {
+      "name": "主頁功能完整性",
+      "status": "PASS",
+      "details": "包含登入、註冊功能和手機支援",
+      "timestamp": "2025-08-16T12:07:27.937Z",
+      "response": {
+        "statusCode": 200,
+        "contentType": "text/html; charset=UTF-8",
+        "hasBody": true
+      }
+    },
+    {
+      "name": "管理員工作台完整性",
+      "status": "FAIL",
+      "details": "缺少管理功能模組",
+      "timestamp": "2025-08-16T12:07:29.201Z",
+      "response": {
+        "statusCode": 200,
+        "contentType": "text/html; charset=UTF-8",
+        "hasBody": true
+      }
+    },
+    {
+      "name": "員工工作台完整性",
+      "status": "PASS",
+      "details": "包含所有員工業務功能",
+      "timestamp": "2025-08-16T12:07:31.011Z",
+      "response": {
+        "statusCode": 200,
+        "contentType": "text/html; charset=UTF-8",
+        "hasBody": true
+      }
+    },
+    {
+      "name": "員工註冊頁面完整性",
+      "status": "FAIL",
+      "details": "註冊表單不完整",
+      "timestamp": "2025-08-16T12:07:32.247Z",
+      "response": {
+        "statusCode": 200,
+        "contentType": "text/html; charset=UTF-8",
+        "hasBody": true
+      }
+    },
+    {
+      "name": "API端點 /api/auth/login",
+      "status": "PASS",
+      "details": "正確回應 HTTP 401",
+      "timestamp": "2025-08-16T12:07:33.483Z",
+      "response": {
+        "statusCode": 401,
+        "contentType": "application/json; charset=utf-8",
+        "hasBody": true
+      }
+    },
+    {
+      "name": "API端點 /api/stores",
+      "status": "FAIL",
+      "details": "異常狀態碼 HTTP 500",
+      "timestamp": "2025-08-16T12:07:34.198Z",
+      "response": {
+        "statusCode": 500,
+        "contentType": "application/json; charset=utf-8",
+        "hasBody": true
+      }
+    },
+    {
+      "name": "API端點 /api/admin/employees",
+      "status": "PASS",
+      "details": "正確回應 HTTP 401",
+      "timestamp": "2025-08-16T12:07:34.932Z",
+      "response": {
+        "statusCode": 401,
+        "contentType": "application/json; charset=utf-8",
+        "hasBody": true
+      }
+    },
+    {
+      "name": "API端點 /api/admin/stores",
+      "status": "PASS",
+      "details": "正確回應 HTTP 401",
+      "timestamp": "2025-08-16T12:07:35.682Z",
+      "response": {
+        "statusCode": 401,
+        "contentType": "application/json; charset=utf-8",
+        "hasBody": true
+      }
+    },
+    {
+      "name": "手機響應式設計",
+      "status": "FAIL",
+      "details": "缺少手機支援元素",
+      "timestamp": "2025-08-16T12:07:37.389Z",
+      "response": {
+        "statusCode": 200,
+        "contentType": "text/html; charset=UTF-8",
+        "hasBody": true
+      }
+    },
+    {
+      "name": "Telegram整合檢查",
+      "status": "PASS",
+      "details": "系統包含Telegram通知功能",
+      "timestamp": "2025-08-16T12:07:38.582Z",
+      "response": {
+        "statusCode": 200,
+        "contentType": "application/json; charset=utf-8",
+        "hasBody": true
+      }
+    }
+  ],
+  "summary": {
+    "total": 11,
+    "passed": 7,
+    "failed": 4,
+    "successRate": 64
+  }
+}

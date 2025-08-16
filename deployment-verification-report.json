@@ -1,0 +1,135 @@
+{
+  "timestamp": "2025-08-16T12:53:28.310Z",
+  "baseUrl": "http://localhost:3009",
+  "tests": [
+    {
+      "name": "健康檢查端點",
+      "endpoint": "/api/health",
+      "expectedStatus": 200,
+      "timestamp": "2025-08-16T12:53:28.312Z",
+      "actualStatus": 200,
+      "responseTime": 29,
+      "success": true,
+      "contentLength": 0,
+      "contentType": "application/json; charset=utf-8",
+      "healthData": {
+        "status": "healthy",
+        "environment": "cloud_simulation",
+        "platform": "render.com",
+        "uptime": 153.1730345,
+        "timestamp": "2025-08-16T12:53:28.335Z",
+        "version": "2.0.0",
+        "deployment": {
+          "success": true,
+          "url": "http://localhost:3009",
+          "features": [
+            "employee-management",
+            "admin-dashboard",
+            "telegram-notifications",
+            "json-database",
+            "jwt-authentication"
+          ]
+        }
+      },
+      "platformCheck": true,
+      "featuresCheck": true
+    },
+    {
+      "name": "部署狀態端點",
+      "endpoint": "/api/deployment/status",
+      "expectedStatus": 200,
+      "timestamp": "2025-08-16T12:53:28.341Z",
+      "actualStatus": 200,
+      "responseTime": 3,
+      "success": true,
+      "contentLength": 0,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "name": "首頁",
+      "endpoint": "/",
+      "expectedStatus": 200,
+      "timestamp": "2025-08-16T12:53:28.344Z",
+      "actualStatus": 200,
+      "responseTime": 4,
+      "success": true,
+      "contentLength": 16575,
+      "contentType": "text/html; charset=UTF-8"
+    },
+    {
+      "name": "登入頁面",
+      "endpoint": "/login.html",
+      "expectedStatus": 200,
+      "timestamp": "2025-08-16T12:53:28.348Z",
+      "actualStatus": 200,
+      "responseTime": 1,
+      "success": true,
+      "contentLength": 16898,
+      "contentType": "text/html; charset=UTF-8"
+    },
+    {
+      "name": "管理員面板",
+      "endpoint": "/admin-dashboard.html",
+      "expectedStatus": 200,
+      "timestamp": "2025-08-16T12:53:28.349Z",
+      "actualStatus": 200,
+      "responseTime": 3,
+      "success": true,
+      "contentLength": 90267,
+      "contentType": "text/html; charset=UTF-8"
+    },
+    {
+      "name": "員工面板",
+      "endpoint": "/employee-dashboard.html",
+      "expectedStatus": 200,
+      "timestamp": "2025-08-16T12:53:28.352Z",
+      "actualStatus": 200,
+      "responseTime": 2,
+      "success": true,
+      "contentLength": 76238,
+      "contentType": "text/html; charset=UTF-8"
+    },
+    {
+      "name": "API 根路由",
+      "endpoint": "/api/",
+      "expectedStatus": 404,
+      "timestamp": "2025-08-16T12:53:28.354Z",
+      "actualStatus": 404,
+      "responseTime": 2,
+      "success": true,
+      "contentLength": 143,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "name": "用戶 API",
+      "endpoint": "/api/users",
+      "expectedStatus": 404,
+      "timestamp": "2025-08-16T12:53:28.356Z",
+      "actualStatus": 404,
+      "responseTime": 1,
+      "success": true,
+      "contentLength": 148,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "name": "認證 API",
+      "endpoint": "/api/auth",
+      "expectedStatus": 404,
+      "timestamp": "2025-08-16T12:53:28.357Z",
+      "actualStatus": 404,
+      "responseTime": 1,
+      "success": true,
+      "contentLength": 147,
+      "contentType": "text/html; charset=utf-8"
+    }
+  ],
+  "summary": {
+    "total": 9,
+    "passed": 9,
+    "failed": 0,
+    "successRate": "100.0"
+  },
+  "generated": "2025-08-16T12:53:28.358Z",
+  "platform": "雲端部署驗證",
+  "environment": "localhost:3009 (模擬雲端)"
+}

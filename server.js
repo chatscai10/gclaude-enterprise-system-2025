@@ -1258,6 +1258,24 @@ app.get('/api/schedule/my-schedule', authenticateToken, async (req, res) => {
 
 // ==================== 升遷系統 API ====================
 
+// 獲取職位階級列表
+app.get('/api/promotion/position-levels', async (req, res) => {
+    try {
+        const positions = await db.getAllPositions();
+        
+        res.json({
+            success: true,
+            data: positions,
+            message: '職位階級獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取職位階級失敗: ' + error.message
+        });
+    }
+});
+
 app.get('/api/promotion/check-eligibility', authenticateToken, async (req, res) => {
     try {
         const result = await db.canEmployeeStartPromotion(req.user.employee_id);
@@ -1440,6 +1458,10 @@ app.get('/api/admin/promotions', authenticateToken, requireAdmin, async (req, re
 });
 
 // ==================== 排班系統API ====================
+
+// 排班系統API路由
+const scheduleAPI = require('./routes/schedule-api');
+app.use('/api/schedule', scheduleAPI);
 
 // 獲取排班設定和狀態
 app.get('/api/schedule/settings', authenticateToken, async (req, res) => {
@@ -1908,6 +1930,28 @@ app.get('/api/revenue/stats', authenticateToken, async (req, res) => {
         res.status(500).json({
             success: false,
             message: '獲取營收統計失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取月營收統計 (前端需要的端點)
+app.get('/api/revenue/monthly', async (req, res) => {
+    try {
+        const { month, year } = req.query;
+        const searchMonth = month && year ? `${year}-${month.padStart(2, '0')}` : new Date().toISOString().slice(0, 7);
+        
+        const revenues = await db.getRevenueByMonth(searchMonth);
+        
+        res.json({
+            success: true,
+            data: revenues,
+            message: '月營收統計獲取成功'
+        });
+    } catch (error) {
+        console.error('獲取月營收統計失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '獲取月營收統計失敗: ' + error.message
         });
     }
 });

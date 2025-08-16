@@ -1,0 +1,11 @@
+{
+  "timestamp": "2025-08-14T08:02:08.061Z",
+  "messageId": 2890,
+  "success": true,
+  "reportSummary": {
+    "totalTests": 14,
+    "successfulTests": 12,
+    "failedTests": 2,
+    "successRate": 86
+  }
+}

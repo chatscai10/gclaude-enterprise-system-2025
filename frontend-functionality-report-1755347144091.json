@@ -1,0 +1,433 @@
+{
+  "timestamp": "2025-08-16T12:25:44.082Z",
+  "employeePage": {
+    "sections": [
+      {
+        "id": "attendance",
+        "name": "打卡系統",
+        "exists": true,
+        "required": true
+      },
+      {
+        "id": "revenue",
+        "name": "營收系統",
+        "exists": true,
+        "required": true
+      },
+      {
+        "id": "orders",
+        "name": "叫貨系統",
+        "exists": false,
+        "required": true
+      },
+      {
+        "id": "schedule",
+        "name": "排班系統",
+        "exists": true,
+        "required": true
+      },
+      {
+        "id": "promotion",
+        "name": "升遷投票",
+        "exists": true,
+        "required": true
+      },
+      {
+        "id": "maintenance",
+        "name": "維修保養",
+        "exists": true,
+        "required": true
+      }
+    ],
+    "buttons": [
+      {
+        "id": "clockInBtn",
+        "name": "上班打卡按鈕",
+        "exists": true,
+        "functionExists": true,
+        "function": "handleClockIn"
+      },
+      {
+        "id": "clockOutBtn",
+        "name": "下班打卡按鈕",
+        "exists": true,
+        "functionExists": true,
+        "function": "handleClockOut"
+      },
+      {
+        "id": "submitRevenueBtn",
+        "name": "提交營收按鈕",
+        "exists": false,
+        "functionExists": false,
+        "function": "submitRevenue"
+      },
+      {
+        "id": "submitOrderBtn",
+        "name": "提交叫貨按鈕",
+        "exists": false,
+        "functionExists": false,
+        "function": "submitOrder"
+      },
+      {
+        "id": "enterScheduleBtn",
+        "name": "進入排班按鈕",
+        "exists": true,
+        "functionExists": true,
+        "function": "enterScheduleSystem"
+      },
+      {
+        "id": "submitMaintenanceBtn",
+        "name": "提交維修按鈕",
+        "exists": false,
+        "functionExists": false,
+        "function": "submitMaintenance"
+      }
+    ],
+    "dataBinding": [
+      {
+        "id": "currentTime",
+        "name": "當前時間顯示",
+        "exists": true,
+        "required": true
+      },
+      {
+        "id": "workingHours",
+        "name": "工作時數顯示",
+        "exists": true,
+        "required": true
+      },
+      {
+        "id": "attendanceRecords",
+        "name": "打卡記錄容器",
+        "exists": true,
+        "required": true
+      },
+      {
+        "id": "revenueHistory",
+        "name": "營收記錄容器",
+        "exists": false,
+        "required": false
+      },
+      {
+        "id": "orderHistory",
+        "name": "叫貨記錄容器",
+        "exists": false,
+        "required": false
+      },
+      {
+        "id": "scheduleCalendar",
+        "name": "排班月曆容器",
+        "exists": true,
+        "required": true
+      }
+    ],
+    "modals": [
+      {
+        "name": "叫貨操作動態視窗",
+        "exists": false,
+        "pattern": "modal.*fade.*order"
+      },
+      {
+        "name": "營收操作動態視窗",
+        "exists": false,
+        "pattern": "modal.*fade.*revenue"
+      },
+      {
+        "name": "排班操作動態視窗",
+        "exists": false,
+        "pattern": "modal.*fade.*schedule"
+      },
+      {
+        "name": "維修操作動態視窗",
+        "exists": false,
+        "pattern": "modal.*fade.*maintenance"
+      }
+    ],
+    "issues": [
+      {
+        "type": "critical",
+        "component": "section",
+        "message": "缺少必要區段: 叫貨系統 (#orders)"
+      },
+      {
+        "type": "critical",
+        "component": "button",
+        "message": "缺少按鈕: 提交營收按鈕 (#submitRevenueBtn)"
+      },
+      {
+        "type": "critical",
+        "component": "function",
+        "message": "缺少按鈕功能: submitRevenue for 提交營收按鈕"
+      },
+      {
+        "type": "critical",
+        "component": "button",
+        "message": "缺少按鈕: 提交叫貨按鈕 (#submitOrderBtn)"
+      },
+      {
+        "type": "critical",
+        "component": "function",
+        "message": "缺少按鈕功能: submitOrder for 提交叫貨按鈕"
+      },
+      {
+        "type": "critical",
+        "component": "button",
+        "message": "缺少按鈕: 提交維修按鈕 (#submitMaintenanceBtn)"
+      },
+      {
+        "type": "critical",
+        "component": "function",
+        "message": "缺少按鈕功能: submitMaintenance for 提交維修按鈕"
+      },
+      {
+        "type": "minor",
+        "component": "modal",
+        "message": "建議添加動態視窗: 叫貨操作動態視窗"
+      },
+      {
+        "type": "minor",
+        "component": "modal",
+        "message": "建議添加動態視窗: 營收操作動態視窗"
+      },
+      {
+        "type": "minor",
+        "component": "modal",
+        "message": "建議添加動態視窗: 排班操作動態視窗"
+      },
+      {
+        "type": "minor",
+        "component": "modal",
+        "message": "建議添加動態視窗: 維修操作動態視窗"
+      }
+    ]
+  },
+  "adminPage": {
+    "sections": [
+      {
+        "id": "dashboard",
+        "name": "管理總覽",
+        "exists": true,
+        "required": true
+      },
+      {
+        "id": "employees",
+        "name": "員工管理",
+        "exists": true,
+        "required": true
+      },
+      {
+        "id": "stores",
+        "name": "分店管理",
+        "exists": true,
+        "required": true
+      },
+      {
+        "id": "attendance",
+        "name": "出勤管理",
+        "exists": true,
+        "required": true
+      },
+      {
+        "id": "revenue",
+        "name": "營收分析",
+        "exists": true,
+        "required": true
+      },
+      {
+        "id": "maintenance",
+        "name": "維修管理",
+        "exists": true,
+        "required": true
+      },
+      {
+        "id": "orders",
+        "name": "叫貨管理",
+        "exists": true,
+        "required": true
+      },
+      {
+        "id": "promotions",
+        "name": "升遷管理",
+        "exists": true,
+        "required": true
+      },
+      {
+        "id": "scheduling",
+        "name": "排班管理",
+        "exists": true,
+        "required": true
+      },
+      {
+        "id": "settings",
+        "name": "系統設定",
+        "exists": true,
+        "required": true
+      }
+    ],
+    "buttons": [
+      {
+        "name": "載入員工資料功能",
+        "exists": false,
+        "pattern": "loadEmployees|loadAllEmployees"
+      },
+      {
+        "name": "載入分店資料功能",
+        "exists": false,
+        "pattern": "loadStores|loadAllStores"
+      },
+      {
+        "name": "載入出勤資料功能",
+        "exists": true,
+        "pattern": "loadAttendance|loadAllAttendance"
+      },
+      {
+        "name": "載入營收資料功能",
+        "exists": true,
+        "pattern": "loadRevenue|loadAllRevenue"
+      },
+      {
+        "name": "載入排班資料功能",
+        "exists": true,
+        "pattern": "loadScheduling|loadSchedulingCalendar"
+      },
+      {
+        "name": "儲存設定功能",
+        "exists": false,
+        "pattern": "saveSettings|updateSettings"
+      }
+    ],
+    "dataBinding": [
+      {
+        "id": "employeesTable",
+        "name": "員工資料表格",
+        "exists": false,
+        "required": true
+      },
+      {
+        "id": "storesTable",
+        "name": "分店資料表格",
+        "exists": false,
+        "required": true
+      },
+      {
+        "id": "attendanceTable",
+        "name": "出勤資料表格",
+        "exists": false,
+        "required": true
+      },
+      {
+        "id": "revenueTable",
+        "name": "營收資料表格",
+        "exists": false,
+        "required": true
+      },
+      {
+        "id": "schedulingCalendar",
+        "name": "排班月曆",
+        "exists": true,
+        "required": true
+      },
+      {
+        "id": "systemStats",
+        "name": "系統統計資料",
+        "exists": false,
+        "required": false
+      }
+    ],
+    "modals": [
+      {
+        "name": "員工編輯動態視窗",
+        "exists": false,
+        "pattern": "modal.*employee.*edit"
+      },
+      {
+        "name": "分店編輯動態視窗",
+        "exists": false,
+        "pattern": "modal.*store.*edit"
+      },
+      {
+        "name": "營收審核動態視窗",
+        "exists": false,
+        "pattern": "modal.*revenue.*approve"
+      },
+      {
+        "name": "維修更新動態視窗",
+        "exists": false,
+        "pattern": "modal.*maintenance.*update"
+      },
+      {
+        "name": "排班分配動態視窗",
+        "exists": false,
+        "pattern": "modal.*schedule.*assign"
+      }
+    ],
+    "issues": [
+      {
+        "type": "critical",
+        "component": "function",
+        "message": "缺少管理功能: 載入員工資料功能"
+      },
+      {
+        "type": "critical",
+        "component": "function",
+        "message": "缺少管理功能: 載入分店資料功能"
+      },
+      {
+        "type": "critical",
+        "component": "function",
+        "message": "缺少管理功能: 儲存設定功能"
+      },
+      {
+        "type": "minor",
+        "component": "data-binding",
+        "message": "缺少數據容器: 員工資料表格 (#employeesTable)"
+      },
+      {
+        "type": "minor",
+        "component": "data-binding",
+        "message": "缺少數據容器: 分店資料表格 (#storesTable)"
+      },
+      {
+        "type": "minor",
+        "component": "data-binding",
+        "message": "缺少數據容器: 出勤資料表格 (#attendanceTable)"
+      },
+      {
+        "type": "minor",
+        "component": "data-binding",
+        "message": "缺少數據容器: 營收資料表格 (#revenueTable)"
+      },
+      {
+        "type": "minor",
+        "component": "modal",
+        "message": "建議添加動態視窗: 員工編輯動態視窗"
+      },
+      {
+        "type": "minor",
+        "component": "modal",
+        "message": "建議添加動態視窗: 分店編輯動態視窗"
+      },
+      {
+        "type": "minor",
+        "component": "modal",
+        "message": "建議添加動態視窗: 營收審核動態視窗"
+      },
+      {
+        "type": "minor",
+        "component": "modal",
+        "message": "建議添加動態視窗: 維修更新動態視窗"
+      },
+      {
+        "type": "minor",
+        "component": "modal",
+        "message": "建議添加動態視窗: 排班分配動態視窗"
+      }
+    ]
+  },
+  "summary": {
+    "totalIssues": 23,
+    "criticalIssues": 10,
+    "minorIssues": 13,
+    "successRate": 64
+  }
+}

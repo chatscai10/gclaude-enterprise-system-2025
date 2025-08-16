@@ -1,0 +1,22 @@
+{
+  "status": "ready_for_deployment",
+  "timestamp": "2025-08-16T12:46:26.085Z",
+  "platform": "render.com",
+  "config": {
+    "projectName": "gclaude-enterprise-system",
+    "port": 3007,
+    "nodeVersion": "18",
+    "buildCommand": "npm install",
+    "startCommand": "node server.js",
+    "envVars": {
+      "NODE_ENV": "production",
+      "JWT_SECRET": "gclaude-enterprise-jwt-secret-prod-2025",
+      "TELEGRAM_BOT_TOKEN": "7659930552:AAF_jF1rAXFnjFO176-9X5fKfBwbrko8BNc",
+      "TELEGRAM_BOSS_GROUP_ID": "-1002658082392",
+      "TELEGRAM_EMPLOYEE_GROUP_ID": "-1002658082392"
+    }
+  },
+  "deploymentUrl": "https://render.com",
+  "expectedUrl": "https://gclaude-enterprise-system.onrender.com",
+  "healthCheckUrl": "https://gclaude-enterprise-system.onrender.com/api/health"
+}
