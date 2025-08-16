@@ -1790,6 +1790,62 @@ app.post('/api/admin/system/save', authenticateToken, requireAdmin, async (req, 
     }
 });
 
+// 儲存財務項目設定
+app.post('/api/admin/finance/save', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const financeSettings = req.body;
+        
+        // 驗證資料格式
+        if (!financeSettings.incomeItems || !Array.isArray(financeSettings.incomeItems)) {
+            return res.status(400).json({
+                success: false,
+                message: '收入項目資料格式錯誤'
+            });
+        }
+
+        if (!financeSettings.expenseItems || !Array.isArray(financeSettings.expenseItems)) {
+            return res.status(400).json({
+                success: false,
+                message: '支出項目資料格式錯誤'
+            });
+        }
+
+        // 保存財務設定
+        await db.saveFinanceSettings(financeSettings);
+        
+        res.json({
+            success: true,
+            message: '財務項目設定已成功儲存',
+            data: financeSettings
+        });
+    } catch (error) {
+        console.error('儲存財務設定失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '儲存財務設定失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取財務項目設定
+app.get('/api/admin/finance/settings', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const financeSettings = await db.getFinanceSettings();
+        
+        res.json({
+            success: true,
+            data: financeSettings,
+            message: '財務設定獲取成功'
+        });
+    } catch (error) {
+        console.error('獲取財務設定失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '獲取財務設定失敗: ' + error.message
+        });
+    }
+});
+
 // 管理員設定頁面路由
 app.get('/admin-settings', (req, res) => {
     const settingsPath = path.join(__dirname, 'public', 'admin-settings.html');

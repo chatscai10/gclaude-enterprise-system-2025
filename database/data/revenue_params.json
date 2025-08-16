@@ -1,0 +1,15 @@
+[
+  {
+    "id": 1,
+    "weekday_target": 50000,
+    "holiday_target": 80000,
+    "bonus_threshold": 90,
+    "base_bonus_amount": 1000,
+    "weekday_bonus_rate": 2,
+    "holiday_bonus_rate": 3,
+    "over_target_multiplier": 1.5,
+    "cost_deduction_rate": 70,
+    "created_at": "2025-08-16T02:33:09.941Z",
+    "updated_at": "2025-08-16T02:33:09.941Z"
+  }
+]

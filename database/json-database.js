@@ -28,7 +28,10 @@ class JsonDatabase {
             promotions: 'promotions.json',
             promotion_votes: 'promotion_votes.json',
             schedules: 'schedules.json',
-            schedule_settings: 'schedule_settings.json'
+            schedule_settings: 'schedule_settings.json',
+            income_items: 'income_items.json',
+            expense_items: 'expense_items.json',
+            revenue_params: 'revenue_params.json'
         };
         
         this.initializeData();
@@ -2073,6 +2076,80 @@ class JsonDatabase {
             return settings;
         } catch (error) {
             console.error('儲存系統設定失敗:', error);
+            throw error;
+        }
+    }
+
+    async saveFinanceSettings(financeSettings) {
+        try {
+            // 處理收入項目
+            const validIncomeItems = financeSettings.incomeItems.map((item, index) => ({
+                id: item.id || (index + 1),
+                name: item.name || '未命名收入項目',
+                category: item.category || '銷售收入',
+                status: item.status || '啟用',
+                created_at: item.created_at || new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            }));
+
+            // 處理支出項目
+            const validExpenseItems = financeSettings.expenseItems.map((item, index) => ({
+                id: item.id || (index + 1),
+                name: item.name || '未命名支出項目',
+                category: item.category || '營運成本',
+                status: item.status || '啟用',
+                created_at: item.created_at || new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            }));
+
+            // 處理營收參數
+            const revenueParams = {
+                id: 1,
+                weekday_target: parseFloat(financeSettings.revenueParams?.weekdayTarget) || 50000,
+                holiday_target: parseFloat(financeSettings.revenueParams?.holidayTarget) || 80000,
+                bonus_threshold: parseFloat(financeSettings.revenueParams?.bonusThreshold) || 90,
+                base_bonus_amount: parseFloat(financeSettings.revenueParams?.baseBonusAmount) || 1000,
+                weekday_bonus_rate: parseFloat(financeSettings.revenueParams?.weekdayBonusRate) || 2.0,
+                holiday_bonus_rate: parseFloat(financeSettings.revenueParams?.holidayBonusRate) || 3.0,
+                over_target_multiplier: parseFloat(financeSettings.revenueParams?.overTargetMultiplier) || 1.5,
+                cost_deduction_rate: parseFloat(financeSettings.revenueParams?.costDeductionRate) || 70,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+
+            // 保存到對應的表格
+            await Promise.all([
+                this.writeTable('income_items', validIncomeItems),
+                this.writeTable('expense_items', validExpenseItems),
+                this.writeTable('revenue_params', [revenueParams])
+            ]);
+
+            return {
+                incomeItems: validIncomeItems,
+                expenseItems: validExpenseItems,
+                revenueParams: revenueParams
+            };
+        } catch (error) {
+            console.error('儲存財務設定失敗:', error);
+            throw error;
+        }
+    }
+
+    async getFinanceSettings() {
+        try {
+            const [incomeItems, expenseItems, revenueParams] = await Promise.all([
+                this.readTable('income_items'),
+                this.readTable('expense_items'),
+                this.readTable('revenue_params')
+            ]);
+
+            return {
+                incomeItems: incomeItems || [],
+                expenseItems: expenseItems || [],
+                revenueParams: revenueParams.length > 0 ? revenueParams[0] : {}
+            };
+        } catch (error) {
+            console.error('獲取財務設定失敗:', error);
             throw error;
         }
     }
