@@ -1,0 +1,6 @@
+# 強制觸發 Render.com 重新部署
+# 時間戳: 2025-08-16T18:19:30Z
+# 目的: 確保新增的路由 /employee-login 和 /admin-login 正確部署
+
+DEPLOYMENT_TRIGGER=true
+LAST_UPDATE=2025-08-16T18:19:30Z
