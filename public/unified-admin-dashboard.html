@@ -261,14 +261,19 @@
                 <i class="fas fa-crown me-2"></i>
                 <span id="systemTitle">GClaude 企業管理系統 - 管理員</span>
             </a>
-            <div class="navbar-nav ms-auto">
-                <span class="navbar-text me-3">
-                    <i class="fas fa-shield-alt me-1"></i>
-                    管理員，<span id="adminName">載入中...</span>
-                </span>
-                <button class="btn btn-outline-light btn-sm" onclick="logout()">
-                    <i class="fas fa-sign-out-alt me-1"></i>登出
-                </button>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto">
+                    <span class="navbar-text me-3">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        管理員，<span id="adminName">載入中...</span>
+                    </span>
+                    <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                        <i class="fas fa-sign-out-alt me-1"></i>登出
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
@@ -307,6 +312,9 @@
                         <button class="nav-link" data-section="promotions">
                             <i class="fas fa-vote-yea"></i>升遷管理
                         </button>
+                        <button class="nav-link" data-section="scheduling">
+                            <i class="fas fa-calendar-alt"></i>排班管理
+                        </button>
                         <button class="nav-link" data-section="settings">
                             <i class="fas fa-cog"></i>系統設定
                         </button>
@@ -329,6 +337,7 @@
                         <option value="maintenance">🔧 維修管理</option>
                         <option value="orders">🛒 訂單管理</option>
                         <option value="promotions">🗳️ 升遷管理</option>
+                        <option value="scheduling">📅 排班管理</option>
                         <option value="settings">⚙️ 系統設定</option>
                         <option value="reports">📊 報表分析</option>
                     </select>
@@ -593,6 +602,132 @@
                         </div>
                     </div>
 
+                    <!-- 排班管理 -->
+                    <div id="scheduling" class="section-content">
+                        <div class="content-header">
+                            <h2><i class="fas fa-calendar-alt me-2"></i>排班管理</h2>
+                            <p class="text-muted mb-0">管理各分店員工排班分配</p>
+                        </div>
+
+                        <!-- 排班控制面板 -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card border-primary">
+                                    <div class="card-header bg-primary text-white">
+                                        <i class="fas fa-calendar me-2"></i>排班月份選擇
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <label for="scheduleYear" class="form-label">年份</label>
+                                                <select class="form-select" id="scheduleYear">
+                                                    <option value="2025">2025</option>
+                                                    <option value="2026">2026</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-6">
+                                                <label for="scheduleMonth" class="form-label">月份</label>
+                                                <select class="form-select" id="scheduleMonth">
+                                                    <option value="1">1月</option>
+                                                    <option value="2">2月</option>
+                                                    <option value="3">3月</option>
+                                                    <option value="4">4月</option>
+                                                    <option value="5">5月</option>
+                                                    <option value="6">6月</option>
+                                                    <option value="7">7月</option>
+                                                    <option value="8">8月</option>
+                                                    <option value="9">9月</option>
+                                                    <option value="10">10月</option>
+                                                    <option value="11">11月</option>
+                                                    <option value="12">12月</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-primary w-100 mt-3" onclick="loadSchedulingCalendar()">
+                                            <i class="fas fa-sync-alt me-2"></i>載入排班月曆
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-info">
+                                    <div class="card-header bg-info text-white">
+                                        <i class="fas fa-store me-2"></i>分店選擇
+                                    </div>
+                                    <div class="card-body">
+                                        <label for="scheduleStore" class="form-label">選擇分店</label>
+                                        <select class="form-select" id="scheduleStore">
+                                            <option value="">請選擇分店</option>
+                                        </select>
+                                        <div class="mt-3">
+                                            <small class="text-muted">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                選擇分店後可查看該店員工排班狀況
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 排班月曆區域 -->
+                        <div id="schedulingCalendarContainer" style="display: none;">
+                            <div class="card">
+                                <div class="card-header bg-secondary text-white">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-calendar-alt me-2"></i>
+                                            <span id="calendarTitle">排班月曆</span>
+                                        </h5>
+                                        <div class="btn-group">
+                                            <button class="btn btn-outline-light btn-sm" onclick="saveSchedulingChanges()">
+                                                <i class="fas fa-save me-1"></i>儲存變更
+                                            </button>
+                                            <button class="btn btn-outline-light btn-sm" onclick="autoAssignSchedules()">
+                                                <i class="fas fa-magic me-1"></i>智能分配
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div id="schedulingCalendar" class="p-3">
+                                        <!-- 月曆將在這裡動態生成 -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 員工班表統計 -->
+                        <div id="employeeScheduleStats" style="display: none;">
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header bg-success text-white">
+                                            <h5 class="mb-0">
+                                                <i class="fas fa-chart-pie me-2"></i>員工班表統計
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="employeeStatsContent">
+                                                <!-- 統計內容將在這裡顯示 -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 衝突檢測警告 -->
+                        <div id="scheduleConflictWarnings" style="display: none;">
+                            <div class="alert alert-warning mt-3">
+                                <h6><i class="fas fa-exclamation-triangle me-2"></i>排班衝突警告</h6>
+                                <div id="conflictList">
+                                    <!-- 衝突清單將在這裡顯示 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- 系統設定 -->
                     <div id="settings" class="section-content">
                         <div class="content-header">
@@ -799,6 +934,9 @@
                 case 'promotions':
                     await loadPromotionManagement();
                     break;
+                case 'scheduling':
+                    initSchedulingManagement();
+                    break;
                 case 'reports':
                     await loadReportsAnalysis();
                     break;
@@ -983,12 +1121,203 @@
         }
 
         async function loadRevenueAnalysis() {
-            document.getElementById('revenueAnalysis').innerHTML = `
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle me-2"></i>
-                    營收分析功能開發中
-                </div>
-            `;
+            try {
+                // 載入營收統計和待審核記錄
+                const [statsResponse, recordsResponse] = await Promise.all([
+                    fetch('/api/revenue/stats', {
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt_token')}` }
+                    }),
+                    fetch('/api/admin/revenue/all?status=pending', {
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt_token')}` }
+                    })
+                ]);
+
+                const stats = await statsResponse.json();
+                const records = await recordsResponse.json();
+
+                document.getElementById('revenueAnalysis').innerHTML = `
+                    <!-- 營收統計概覽 -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">總營收</h5>
+                                    <h3 class="text-primary">NT$ ${(stats.data?.total_revenue || 0).toLocaleString()}</h3>
+                                    <small class="text-muted">本月累計</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">總獎金</h5>
+                                    <h3 class="text-success">NT$ ${(stats.data?.total_bonus || 0).toLocaleString()}</h3>
+                                    <small class="text-muted">已發放獎金</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">平均營收</h5>
+                                    <h3 class="text-info">NT$ ${(stats.data?.average_revenue || 0).toLocaleString()}</h3>
+                                    <small class="text-muted">每筆記錄</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">待審核</h5>
+                                    <h3 class="text-warning">${records.data?.summary?.pending || 0}</h3>
+                                    <small class="text-muted">筆待審核記錄</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 狀態統計 -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-chart-pie me-2"></i>記錄狀態分布</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>✅ 已核准</span>
+                                        <span><strong>${stats.data?.active_records || 0}</strong> 筆</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>⏳ 待審核</span>
+                                        <span><strong>${stats.data?.pending_records || 0}</strong> 筆</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>🎯 達標記錄</span>
+                                        <span><strong>${stats.data?.achieved_records || 0}</strong> 筆</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-trophy me-2"></i>獎金類型分布</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>🌟 平日獎金</span>
+                                        <span><strong>${stats.data?.weekday_records || 0}</strong> 筆</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>🎊 假日獎金</span>
+                                        <span><strong>${stats.data?.holiday_records || 0}</strong> 筆</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>💎 完美表現</span>
+                                        <span><strong>${stats.data?.perfect_records || 0}</strong> 筆</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 待審核記錄 -->
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5><i class="fas fa-clock me-2"></i>待審核營收記錄</h5>
+                            <button class="btn btn-sm btn-outline-primary" onclick="loadRevenueAnalysis()">
+                                <i class="fas fa-sync-alt"></i> 重新載入
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            ${records.data?.revenues?.length > 0 ? `
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>員工</th>
+                                                <th>日期</th>
+                                                <th>營收</th>
+                                                <th>支出</th>
+                                                <th>獲利</th>
+                                                <th>獎金</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${records.data.revenues.map(record => `
+                                                <tr>
+                                                    <td>#${record.id}</td>
+                                                    <td>${record.employee_name}</td>
+                                                    <td>${record.date}</td>
+                                                    <td class="text-success">NT$ ${(record.total_revenue || 0).toLocaleString()}</td>
+                                                    <td class="text-danger">NT$ ${(record.total_expense || 0).toLocaleString()}</td>
+                                                    <td class="text-primary">NT$ ${((record.total_revenue || 0) - (record.total_expense || 0)).toLocaleString()}</td>
+                                                    <td class="text-warning">NT$ ${(record.calculated_bonus || 0).toLocaleString()}</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-success me-1" onclick="approveRevenue(${record.id}, 'approve')">
+                                                            <i class="fas fa-check"></i> 核准
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger" onclick="approveRevenue(${record.id}, 'reject')">
+                                                            <i class="fas fa-times"></i> 拒絕
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ` : `
+                                <div class="alert alert-info text-center">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    目前沒有待審核的營收記錄
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('載入營收分析失敗:', error);
+                document.getElementById('revenueAnalysis').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        載入營收分析失敗: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // 審核營收記錄
+        async function approveRevenue(revenueId, action) {
+            const reason = prompt(action === 'approve' ? '核准原因（可選）:' : '拒絕原因:');
+            if (action === 'reject' && !reason) {
+                alert('拒絕時必須填寫原因');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/revenue/${revenueId}/approve`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    },
+                    body: JSON.stringify({ action, reason })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message);
+                    loadRevenueAnalysis(); // 重新載入
+                } else {
+                    alert(`審核失敗: ${result.message}`);
+                }
+            } catch (error) {
+                console.error('審核失敗:', error);
+                alert('審核失敗: ' + error.message);
+            }
         }
 
         async function loadMaintenanceManagement() {
@@ -1067,6 +1396,542 @@
         }
 
         // 登出功能
+        // ==================== 排班管理功能 ====================
+        
+        // 全域變數
+        let currentScheduleData = {};
+        let selectedStore = null;
+        let selectedMonth = null;
+        let selectedYear = null;
+
+        // 載入排班月曆
+        async function loadSchedulingCalendar() {
+            const year = document.getElementById('scheduleYear').value;
+            const month = document.getElementById('scheduleMonth').value;
+            const store = document.getElementById('scheduleStore').value;
+            
+            if (!store) {
+                alert('請先選擇分店');
+                return;
+            }
+
+            selectedYear = year;
+            selectedMonth = month;
+            selectedStore = store;
+
+            try {
+                // 載入該分店的員工列表和排班資料
+                const [employeesResponse, scheduleResponse] = await Promise.all([
+                    fetch(`/api/admin/employees?store=${store}`, {
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt_token')}` }
+                    }),
+                    fetch(`/api/admin/schedule/${year}/${month}?store=${store}`, {
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt_token')}` }
+                    })
+                ]);
+
+                const employees = await employeesResponse.json();
+                const scheduleData = await scheduleResponse.json();
+
+                currentScheduleData = scheduleData.data || {};
+                
+                // 生成月曆介面
+                generateAdminSchedulingCalendar(year, month, employees.data || [], currentScheduleData);
+                
+                // 更新標題
+                document.getElementById('calendarTitle').textContent = 
+                    `${year}年${month}月 - ${getStoreName(store)} 排班月曆`;
+
+                // 顯示月曆容器
+                document.getElementById('schedulingCalendarContainer').style.display = 'block';
+                document.getElementById('employeeScheduleStats').style.display = 'block';
+                
+                // 載入統計資料
+                loadEmployeeScheduleStats(employees.data || [], currentScheduleData);
+                
+                // 檢查衝突
+                checkScheduleConflicts();
+
+            } catch (error) {
+                console.error('載入排班資料失敗:', error);
+                alert('載入排班資料失敗');
+            }
+        }
+
+        // 生成管理員排班月曆
+        function generateAdminSchedulingCalendar(year, month, employees, scheduleData) {
+            const calendar = document.getElementById('schedulingCalendar');
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const firstDay = new Date(year, month - 1, 1).getDay();
+            
+            let html = `
+                <style>
+                    .admin-calendar-grid {
+                        display: grid;
+                        grid-template-columns: repeat(7, 1fr);
+                        gap: 2px;
+                        font-size: 12px;
+                    }
+                    .admin-calendar-header {
+                        background: #6c757d;
+                        color: white;
+                        padding: 8px;
+                        text-align: center;
+                        font-weight: bold;
+                    }
+                    .admin-calendar-day {
+                        border: 1px solid #dee2e6;
+                        min-height: 120px;
+                        background: white;
+                        position: relative;
+                        overflow: hidden;
+                    }
+                    .admin-day-number {
+                        position: absolute;
+                        top: 2px;
+                        left: 5px;
+                        font-weight: bold;
+                        font-size: 14px;
+                    }
+                    .admin-day-content {
+                        margin-top: 20px;
+                        padding: 2px;
+                    }
+                    .employee-assignment {
+                        background: #e7f3ff;
+                        border: 1px solid #b3d9ff;
+                        border-radius: 3px;
+                        padding: 2px 4px;
+                        margin: 1px 0;
+                        font-size: 10px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+                    .assignment-controls {
+                        display: flex;
+                        gap: 2px;
+                    }
+                    .btn-assignment {
+                        padding: 1px 4px;
+                        font-size: 8px;
+                        border: none;
+                        border-radius: 2px;
+                        cursor: pointer;
+                    }
+                    .add-employee-btn {
+                        background: #28a745;
+                        color: white;
+                        border: 1px dashed #198754;
+                        width: 100%;
+                        padding: 4px;
+                        font-size: 10px;
+                        margin-top: 2px;
+                        border-radius: 3px;
+                        cursor: pointer;
+                    }
+                    .weekend-day {
+                        background-color: #fff8e1 !important;
+                    }
+                    .holiday-day {
+                        background-color: #ffebee !important;
+                    }
+                </style>
+                
+                <div class="admin-calendar-grid">
+                    <!-- 星期標題 -->
+                    <div class="admin-calendar-header">日</div>
+                    <div class="admin-calendar-header">一</div>
+                    <div class="admin-calendar-header">二</div>
+                    <div class="admin-calendar-header">三</div>
+                    <div class="admin-calendar-header">四</div>
+                    <div class="admin-calendar-header">五</div>
+                    <div class="admin-calendar-header">六</div>
+            `;
+
+            // 前面空白格子
+            for (let i = 0; i < firstDay; i++) {
+                html += '<div class="admin-calendar-day"></div>';
+            }
+
+            // 日期格子
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayKey = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+                const dayOfWeek = new Date(year, month - 1, day).getDay();
+                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                
+                // 取得當日排班員工
+                const dayAssignments = scheduleData[dayKey] || [];
+                
+                let dayClass = 'admin-calendar-day';
+                if (isWeekend) dayClass += ' weekend-day';
+
+                html += `
+                    <div class="${dayClass}" data-date="${dayKey}">
+                        <div class="admin-day-number">${day}</div>
+                        <div class="admin-day-content">
+                            ${dayAssignments.map(assignment => `
+                                <div class="employee-assignment">
+                                    <span>${assignment.employee_name}</span>
+                                    <div class="assignment-controls">
+                                        <button class="btn-assignment" style="background: #ffc107; color: #000;" 
+                                                onclick="editEmployeeAssignment('${dayKey}', '${assignment.employee_id}')">
+                                            編
+                                        </button>
+                                        <button class="btn-assignment" style="background: #dc3545; color: white;" 
+                                                onclick="removeEmployeeAssignment('${dayKey}', '${assignment.employee_id}')">
+                                            ×
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            <button class="add-employee-btn" onclick="showEmployeeSelector('${dayKey}')">
+                                + 新增員工
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+            
+            // 員工選擇模組
+            html += `
+                <div id="employeeSelectorModal" class="modal fade" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">選擇員工</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="employeeSelectList">
+                                    ${employees.map(emp => `
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" 
+                                                   value="${emp.id}" id="emp_${emp.id}">
+                                            <label class="form-check-label" for="emp_${emp.id}">
+                                                ${emp.name} 
+                                                <small class="text-muted">(${emp.position || '未設定職位'})</small>
+                                                ${emp.on_vacation ? '<span class="badge bg-warning">休假中</span>' : ''}
+                                            </label>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                <button type="button" class="btn btn-primary" onclick="confirmEmployeeSelection()">確認</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            calendar.innerHTML = html;
+        }
+
+        // 顯示員工選擇器
+        let currentSelectingDate = null;
+        function showEmployeeSelector(date) {
+            currentSelectingDate = date;
+            
+            // 清除先前選擇
+            document.querySelectorAll('#employeeSelectList input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // 顯示模組
+            const modal = new bootstrap.Modal(document.getElementById('employeeSelectorModal'));
+            modal.show();
+        }
+
+        // 確認員工選擇
+        function confirmEmployeeSelection() {
+            const selectedEmployees = [];
+            document.querySelectorAll('#employeeSelectList input[type="checkbox"]:checked').forEach(checkbox => {
+                const employeeId = checkbox.value;
+                const employeeName = checkbox.nextElementSibling.textContent.trim().split(' ')[0];
+                selectedEmployees.push({ employee_id: employeeId, employee_name: employeeName });
+            });
+
+            if (selectedEmployees.length > 0) {
+                // 更新當日排班資料
+                if (!currentScheduleData[currentSelectingDate]) {
+                    currentScheduleData[currentSelectingDate] = [];
+                }
+                
+                selectedEmployees.forEach(emp => {
+                    // 檢查是否已存在
+                    const exists = currentScheduleData[currentSelectingDate].some(existing => 
+                        existing.employee_id === emp.employee_id);
+                    
+                    if (!exists) {
+                        currentScheduleData[currentSelectingDate].push(emp);
+                    }
+                });
+
+                // 重新生成該日顯示
+                updateDayDisplay(currentSelectingDate);
+            }
+
+            // 關閉模組
+            bootstrap.Modal.getInstance(document.getElementById('employeeSelectorModal')).hide();
+        }
+
+        // 更新單日顯示
+        function updateDayDisplay(date) {
+            const dayElement = document.querySelector(`[data-date="${date}"] .admin-day-content`);
+            const assignments = currentScheduleData[date] || [];
+            
+            dayElement.innerHTML = `
+                ${assignments.map(assignment => `
+                    <div class="employee-assignment">
+                        <span>${assignment.employee_name}</span>
+                        <div class="assignment-controls">
+                            <button class="btn-assignment" style="background: #ffc107; color: #000;" 
+                                    onclick="editEmployeeAssignment('${date}', '${assignment.employee_id}')">
+                                編
+                            </button>
+                            <button class="btn-assignment" style="background: #dc3545; color: white;" 
+                                    onclick="removeEmployeeAssignment('${date}', '${assignment.employee_id}')">
+                                ×
+                            </button>
+                        </div>
+                    </div>
+                `).join('')}
+                <button class="add-employee-btn" onclick="showEmployeeSelector('${date}')">
+                    + 新增員工
+                </button>
+            `;
+            
+            // 更新統計和檢查衝突
+            loadEmployeeScheduleStats();
+            checkScheduleConflicts();
+        }
+
+        // 移除員工分配
+        function removeEmployeeAssignment(date, employeeId) {
+            if (!currentScheduleData[date]) return;
+            
+            currentScheduleData[date] = currentScheduleData[date].filter(assignment => 
+                assignment.employee_id !== employeeId);
+            
+            updateDayDisplay(date);
+        }
+
+        // 載入員工統計
+        function loadEmployeeScheduleStats(employees = null, scheduleData = null) {
+            if (!employees) {
+                // 如果沒有傳入員工資料，使用現有的
+                // 這裡可以從API重新載入或使用快取
+                return;
+            }
+
+            const stats = {};
+            employees.forEach(emp => {
+                stats[emp.id] = {
+                    name: emp.name,
+                    total_days: 0,
+                    work_days: [],
+                    position: emp.position || '未設定'
+                };
+            });
+
+            // 計算每個員工的工作天數
+            Object.keys(scheduleData || currentScheduleData).forEach(date => {
+                const assignments = (scheduleData || currentScheduleData)[date] || [];
+                assignments.forEach(assignment => {
+                    if (stats[assignment.employee_id]) {
+                        stats[assignment.employee_id].total_days++;
+                        stats[assignment.employee_id].work_days.push(date);
+                    }
+                });
+            });
+
+            // 生成統計顯示
+            const statsHtml = `
+                <div class="row">
+                    ${Object.values(stats).map(stat => `
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">${stat.name}</h6>
+                                    <div class="h4 text-primary">${stat.total_days}天</div>
+                                    <small class="text-muted">${stat.position}</small>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            document.getElementById('employeeStatsContent').innerHTML = statsHtml;
+        }
+
+        // 檢查排班衝突
+        function checkScheduleConflicts() {
+            const conflicts = [];
+            
+            // 檢查員工是否在同一天被分配到多個分店
+            // 這需要跨分店的資料，目前先檢查當前分店的過度分配
+            
+            Object.keys(currentScheduleData).forEach(date => {
+                const assignments = currentScheduleData[date] || [];
+                const employeeCount = {};
+                
+                assignments.forEach(assignment => {
+                    if (employeeCount[assignment.employee_id]) {
+                        employeeCount[assignment.employee_id]++;
+                    } else {
+                        employeeCount[assignment.employee_id] = 1;
+                    }
+                });
+                
+                // 檢查重複分配
+                Object.keys(employeeCount).forEach(employeeId => {
+                    if (employeeCount[employeeId] > 1) {
+                        const assignment = assignments.find(a => a.employee_id === employeeId);
+                        conflicts.push({
+                            date: date,
+                            message: `${assignment.employee_name} 在 ${date} 被重複分配`,
+                            type: 'duplicate'
+                        });
+                    }
+                });
+            });
+
+            // 顯示衝突警告
+            if (conflicts.length > 0) {
+                document.getElementById('scheduleConflictWarnings').style.display = 'block';
+                document.getElementById('conflictList').innerHTML = conflicts.map(conflict => `
+                    <div class="alert alert-warning alert-sm">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        ${conflict.message}
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('scheduleConflictWarnings').style.display = 'none';
+            }
+        }
+
+        // 儲存排班變更
+        async function saveSchedulingChanges() {
+            if (!selectedStore || !selectedYear || !selectedMonth) {
+                alert('請先載入排班資料');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/schedule', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    },
+                    body: JSON.stringify({
+                        store_id: selectedStore,
+                        year: selectedYear,
+                        month: selectedMonth,
+                        schedule_data: currentScheduleData
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('排班資料儲存成功！');
+                } else {
+                    alert('儲存失敗：' + result.message);
+                }
+            } catch (error) {
+                console.error('儲存排班資料失敗:', error);
+                alert('儲存失敗，請稍後再試');
+            }
+        }
+
+        // 智能排班分配
+        async function autoAssignSchedules() {
+            if (!selectedStore || !selectedYear || !selectedMonth) {
+                alert('請先載入排班資料');
+                return;
+            }
+
+            if (!confirm('確定要使用智能分配嗎？這將會覆蓋現有的排班設定。')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/schedule/auto-assign', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    },
+                    body: JSON.stringify({
+                        store_id: selectedStore,
+                        year: selectedYear,
+                        month: selectedMonth
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // 重新載入月曆
+                    currentScheduleData = result.data.schedule_data;
+                    loadSchedulingCalendar();
+                    alert('智能排班分配完成！');
+                } else {
+                    alert('智能分配失敗：' + result.message);
+                }
+            } catch (error) {
+                console.error('智能分配失敗:', error);
+                alert('智能分配失敗，請稍後再試');
+            }
+        }
+
+        // 取得分店名稱
+        function getStoreName(storeId) {
+            // 這裡應該從分店列表中取得名稱
+            // 暫時返回ID
+            return `分店 ${storeId}`;
+        }
+
+        // 載入分店列表到下拉選單
+        async function loadStoreOptions() {
+            try {
+                const response = await fetch('/api/admin/stores', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt_token')}` }
+                });
+                const stores = await response.json();
+                
+                const select = document.getElementById('scheduleStore');
+                select.innerHTML = '<option value="">請選擇分店</option>';
+                
+                if (stores.success && stores.data) {
+                    stores.data.forEach(store => {
+                        select.innerHTML += `<option value="${store.id}">${store.name}</option>`;
+                    });
+                }
+            } catch (error) {
+                console.error('載入分店列表失敗:', error);
+            }
+        }
+
+        // 初始化排班管理
+        function initSchedulingManagement() {
+            // 設定預設月份為下個月
+            const nextMonth = new Date();
+            nextMonth.setMonth(nextMonth.getMonth() + 1);
+            
+            document.getElementById('scheduleYear').value = nextMonth.getFullYear();
+            document.getElementById('scheduleMonth').value = nextMonth.getMonth() + 1;
+            
+            // 載入分店選項
+            loadStoreOptions();
+        }
+
         function logout() {
             localStorage.removeItem('jwt_token');
             localStorage.removeItem('user_data');

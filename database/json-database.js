@@ -544,6 +544,31 @@ class JsonDatabase {
         if (existingRecord && existingRecord.clock_in) {
             throw new Error('今日已完成上班打卡');
         }
+
+        // GPS距離驗證
+        let distanceMeters = null;
+        let isLocationValid = true;
+        
+        if (clockInData.latitude && clockInData.longitude) {
+            // 取得分店GPS座標（這裡先用預設值，實際應從stores表取得）
+            const storeCoords = await this.getStoreCoordinates(clockInData.store_id);
+            if (storeCoords) {
+                distanceMeters = this.calculateHaversineDistance(
+                    clockInData.latitude, 
+                    clockInData.longitude,
+                    storeCoords.latitude, 
+                    storeCoords.longitude
+                );
+                
+                // 檢查距離是否在允許範圍內 (預設100公尺)
+                const maxDistance = 100;
+                isLocationValid = distanceMeters <= maxDistance;
+                
+                if (!isLocationValid) {
+                    throw new Error(`打卡位置距離分店過遠 (${Math.round(distanceMeters)}公尺)，請到分店附近打卡`);
+                }
+            }
+        }
         
         const newRecord = {
             id: Date.now(),
@@ -557,6 +582,8 @@ class JsonDatabase {
             location: clockInData.location,
             latitude: clockInData.latitude,
             longitude: clockInData.longitude,
+            distance_meters: distanceMeters,
+            is_location_valid: isLocationValid,
             gps_accuracy: clockInData.gps_accuracy,
             device_fingerprint: clockInData.device_fingerprint,
             ip_address: clockInData.ip_address,
@@ -572,7 +599,11 @@ class JsonDatabase {
         // 記錄設備指紋歷史
         await this.recordDeviceFingerprint(clockInData.employee_id, clockInData.device_fingerprint, 'clock_in');
         
-        return { id: newRecord.id };
+        return { 
+            id: newRecord.id, 
+            distance_meters: distanceMeters,
+            is_location_valid: isLocationValid
+        };
     }
     
     async clockOutWithGPS(clockOutData) {
@@ -1717,6 +1748,14 @@ class JsonDatabase {
         const store = stores.find(s => s.id === data.store_id);
         const employee = employees.find(e => e.id === data.employee_id);
         
+        // 自動計算獎金（確保一致性）
+        const bonusCalculation = this.calculateBonusAmount({
+            total_revenue: data.total_revenue,
+            total_expense: data.total_expense,
+            date: data.date,
+            created_at: new Date().toISOString()
+        });
+
         const newRevenue = {
             id: revenues.length > 0 ? Math.max(...revenues.map(r => r.id)) + 1 : 1,
             date: data.date,
@@ -1724,20 +1763,21 @@ class JsonDatabase {
             store_name: store ? store.name : '未知分店',
             employee_id: data.employee_id,
             employee_name: employee ? employee.name : '未知員工',
-            bonus_type: data.bonus_type,
+            bonus_type: bonusCalculation.type, // 使用計算出的獎金類型
             order_count: data.order_count,
             revenue_items: JSON.stringify(data.revenue_items),
             expense_items: JSON.stringify(data.expense_items),
             notes: data.notes,
             total_revenue: data.total_revenue,
             total_expense: data.total_expense,
-            net_revenue: data.net_revenue,
-            bonus_amount: data.bonus_amount,
+            net_revenue: data.total_revenue - data.total_expense, // 重新計算淨營收
+            bonus_amount: bonusCalculation.amount, // 使用計算出的獎金
+            bonus_reason: bonusCalculation.reason, // 新增獎金原因
             shortage_amount: data.shortage_amount,
             achievement_rate: data.achievement_rate,
             target: data.target,
             photos: JSON.stringify(data.photos),
-            status: 'active',
+            status: 'pending', // 新記錄預設為pending，需管理員審核
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
         };
@@ -1754,16 +1794,36 @@ class JsonDatabase {
     async getRevenueRecords(filters = {}) {
         const revenues = await this.readTable('revenue');
         
-        let filteredRevenues = revenues.filter(r => r.status === 'active');
+        // 狀態篩選（支援多種狀態）
+        let filteredRevenues = revenues;
+        if (filters.status) {
+            filteredRevenues = filteredRevenues.filter(r => r.status === filters.status);
+        } else {
+            // 預設只返回active記錄，但管理員可以看到所有
+            filteredRevenues = filteredRevenues.filter(r => ['active', 'pending'].includes(r.status));
+        }
         
         // 按分店篩選
         if (filters.store_id) {
             filteredRevenues = filteredRevenues.filter(r => r.store_id === filters.store_id);
         }
         
+        // 按員工篩選
+        if (filters.employee_id) {
+            filteredRevenues = filteredRevenues.filter(r => r.employee_id === filters.employee_id);
+        }
+        
         // 按日期篩選
         if (filters.date) {
             filteredRevenues = filteredRevenues.filter(r => r.date === filters.date);
+        }
+        
+        // 按日期範圍篩選
+        if (filters.date_from) {
+            filteredRevenues = filteredRevenues.filter(r => r.date >= filters.date_from);
+        }
+        if (filters.date_to) {
+            filteredRevenues = filteredRevenues.filter(r => r.date <= filters.date_to);
         }
         
         // 排序：最新的在前
@@ -1781,6 +1841,33 @@ class JsonDatabase {
             expense_items: JSON.parse(revenue.expense_items || '[]'),
             photos: JSON.parse(revenue.photos || '[]')
         }));
+    }
+    
+    async updateRevenueStatus(revenueId, action, reason, reviewerId) {
+        const revenues = await this.readTable('revenue');
+        const revenue = revenues.find(r => r.id === revenueId);
+        
+        if (!revenue) {
+            throw new Error('找不到營收記錄');
+        }
+        
+        // 更新狀態
+        const newStatus = action === 'approve' ? 'active' : 'rejected';
+        revenue.status = newStatus;
+        revenue.reviewed_by = reviewerId;
+        revenue.review_reason = reason;
+        revenue.reviewed_at = new Date().toISOString();
+        revenue.updated_at = new Date().toISOString();
+        
+        await this.writeTable('revenue', revenues);
+        
+        return {
+            id: revenue.id,
+            status: newStatus,
+            employee_name: revenue.employee_name,
+            total_revenue: revenue.total_revenue,
+            bonus_amount: revenue.bonus_amount
+        };
     }
 
     async voidRevenueRecord(recordId, employeeId, reason) {
@@ -1812,10 +1899,11 @@ class JsonDatabase {
 
     async getRevenueStats(filters = {}) {
         const revenues = await this.readTable('revenue');
-        const activeRevenues = revenues.filter(r => r.status === 'active');
+        // 包含pending和active記錄在統計中
+        const validRevenues = revenues.filter(r => r.status === 'active' || r.status === 'pending');
         
         // 按條件篩選
-        let filteredRevenues = activeRevenues;
+        let filteredRevenues = validRevenues;
         
         if (filters.store_id) {
             filteredRevenues = filteredRevenues.filter(r => r.store_id === filters.store_id);
@@ -1851,18 +1939,50 @@ class JsonDatabase {
         
         filteredRevenues = filteredRevenues.filter(r => new Date(r.date) >= startDate);
         
+        // 重新計算所有記錄的獎金（確保邏輯一致）
+        filteredRevenues = filteredRevenues.map(record => {
+            const updatedRecord = { ...record };
+            const bonus = this.calculateBonusAmount(record);
+            updatedRecord.bonus_amount = bonus.amount;
+            updatedRecord.bonus_type = bonus.type;
+            updatedRecord.bonus_reason = bonus.reason;
+            return updatedRecord;
+        });
+        
+        // 按狀態分組統計
+        const activeRecords = filteredRevenues.filter(r => r.status === 'active');
+        const pendingRecords = filteredRevenues.filter(r => r.status === 'pending');
+        
         // 計算統計
         const stats = {
             total_records: filteredRevenues.length,
+            active_records: activeRecords.length,
+            pending_records: pendingRecords.length,
             total_revenue: filteredRevenues.reduce((sum, r) => sum + (r.total_revenue || 0), 0),
             total_expense: filteredRevenues.reduce((sum, r) => sum + (r.total_expense || 0), 0),
+            total_profit: filteredRevenues.reduce((sum, r) => sum + ((r.total_revenue || 0) - (r.total_expense || 0)), 0),
             total_bonus: filteredRevenues.reduce((sum, r) => sum + (r.bonus_amount || 0), 0),
             achieved_records: filteredRevenues.filter(r => r.bonus_amount > 0).length,
             weekday_records: filteredRevenues.filter(r => r.bonus_type === 'weekday').length,
             holiday_records: filteredRevenues.filter(r => r.bonus_type === 'holiday').length,
+            perfect_records: filteredRevenues.filter(r => r.bonus_type === 'perfect').length,
             average_revenue: filteredRevenues.length > 0 ? 
                 filteredRevenues.reduce((sum, r) => sum + (r.total_revenue || 0), 0) / filteredRevenues.length : 0,
+            average_profit: filteredRevenues.length > 0 ? 
+                filteredRevenues.reduce((sum, r) => sum + ((r.total_revenue || 0) - (r.total_expense || 0)), 0) / filteredRevenues.length : 0,
             best_store: this.calculateBestStore(filteredRevenues),
+            status_breakdown: {
+                active: {
+                    count: activeRecords.length,
+                    revenue: activeRecords.reduce((sum, r) => sum + (r.total_revenue || 0), 0),
+                    bonus: activeRecords.reduce((sum, r) => sum + (r.bonus_amount || 0), 0)
+                },
+                pending: {
+                    count: pendingRecords.length,
+                    revenue: pendingRecords.reduce((sum, r) => sum + (r.total_revenue || 0), 0),
+                    bonus: pendingRecords.reduce((sum, r) => sum + (r.bonus_amount || 0), 0)
+                }
+            },
             recent_records: filteredRevenues
                 .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
                 .slice(0, 10)
@@ -1903,6 +2023,97 @@ class JsonDatabase {
         });
         
         return bestStore || '暫無數據';
+    }
+
+    // ==================== 獎金計算邏輯 ====================
+    
+    calculateBonusAmount(revenueRecord) {
+        const totalRevenue = revenueRecord.total_revenue || 0;
+        const totalExpense = revenueRecord.total_expense || 0;
+        const profit = totalRevenue - totalExpense;
+        const recordDate = new Date(revenueRecord.date || revenueRecord.created_at);
+        const isHoliday = this.isHolidayOrWeekend(recordDate);
+        
+        // 基本獎金條件檢查
+        if (profit <= 0) {
+            return { amount: 0, type: 'none', reason: '營收未達獲利標準' };
+        }
+        
+        // 獎金計算邏輯（依照系統需求）
+        let bonusAmount = 0;
+        let bonusType = 'none';
+        let bonusReason = '';
+        
+        // 1. 基本獲利獎金：獲利的5%
+        bonusAmount = Math.floor(profit * 0.05);
+        bonusType = 'basic';
+        bonusReason = `基本獲利獎金 (獲利: $${profit.toLocaleString()})`;
+        
+        // 2. 營收達標獎金
+        if (totalRevenue >= 50000) {
+            bonusAmount += 1000;
+            bonusType = 'achievement';
+            bonusReason += ' + 營收達標獎金 ($50K+)';
+        }
+        
+        if (totalRevenue >= 100000) {
+            bonusAmount += 2000;
+            bonusType = 'high_achievement';
+            bonusReason += ' + 高額營收獎金 ($100K+)';
+        }
+        
+        // 3. 假日加成獎金
+        if (isHoliday) {
+            bonusAmount = Math.floor(bonusAmount * 1.5);
+            bonusType = 'holiday';
+            bonusReason += ' + 假日加成 (1.5倍)';
+        }
+        
+        // 4. 完美表現獎金（高營收 + 低成本）
+        const profitRatio = profit / totalRevenue;
+        if (profitRatio >= 0.7 && totalRevenue >= 30000) {
+            bonusAmount += 1500;
+            bonusType = 'perfect';
+            bonusReason += ' + 完美表現獎金 (獲利率70%+)';
+        }
+        
+        // 5. 平日表現獎金
+        if (!isHoliday && bonusType === 'basic') {
+            bonusType = 'weekday';
+        }
+        
+        return {
+            amount: Math.max(0, bonusAmount),
+            type: bonusType,
+            reason: bonusReason.replace(/^\s\+\s/, '') // 移除開頭的 " + "
+        };
+    }
+    
+    isHolidayOrWeekend(date) {
+        const dayOfWeek = date.getDay(); // 0 = Sunday, 6 = Saturday
+        
+        // 週末判斷
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+            return true;
+        }
+        
+        // 國定假日判斷（簡化版）
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        
+        // 常見假日
+        const holidays = [
+            '1-1',   // 元旦
+            '2-28',  // 和平紀念日
+            '4-4',   // 兒童節
+            '4-5',   // 清明節
+            '5-1',   // 勞動節
+            '10-10', // 國慶日
+            '12-25'  // 聖誕節
+        ];
+        
+        const dateKey = `${month}-${day}`;
+        return holidays.includes(dateKey);
     }
 
     // ==================== 儀表板統計 ====================
@@ -2161,6 +2372,318 @@ class JsonDatabase {
         } catch (error) {
             console.error('獲取財務設定失敗:', error);
             throw error;
+        }
+    }
+
+    // ==================== 管理員排班分配功能 ====================
+    
+    // 取得所有員工
+    async getAllEmployees() {
+        try {
+            const employees = await this.readTable('employees');
+            return employees.filter(emp => emp.status === 'active');
+        } catch (error) {
+            console.error('取得員工列表失敗:', error);
+            throw error;
+        }
+    }
+
+    // 取得所有分店
+    async getAllStores() {
+        try {
+            const stores = await this.readTable('stores');
+            return stores;
+        } catch (error) {
+            console.error('取得分店列表失敗:', error);
+            throw error;
+        }
+    }
+
+    // 取得指定分店的員工
+    async getEmployeesByStore(storeId) {
+        try {
+            const employees = await this.readTable('employees');
+            return employees.filter(emp => 
+                emp.store_id === storeId && emp.status === 'active'
+            );
+        } catch (error) {
+            console.error('取得分店員工失敗:', error);
+            throw error;
+        }
+    }
+
+    // 取得排班資料
+    async getScheduleData(year, month, storeId) {
+        try {
+            const schedules = await this.readTable('schedules');
+            const key = `${year}-${month}-${storeId}`;
+            
+            const schedule = schedules.find(s => 
+                s.year === year && 
+                s.month === month && 
+                s.store_id === storeId
+            );
+            
+            return schedule ? schedule.schedule_data : {};
+        } catch (error) {
+            console.error('取得排班資料失敗:', error);
+            return {};
+        }
+    }
+
+    // 儲存排班資料
+    async saveScheduleData(scheduleInfo) {
+        try {
+            const schedules = await this.readTable('schedules');
+            const { store_id, year, month, schedule_data, updated_by, updated_at } = scheduleInfo;
+            
+            // 查找現有記錄
+            const existingIndex = schedules.findIndex(s => 
+                s.year === year && 
+                s.month === month && 
+                s.store_id === store_id
+            );
+            
+            const scheduleRecord = {
+                id: existingIndex >= 0 ? schedules[existingIndex].id : this.generateId(),
+                store_id,
+                year,
+                month,
+                schedule_data,
+                updated_by,
+                updated_at,
+                created_at: existingIndex >= 0 ? schedules[existingIndex].created_at : updated_at
+            };
+            
+            if (existingIndex >= 0) {
+                schedules[existingIndex] = scheduleRecord;
+            } else {
+                schedules.push(scheduleRecord);
+            }
+            
+            await this.writeTable('schedules', schedules);
+            return scheduleRecord;
+        } catch (error) {
+            console.error('儲存排班資料失敗:', error);
+            throw error;
+        }
+    }
+
+    // 智能排班分配算法
+    async generateAutoSchedule({ store_id, year, month, employees, existing_schedule }) {
+        try {
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const autoSchedule = {};
+            
+            // 基本排班邏輯：輪流分配
+            let employeeIndex = 0;
+            const activeEmployees = employees.filter(emp => !emp.on_vacation);
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayKey = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+                const dayOfWeek = new Date(year, month - 1, day).getDay();
+                
+                // 週末需要更多人手
+                const requiredStaff = (dayOfWeek === 0 || dayOfWeek === 6) ? 
+                    Math.min(3, activeEmployees.length) : 
+                    Math.min(2, activeEmployees.length);
+                
+                autoSchedule[dayKey] = [];
+                
+                for (let i = 0; i < requiredStaff; i++) {
+                    if (activeEmployees.length > 0) {
+                        const employee = activeEmployees[employeeIndex % activeEmployees.length];
+                        autoSchedule[dayKey].push({
+                            employee_id: employee.id,
+                            employee_name: employee.name
+                        });
+                        employeeIndex++;
+                    }
+                }
+            }
+            
+            return autoSchedule;
+        } catch (error) {
+            console.error('智能排班分配失敗:', error);
+            throw error;
+        }
+    }
+
+    // ==================== GPS距離計算功能 ====================
+
+    // Haversine距離計算公式
+    calculateHaversineDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371e3; // 地球半徑（公尺）
+        const φ1 = lat1 * Math.PI/180; // φ, λ in radians
+        const φ2 = lat2 * Math.PI/180;
+        const Δφ = (lat2-lat1) * Math.PI/180;
+        const Δλ = (lon2-lon1) * Math.PI/180;
+
+        const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                  Math.cos(φ1) * Math.cos(φ2) *
+                  Math.sin(Δλ/2) * Math.sin(Δλ/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+        const distance = R * c; // 距離（公尺）
+        return distance;
+    }
+
+    // 取得分店GPS座標
+    async getStoreCoordinates(storeId) {
+        try {
+            const stores = await this.readTable('stores');
+            const store = stores.find(s => s.id === storeId);
+            
+            if (store && store.latitude && store.longitude) {
+                return {
+                    latitude: store.latitude,
+                    longitude: store.longitude
+                };
+            }
+            
+            // 如果分店沒有設定GPS座標，使用預設座標（台北市政府）
+            return {
+                latitude: 25.0378,
+                longitude: 121.5645
+            };
+        } catch (error) {
+            console.error('取得分店座標失敗:', error);
+            // 返回預設座標
+            return {
+                latitude: 25.0378,
+                longitude: 121.5645
+            };
+        }
+    }
+
+    // ==================== 排班系統時間控制功能 ====================
+
+    // 獲取排班系統狀態
+    async getScheduleSystemStatus() {
+        try {
+            const now = new Date();
+            const currentDay = now.getDate();
+            const currentHour = now.getHours();
+            
+            // 排班開放時間：每月16號02:00 - 21號02:00
+            let isOpen = false;
+            let statusText = '系統關閉';
+            let nextOpenTime = '';
+            let inUse = false;
+            let currentUser = null;
+            
+            // 檢查時間範圍
+            if (currentDay >= 16 && currentDay <= 21) {
+                if (currentDay === 16 && currentHour >= 2) {
+                    isOpen = true;
+                } else if (currentDay > 16 && currentDay < 21) {
+                    isOpen = true;
+                } else if (currentDay === 21 && currentHour < 2) {
+                    isOpen = true;
+                }
+            }
+            
+            if (isOpen) {
+                statusText = '系統開放中';
+                
+                // 檢查是否有人正在使用
+                const scheduleSettings = await this.readTable('schedule_settings');
+                const currentSession = scheduleSettings.find(s => s.key === 'current_session');
+                
+                if (currentSession && currentSession.value) {
+                    const session = JSON.parse(currentSession.value);
+                    const sessionStart = new Date(session.start_time);
+                    const fiveMinutesLater = new Date(sessionStart.getTime() + 5 * 60 * 1000);
+                    
+                    if (now < fiveMinutesLater) {
+                        inUse = true;
+                        currentUser = session.employee_name;
+                        statusText = '系統使用中';
+                    } else {
+                        // 超時，清除session
+                        await this.clearScheduleSession();
+                    }
+                }
+                
+                // 計算關閉時間
+                const closeDate = new Date(now.getFullYear(), now.getMonth(), 21, 2, 0);
+                if (now < closeDate) {
+                    nextOpenTime = closeDate.toLocaleString('zh-TW');
+                }
+            } else {
+                // 計算下次開放時間
+                let nextOpen;
+                if (currentDay < 16) {
+                    nextOpen = new Date(now.getFullYear(), now.getMonth(), 16, 2, 0);
+                } else {
+                    nextOpen = new Date(now.getFullYear(), now.getMonth() + 1, 16, 2, 0);
+                }
+                nextOpenTime = nextOpen.toLocaleString('zh-TW');
+            }
+            
+            return {
+                is_open: isOpen,
+                status: statusText,
+                next_open_time: nextOpenTime,
+                current_user: currentUser,
+                in_use: inUse,
+                remaining_time: inUse ? this.calculateRemainingTime(currentSession?.value) : 0
+            };
+        } catch (error) {
+            console.error('獲取排班系統狀態失敗:', error);
+            throw error;
+        }
+    }
+
+    // 獲取員工排班記錄
+    async getEmployeeSchedule(employeeId) {
+        try {
+            const schedules = await this.readTable('schedules');
+            const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM格式
+            
+            const employeeSchedule = schedules.find(s => 
+                s.employee_id === employeeId && 
+                s.schedule_month === currentMonth
+            );
+            
+            return employeeSchedule || null;
+        } catch (error) {
+            console.error('獲取員工排班記錄失敗:', error);
+            throw error;
+        }
+    }
+
+    // 清除排班session
+    async clearScheduleSession() {
+        try {
+            const scheduleSettings = await this.readTable('schedule_settings');
+            const index = scheduleSettings.findIndex(s => s.key === 'current_session');
+            
+            if (index >= 0) {
+                scheduleSettings[index].value = null;
+                scheduleSettings[index].updated_at = new Date().toISOString();
+                await this.writeTable('schedule_settings', scheduleSettings);
+            }
+        } catch (error) {
+            console.error('清除排班session失敗:', error);
+            throw error;
+        }
+    }
+
+    // 計算剩餘時間
+    calculateRemainingTime(sessionValue) {
+        if (!sessionValue) return 0;
+        
+        try {
+            const session = JSON.parse(sessionValue);
+            const sessionStart = new Date(session.start_time);
+            const fiveMinutesLater = new Date(sessionStart.getTime() + 5 * 60 * 1000);
+            const now = new Date();
+            
+            const remaining = Math.max(0, Math.floor((fiveMinutesLater - now) / 1000));
+            return remaining;
+        } catch (error) {
+            return 0;
         }
     }
 

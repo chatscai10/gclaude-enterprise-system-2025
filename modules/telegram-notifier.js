@@ -58,113 +58,167 @@ class TelegramNotifier {
 
     // ==================== 營收系統通知 ====================
     async notifyRevenue(data) {
-        const date = new Date(data.date).toLocaleDateString('zh-TW');
-        const dayType = data.day_type === 'holiday' ? '假日' : '平日';
-        const storeName = data.store_name || '未知分店';
+        const date = this.formatDate(data.date);
+        const dayType = data.day_type === 'holiday' ? '假日獎金' : '平日獎金';
+        const storeName = this.safeGet(data, 'store_name', '總店');
+        const employeeName = this.safeGet(data, 'employee_name', '系統');
+        const orderCount = this.safeGet(data, 'order_count', 0);
+        const totalRevenue = this.safeGet(data, 'total_revenue', 0);
+        const totalExpense = this.safeGet(data, 'total_expense', 0);
+        const netRevenue = totalRevenue - totalExpense;
+        const bonusAmount = this.safeGet(data, 'bonus_amount', 0);
+        const averageOrder = orderCount > 0 ? Math.round(totalRevenue / orderCount) : 0;
         
-        // 老闆詳細通知
+        // 老闆詳細通知 - 按照系統邏輯文件格式
         const bossMessage = `
-🏪 <b>${storeName} 營收記錄</b>
+💰 <b>營業額提交記錄</b>
 
-📅 <b>日期:</b> ${date} (${dayType})
-💰 <b>營業額:</b> NT$ ${data.amount?.toLocaleString() || 0}
-🎯 <b>目標:</b> NT$ ${data.target?.toLocaleString() || 0}
-📊 <b>達成率:</b> ${data.achievement_rate ? (data.achievement_rate * 100).toFixed(1) : 0}%
-💸 <b>獎金:</b> NT$ ${data.bonus?.toLocaleString() || 0}
+分店: ${storeName}
+提交人: ${employeeName}
+日期: ${date}
+現場訂單: ${orderCount} 張
 
-${data.achievement_rate < 1 ? 
-    `⚠️ <b>未達標差距:</b> NT$ ${((data.target || 0) - (data.amount || 0)).toLocaleString()}` :
-    '✅ <b>已達成目標!</b>'
-}
+收入明細:
+• 現場訂單: $${totalRevenue.toLocaleString()}
+• 外送訂單: $0
 
-📝 <b>備註:</b> ${data.notes || '無'}
-👤 <b>記錄員工:</b> ${data.employee_name || '系統'}
-⏰ <b>記錄時間:</b> ${new Date().toLocaleString('zh-TW')}
+支出明細:
+• 材料成本: $${totalExpense.toLocaleString()}
+• 人力成本: $0
+• 雜項支出: $0
+• 其他費用: $0
+
+收入總額: $${totalRevenue.toLocaleString()}
+支出總額: $${totalExpense.toLocaleString()}
+淨收入: $${netRevenue.toLocaleString()}
+
+獎金類別: ${dayType}
+今日獎金：$${bonusAmount.toLocaleString()}
+訂單平均:$${averageOrder.toLocaleString()} /單
+備註: ${this.safeGet(data, 'notes', '無')}
         `.trim();
 
-        // 員工簡化通知
+        // 員工簡化通知 - 按照系統邏輯文件格式
         const employeeMessage = `
-📅 <b>${date} ${storeName} 營收記錄</b>
-
-💰 營業額: NT$ ${data.amount?.toLocaleString() || 0}
-🎯 今日獎金 (${dayType}): NT$ ${data.bonus?.toLocaleString() || 0}
-
-${data.achievement_rate < 1 ? 
-    `未達標差距: NT$ ${((data.target || 0) - (data.amount || 0)).toLocaleString()}` :
-    '✅ 已達成目標!'
-}
+${storeName} 營業額紀錄成功
+分店: ${storeName}
+日期: ${date}
+獎金類別: ${dayType}
+今日獎金: $${bonusAmount.toLocaleString()}
         `.trim();
 
         return await this.sendToBoth(bossMessage, employeeMessage);
     }
 
-    // ==================== 叫貨系統通知 ====================
-    async notifyOrdering(orderData, anomalies = []) {
-        const date = new Date(orderData.created_at).toLocaleDateString('zh-TW');
-        const storeName = orderData.store_name || '未知分店';
+    // ==================== 營收審核通知 ====================
+    async notifyRevenueApproval(data) {
+        const action = data.action === 'approve' ? '✅ 核准' : '❌ 拒絕';
+        const actionColor = data.action === 'approve' ? '🟢' : '🔴';
         
-        // 計算總價
-        const totalAmount = orderData.items.reduce((sum, item) => 
-            sum + (item.quantity * item.unit_price), 0);
+        // 管理員通知
+        const adminMessage = `
+${actionColor} <b>營收記錄審核完成</b>
+
+📋 <b>記錄ID:</b> #${data.revenue_id}
+👤 <b>員工:</b> ${data.employee_name}
+⚖️ <b>審核結果:</b> ${action}
+👨‍💼 <b>審核者:</b> ${data.reviewer}
+
+${data.reason ? `📝 <b>審核原因:</b> ${data.reason}` : ''}
+⏰ <b>審核時間:</b> ${new Date().toLocaleString('zh-TW')}
+        `.trim();
 
         // 員工通知
         const employeeMessage = `
-🛒 <b>${storeName} 叫貨記錄</b>
+${actionColor} <b>您的營收記錄已${data.action === 'approve' ? '核准' : '被拒絕'}</b>
 
-📅 <b>日期:</b> ${date}
-🏪 <b>分店:</b> ${storeName}
-💰 <b>總價:</b> NT$ ${totalAmount.toLocaleString()}
+📋 <b>記錄ID:</b> #${data.revenue_id}
+⚖️ <b>審核結果:</b> ${action}
 
-📦 <b>叫貨品項:</b>
-${orderData.items.map(item => 
-    `• ${item.product_name} x${item.quantity} = NT$ ${(item.quantity * item.unit_price).toLocaleString()}`
-).join('\n')}
+${data.reason ? `📝 <b>原因:</b> ${data.reason}` : ''}
+⏰ <b>時間:</b> ${new Date().toLocaleString('zh-TW')}
 
-👤 <b>叫貨員工:</b> ${orderData.employee_name || '系統'}
+${data.action === 'approve' ? 
+    '🎉 恭喜！您的營收記錄已通過審核，獎金將會發放！' : 
+    '😔 很抱歉，您的營收記錄未通過審核，如有疑問請聯繫管理員。'
+}
         `.trim();
 
-        // 老闆詳細通知（按供應商分類）
+        return await this.sendToBoth(adminMessage, employeeMessage);
+    }
+
+    // ==================== 叫貨記錄通知 (按照系統邏輯文件格式) ====================
+    async notifyOrdering(orderData, anomalies = []) {
+        const date = this.formatDate(orderData.created_at);
+        const storeName = this.safeGet(orderData, 'store_name', '未知分店');
+        const employeeName = this.safeGet(orderData, 'employee_name', '系統');
+        const items = orderData.items || [];
+        
+        // 計算總價
+        const totalAmount = items.reduce((sum, item) => 
+            sum + (Number(item.quantity || 0) * Number(item.unit_price || 0)), 0);
+
+        // 按供應商分類整理
         const supplierGroups = {};
-        orderData.items.forEach(item => {
-            const supplier = item.supplier || '未知供應商';
+        items.forEach(item => {
+            const supplier = this.safeGet(item, 'supplier', '未知供應商');
             if (!supplierGroups[supplier]) {
                 supplierGroups[supplier] = [];
             }
             supplierGroups[supplier].push(item);
         });
 
+        // 老闆詳細通知（按照系統邏輯文件529-552行格式）
         let bossMessage = `
-🛒 <b>${storeName} 叫貨分析</b>
-
-📅 <b>日期:</b> ${date}
+🛒 <b>叫貨記錄</b>
+叫貨人員：${employeeName}
+📅 <b>送貨日期:</b> ${date}
 🏪 <b>分店:</b> ${storeName}
-💰 <b>總價:</b> NT$ ${totalAmount.toLocaleString()}
+💰 <b>總金額:</b> $${totalAmount.toLocaleString()}`;
 
-📊 <b>供應商分類:</b>
-`;
-
+        // 按供應商分類顯示
         Object.entries(supplierGroups).forEach(([supplier, items]) => {
-            const supplierTotal = items.reduce((sum, item) => 
-                sum + (item.quantity * item.unit_price), 0);
-            
-            bossMessage += `\n🏭 <b>${supplier}</b> (NT$ ${supplierTotal.toLocaleString()})\n`;
+            bossMessage += `\n🏭 <b>${supplier}</b>`;
             items.forEach(item => {
-                bossMessage += `  • ${item.product_name} x${item.quantity}\n`;
+                const brand = this.safeGet(item, 'brand', '');
+                const productName = this.safeGet(item, 'product_name', '未知商品');
+                const quantity = Number(item.quantity || 0);
+                const unit = this.safeGet(item, 'unit', '個');
+                bossMessage += `\n  •${brand} ${productName} ${quantity} ${unit}`;
             });
         });
 
-        // 添加異常警告
+        // 添加異常天數分析
         if (anomalies.length > 0) {
-            bossMessage += '\n⚠️ <b>進貨異常警告:</b>\n';
+            bossMessage += '\n\n';
             anomalies.forEach(anomaly => {
-                bossMessage += `• ${anomaly.product_name} - 異常天數: ${anomaly.days_since_last_order}天\n`;
-                bossMessage += `  上次進貨: ${anomaly.last_order_date} (${anomaly.last_quantity}個)\n`;
+                const productName = this.safeGet(anomaly, 'product_name', '未知商品');
+                const daysSince = Number(anomaly.days_since_last_order || 0);
+                const lastOrderDate = this.formatDate(anomaly.last_order_date);
+                const lastQuantity = Number(anomaly.last_quantity || 0);
+                const unit = this.safeGet(anomaly, 'unit', '個');
+                
+                if (daysSince >= 3) {
+                    bossMessage += `\n品項 ${productName} 已經${daysSince}天沒有叫貨`;
+                    bossMessage += `\n上次叫貨${lastOrderDate}-${productName}${lastQuantity}${unit}\n`;
+                } else if (daysSince <= 2) {
+                    bossMessage += `\n品項 ${productName} 已經${daysSince}天內頻繁叫貨`;
+                    bossMessage += `\n上次叫貨${lastOrderDate}-${productName}${lastQuantity}${unit}\n`;
+                }
             });
         }
 
-        bossMessage += `\n👤 <b>叫貨員工:</b> ${orderData.employee_name || '系統'}`;
+        // 員工簡化通知
+        const employeeMessage = `
+🛒 <b>${storeName} 叫貨記錄成功</b>
 
-        return await this.sendToBoth(bossMessage, employeeMessage);
+📅 <b>日期:</b> ${date}
+🏪 <b>分店:</b> ${storeName}
+💰 <b>總金額:</b> $${totalAmount.toLocaleString()}
+👤 <b>叫貨員工:</b> ${employeeName}
+        `.trim();
+
+        return await this.sendToBoth(bossMessage.trim(), employeeMessage);
     }
 
     // ==================== 員工註冊通知 ====================
@@ -182,21 +236,21 @@ ${orderData.items.map(item =>
 
         // 老闆詳細通知
         const bossMessage = `
-🟟 <b>新員工資料登入</b>
+👤 <b>新員工資料登入</b>
 
-🟟 <b>日期:</b> ${date}
-🟟 <b>姓名:</b> ${employeeData.name || '未填寫'}
-🟟 <b>身份證:</b> ${employeeData.id_card || '未填寫'}
-🟟 <b>生日:</b> ${employeeData.birth_date || '未填寫'}
+📅 <b>日期:</b> ${date}
+👤 <b>姓名:</b> ${employeeData.name || '未填寫'}
+🆔 <b>身份證:</b> ${employeeData.id_card || '未填寫'}
+🎂 <b>生日:</b> ${this.formatDate(employeeData.birth_date)}
 ⚥ <b>性別:</b> ${this.getGenderText(employeeData.gender)}
-🟟 <b>駕照:</b> ${employeeData.license_number ? '有' : '無'}
-🟟 <b>電話:</b> ${employeeData.phone || '未填寫'}
-🟟 <b>地址:</b> ${employeeData.address || '未填寫'}
-🟟 <b>緊急聯絡人:</b> ${employeeData.emergency_contact_name || '未填寫'} (${this.getRelationText(employeeData.emergency_contact_relation)})
-🟟 <b>緊急電話:</b> ${employeeData.emergency_contact_phone || '未填寫'}
-🟟 <b>到職日:</b> ${employeeData.join_date || '待安排'}
-🟟 <b>分店:</b> ${employeeData.store_name || '待分配'}
-🟟 <b>職位:</b> ${employeeData.position || '待分配'}
+🚗 <b>駕照:</b> ${employeeData.license_number ? `有 (${employeeData.license_number})` : '無'}
+📞 <b>電話:</b> ${employeeData.phone || '未填寫'}
+🏠 <b>地址:</b> ${employeeData.address || '未填寫'}
+🚨 <b>緊急聯絡人:</b> ${employeeData.emergency_contact_name || '未填寫'} (${this.getRelationText(employeeData.emergency_contact_relation)})
+📱 <b>緊急電話:</b> ${employeeData.emergency_contact_phone || '未填寫'}
+📅 <b>到職日:</b> ${this.formatDate(employeeData.join_date)}
+🏪 <b>分店:</b> ${employeeData.store_name || '待分配'}
+💼 <b>職位:</b> ${employeeData.position || '待分配'}
         `.trim();
 
         return await this.sendToBoth(bossMessage, employeeMessage);
@@ -204,12 +258,13 @@ ${orderData.items.map(item =>
 
     // ==================== 打卡通知 ====================
     async notifyAttendance(attendanceData) {
-        const time = new Date(attendanceData.check_time).toLocaleString('zh-TW');
-        const storeName = attendanceData.store_name || '未知分店';
+        const time = this.formatDateTime(attendanceData.check_time);
+        const storeName = this.safeGet(attendanceData, 'store_name', '未知分店');
+        const employeeName = this.safeGet(attendanceData, 'employee_name', '未知員工');
         
         // 員工通知
         const employeeMessage = `
-👋 <b>${attendanceData.employee_name} 來${storeName}上班了~</b>
+👋 <b>${employeeName} 來${storeName}上班了~</b>
 
 📅 <b>時間:</b> ${time}
 📍 <b>地點:</b> ${storeName}
@@ -219,12 +274,13 @@ ${orderData.items.map(item =>
         let bossMessage = `
 👋 <b>員工打卡記錄</b>
 
-👤 <b>員工:</b> ${attendanceData.employee_name}
+👤 <b>員工:</b> ${employeeName}
 ⏰ <b>打卡時間:</b> ${time}
 🏪 <b>分店:</b> ${storeName}
-📍 <b>座標:</b> ${attendanceData.latitude || 'N/A'}, ${attendanceData.longitude || 'N/A'}
-📏 <b>距離分店:</b> ${attendanceData.distance_meters || 'N/A'}公尺
-🔐 <b>打卡設備:</b> ${attendanceData.device_fingerprint || 'N/A'}
+📍 <b>座標:</b> ${this.safeGet(attendanceData, 'latitude', 'N/A')}, ${this.safeGet(attendanceData, 'longitude', 'N/A')}
+📏 <b>距離分店:</b> ${attendanceData.distance_meters ? Math.round(attendanceData.distance_meters) + '公尺' : 'N/A'}
+🎯 <b>GPS精度:</b> ${this.safeGet(attendanceData, 'gps_accuracy', 'N/A')}公尺
+🔐 <b>打卡設備:</b> ${this.safeGet(attendanceData, 'device_info', 'N/A')}
         `;
 
         // 添加異常警告
@@ -326,62 +382,81 @@ ${orderData.items.map(item =>
     }
 
     async notifyScheduleBossSettings() {
+        // 按照系統邏輯文件585-591行格式
         const message = `
-⚙️ <b>排班系統設定提醒</b>
-
-🚨 排班系統將於 5 天後開啟！
-
-請設定下個月的:
-• 公休日期
-• 禁休日期
-• 其他排班參數
-
-請登入管理系統完成設定。
+🚨 <b>排班系統準備開啟</b>
+ 請即時設定各店公休日 禁休日
+⏰ <b>開放天數:</b> 5
+📅 <b>開啟時間:</b> ${new Date().toLocaleDateString('zh-TW')} 上午2:00:00
+📅 <b>結束時間:</b> ${new Date(Date.now() + 5*24*60*60*1000).toLocaleDateString('zh-TW')} 上午2:00:00
         `.trim();
 
         return await this.sendToBoss(message);
     }
 
-    async notifyScheduleEntry(employeeData) {
-        const time = new Date().toLocaleString('zh-TW');
+    async notifyForceScheduleOpen(adminData) {
+        // 按照系統邏輯文件578-584行格式
+        const openTime = new Date().toLocaleString('zh-TW');
+        const endTime = new Date(Date.now() + 30*60*1000).toLocaleString('zh-TW');
         
-        const bossMessage = `
-📅 <b>排班系統使用記錄</b>
-
-👤 <b>員工:</b> ${employeeData.name}
-⏰ <b>登錄時間:</b> ${time}
-🏪 <b>分店:</b> ${employeeData.store_name}
-
-系統已為該員工開啟5分鐘操作時間。
+        const message = `
+🚨 <b>強制排班系統已開啟</b>
+⏰ <b>開放時間:</b> 30分鐘
+👤 <b>開啟者:</b> ${adminData.admin_name || '管理員'}
+📅 <b>開啟時間:</b> ${openTime}
+📅 <b>結束時間:</b> ${endTime}
         `.trim();
 
-        return await this.sendToBoss(bossMessage);
+        return await this.sendToBoth(message, message);
     }
 
-    async notifyScheduleCompleted(scheduleData) {
-        const employeeName = scheduleData.employee_name;
-        const leaveDates = scheduleData.leave_dates.join(', ');
+    async notifyDailySchedule(dailyScheduleData) {
+        // 按照系統邏輯文件593-616行格式
+        const tomorrow = new Date(Date.now() + 24*60*60*1000);
+        const dayAfterTomorrow = new Date(Date.now() + 2*24*60*60*1000);
         
-        // 老闆詳細通知
-        const bossMessage = `
-📅 <b>排班完成記錄</b>
+        let message = `
+📅 <b>明日班提醒</b>
+📆 <b>日期:</b> ${tomorrow.toLocaleDateString('zh-TW')}
 
-👤 <b>員工:</b> ${employeeName}
-🏪 <b>分店:</b> ${scheduleData.store_name}
-📅 <b>休假日期:</b> ${leaveDates}
-🗓️ <b>休假天數:</b> ${scheduleData.leave_dates.length}天
-⏰ <b>完成時間:</b> ${new Date().toLocaleString('zh-TW')}
-        `.trim();
+`;
+        
+        // 為每家分店添加明日排班資訊
+        dailyScheduleData.stores.forEach(store => {
+            message += `🏪 <b>${store.store_name}</b>\n`;
+            message += `👥 <b>值班:</b> ${store.working_employees.join('、')}\n`;
+            message += `🏠 <b>休假:</b> ${store.off_employees.length > 0 ? store.off_employees.join('、') : '無'}\n\n`;
+        });
+        
+        message += `📆 <b>後天 (${dayAfterTomorrow.toLocaleDateString('zh-TW')}) 值班預告:</b>\n`;
+        dailyScheduleData.next_day_preview.forEach(store => {
+            message += `🏪 ${store.store_name}: ${store.working_employees.join('、')}\n`;
+        });
+        
+        message += `\n⏰ 每日18:00自動發送\n🔄 資料來源: 排班系統`;
+        
+        return await this.sendToBoth(message.trim(), message.trim());
+    }
 
-        // 員工群組通知
-        const employeeMessage = `
-📅 <b>排班記錄通知</b>
+    async notifyMonthlyBirthdays(birthdayData) {
+        // 按照系統邏輯文件622-627行格式
+        const currentMonth = new Date().getMonth() + 1;
+        const currentYear = new Date().getFullYear();
+        
+        let message = `
+📅 <b>本月生日清單</b>
+📆 <b>${currentYear}年${currentMonth}月</b>
 
-👤 <b>${employeeName}</b> 已完成排班
-🗓️ <b>休假日期:</b> ${leaveDates}
-        `.trim();
-
-        return await this.sendToBoth(bossMessage, employeeMessage);
+🎂 <b>本月壽星 (${birthdayData.length}位):</b>\n`;
+        
+        birthdayData.forEach(employee => {
+            const birthdayDate = new Date(employee.birth_date).getDate();
+            message += `• ${employee.name} (${employee.store_name}) - ${currentMonth}/${birthdayDate}\n`;
+        });
+        
+        message += `\n🎉 請記得為壽星送上祝福！`;
+        
+        return await this.sendToBoth(message.trim(), message.trim());
     }
 
     // 輔助函數：性別文字轉換
@@ -406,21 +481,52 @@ ${orderData.items.map(item =>
         }
     }
 
-    // ==================== 升遷投票通知 ====================
+    // 輔助函數：日期格式化
+    formatDate(dateStr) {
+        if (!dateStr) return '未填寫';
+        try {
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return '未填寫';
+            return date.toLocaleDateString('zh-TW');
+        } catch (error) {
+            return '未填寫';
+        }
+    }
+
+    // 輔助函數：時間格式化
+    formatDateTime(dateStr) {
+        if (!dateStr) return '未填寫';
+        try {
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return '未填寫';
+            return date.toLocaleString('zh-TW');
+        } catch (error) {
+            return '未填寫';
+        }
+    }
+
+    // 輔助函數：安全取值
+    safeGet(obj, key, defaultValue = '未填寫') {
+        return (obj && obj[key] !== undefined && obj[key] !== null) ? obj[key] : defaultValue;
+    }
+
+    // ==================== 升遷投票通知 (按照系統邏輯文件格式) ====================
     async notifyPromotionStart(promotionData) {
         const endDate = new Date(promotionData.voting_end_date).toLocaleDateString('zh-TW');
+        const joinDate = this.formatDate(promotionData.join_date);
+        const totalDays = Math.floor((new Date() - new Date(promotionData.join_date)) / (1000 * 60 * 60 * 24));
+        const currentPositionDays = Math.floor((new Date() - new Date(promotionData.current_position_start_date)) / (1000 * 60 * 60 * 24));
         
+        // 按照系統邏輯文件554-564行格式
         const message = `
-🗳️ <b>升遷投票開始</b>
-
-👤 <b>申請人:</b> ${promotionData.employee_name}
-📊 <b>目前職位:</b> ${promotionData.current_position_name}
-⬆️ <b>目標職位:</b> ${promotionData.target_position_name}
-📅 <b>投票截止:</b> ${endDate}
-🎯 <b>通過門檻:</b> ${(promotionData.required_approval_rate * 100).toFixed(0)}%
-
-請前往系統參與投票！
-（每日可修改投票 3 次）
+🗳️ <b>升遷投票發起</b>
+👤 <b>候選人:</b> ${promotionData.employee_name}
+<b>到職日期總天數：</b>${joinDate}到職 任職總天數 ${totalDays} 天
+<b>目前職位：</b>${promotionData.current_position_name}
+<b>目前職位任職天數：</b>${currentPositionDays}天
+📈 <b>目標職位:</b> ${promotionData.target_position_name}
+📅 <b>投票結束:</b> ${endDate}
+💼 <b>詳細資料:</b> 請查看系統
         `.trim();
 
         return await this.sendToEmployees(message);
@@ -449,107 +555,76 @@ ${promotionData.is_approved ?
         return await this.sendToEmployees(message);
     }
 
-    // ==================== 出勤打卡通知 ====================
+    // ==================== 出勤打卡通知 (按照系統邏輯文件格式) ====================
     async notifyAttendance(attendanceData, deviceAnomalies = []) {
         const clockType = attendanceData.clock_type === 'in' ? '上班' : '下班';
-        const clockEmoji = attendanceData.clock_type === 'in' ? '🔄' : '✅';
         const time = new Date(attendanceData.timestamp).toLocaleString('zh-TW');
+        const status = attendanceData.clock_type === 'in' ? '上班打卡' : '下班打卡';
         
-        // 老闆群組訊息（詳細資訊）
+        // 遲到資訊計算
+        let lateInfo = '';
+        if (attendanceData.is_late && attendanceData.late_minutes > 0) {
+            lateInfo = `    遲到：遲到${attendanceData.late_minutes}分鐘,本月累計共${attendanceData.monthly_late_minutes || attendanceData.late_minutes}分鐘`;
+        }
+        
+        // 老闆群組訊息（按照系統邏輯文件517-527行格式）
         let bossMessage = `
-${clockEmoji} <b>${clockType}打卡通知</b>
-
+🕐 <b>員工打卡記錄</b>
 👤 <b>員工:</b> ${attendanceData.employee_name}
+⏰ <b>時間:</b> ${time}
 🏪 <b>分店:</b> ${attendanceData.store_name}
-🕐 <b>時間:</b> ${time}
-📍 <b>位置:</b> ${attendanceData.location}
-🎯 <b>精度:</b> ±${attendanceData.gps_accuracy}公尺
-📱 <b>設備:</b> ${attendanceData.device_info}
+📍 <b>座標:</b> ${this.safeGet(attendanceData, 'latitude', 'N/A')}, ${this.safeGet(attendanceData, 'longitude', 'N/A')}
+📏 <b>距離:</b> ${attendanceData.distance_meters ? Math.round(attendanceData.distance_meters) + '公尺' : 'N/A'}
+📱 <b>設備:</b> ${this.safeGet(attendanceData, 'device_info', 'N/A')}
+✅ <b>狀態:</b> ${status}${lateInfo}
         `.trim();
 
-        // 如果是下班打卡，加入工作時數
-        if (attendanceData.clock_type === 'out' && attendanceData.work_hours) {
-            bossMessage += `\n⏰ <b>工作時數:</b> ${attendanceData.work_hours}小時`;
-        }
-
-        // 員工群組訊息（簡化資訊）
+        // 員工群組訊息（簡化）
         let employeeMessage = `
-${clockEmoji} <b>${clockType}打卡通知</b>
+👋 <b>${attendanceData.employee_name} ${clockType}打卡成功</b>
 
-👤 <b>員工:</b> ${attendanceData.employee_name}
-🏪 <b>分店:</b> ${attendanceData.store_name}
-🕐 <b>時間:</b> ${time}
+📅 <b>時間:</b> ${time}
+📍 <b>地點:</b> ${attendanceData.store_name}
         `.trim();
-
-        if (attendanceData.clock_type === 'out' && attendanceData.work_hours) {
-            employeeMessage += `\n⏰ <b>工作時數:</b> ${attendanceData.work_hours}小時`;
-        }
 
         // 設備異常警告
         if (deviceAnomalies && deviceAnomalies.length > 0) {
-            const alertEmojis = { 'warning': '⚠️', 'alert': '🚨' };
-            
-            bossMessage += '\n\n🔒 <b>安全提醒:</b>';
+            bossMessage += '\n\n⚠️ <b>設備異常警告:</b>';
             deviceAnomalies.forEach(anomaly => {
-                const emoji = alertEmojis[anomaly.severity] || '⚠️';
-                bossMessage += `\n${emoji} ${anomaly.message}: ${anomaly.details}`;
+                bossMessage += `\n• ${anomaly.message}: ${anomaly.details}`;
             });
-            
-            // 只有嚴重異常才通知員工群組
-            const severeAnomalies = deviceAnomalies.filter(a => a.severity === 'alert');
-            if (severeAnomalies.length > 0) {
-                employeeMessage += '\n\n🔒 <b>安全提醒:</b>';
-                severeAnomalies.forEach(anomaly => {
-                    employeeMessage += `\n🚨 ${anomaly.message}`;
-                });
-            }
         }
 
         return await this.sendToBoth(bossMessage, employeeMessage);
     }
 
-    // ==================== 維修保養通知 ====================
+    // ==================== 維修申請通知 (按照系統邏輯文件格式) ====================
     async notifyMaintenance(maintenanceData) {
         const time = new Date(maintenanceData.created_at).toLocaleString('zh-TW');
-        const priorityEmoji = this.getPriorityEmoji(maintenanceData.priority);
         const priorityText = this.getPriorityText(maintenanceData.priority);
+        const photoCount = maintenanceData.photo_count || 0;
         
-        // 老闆群組訊息（詳細資訊）
+        // 老闆群組訊息（按照系統邏輯文件566-576行格式）
         let bossMessage = `
 🔧 <b>維修申請</b>
-
 📅 <b>日期:</b> ${time}
 🏪 <b>分店:</b> ${maintenanceData.store_name}
 👤 <b>申請人:</b> ${maintenanceData.employee_name}
-🛠️ <b>設備:</b> ${maintenanceData.equipment_type}
-${priorityEmoji} <b>緊急程度:</b> ${priorityText}
-📝 <b>問題標題:</b> ${maintenanceData.title}
-
-<b>問題描述:</b>
-${maintenanceData.description}
+🛠️ <b>設備:</b> ${maintenanceData.equipment_type || maintenanceData.equipment_name}
+⚠️ <b>緊急程度:</b> ${priorityText}
+🏷️ <b>類別:</b> ${maintenanceData.maintenance_type === 'repair' ? '設備故障' : '定期保養'}
+❗ <b>問題:</b> ${maintenanceData.title || maintenanceData.issue_description}
+📷 <b>照片:</b> ${photoCount}張
         `.trim();
 
-        if (maintenanceData.location) {
-            bossMessage += `\n📍 <b>設備位置:</b> ${maintenanceData.location}`;
-        }
-
-        if (maintenanceData.contact_phone) {
-            bossMessage += `\n📞 <b>聯絡電話:</b> ${maintenanceData.contact_phone}`;
-        }
-
-        if (maintenanceData.photo_count > 0) {
-            bossMessage += `\n📷 <b>問題照片:</b> ${maintenanceData.photo_count} 張`;
-        }
-
-        // 員工群組訊息（簡化資訊）
+        // 員工群組訊息（簡化）
         let employeeMessage = `
-🔧 <b>維修申請</b>
+🔧 <b>維修申請已提交</b>
 
 📅 <b>日期:</b> ${time}
 🏪 <b>分店:</b> ${maintenanceData.store_name}
-🛠️ <b>設備:</b> ${maintenanceData.equipment_type}
-${priorityEmoji} <b>緊急程度:</b> ${priorityText}
-❗ <b>原因:</b> ${maintenanceData.title}
+🛠️ <b>設備:</b> ${maintenanceData.equipment_type || maintenanceData.equipment_name}
+❗ <b>問題:</b> ${maintenanceData.title || maintenanceData.issue_description}
         `.trim();
 
         return await this.sendToBoth(bossMessage, employeeMessage);
@@ -571,6 +646,37 @@ ${priorityEmoji} <b>緊急程度:</b> ${priorityText}
             'high': '高'
         };
         return priorityMap[priority] || '未知';
+    }
+
+    // ==================== 排班管理通知 ====================
+    async notifyScheduleUpdate(scheduleData) {
+        const { store_id, year, month, admin_name, total_assignments } = scheduleData;
+        
+        // 老闆群組通知
+        const bossMessage = `
+📅 <b>排班資料更新</b>
+
+🏪 <b>分店:</b> 分店 ${store_id}
+📆 <b>排班月份:</b> ${year}年${month}月
+👨‍💼 <b>更新者:</b> ${admin_name}
+📊 <b>排班日數:</b> ${total_assignments}天
+⏰ <b>更新時間:</b> ${new Date().toLocaleString('zh-TW')}
+
+管理員已完成下個月的排班分配。
+        `.trim();
+
+        // 員工群組通知
+        const employeeMessage = `
+📅 <b>排班資料更新</b>
+
+🏪 <b>分店:</b> 分店 ${store_id}
+📆 <b>排班月份:</b> ${year}年${month}月
+⏰ <b>更新時間:</b> ${new Date().toLocaleString('zh-TW')}
+
+💡 管理員已完成下個月的排班分配，請至系統查看您的班表。
+        `.trim();
+
+        return await this.sendToBoth(bossMessage, employeeMessage);
     }
 
     // ==================== 測試通知 ====================

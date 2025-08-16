@@ -228,6 +228,89 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        /* 排班月曆樣式 */
+        .calendar-grid {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background-color: var(--primary-color);
+        }
+        
+        .calendar-day-header {
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            border-right: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .calendar-day-header:last-child {
+            border-right: none;
+        }
+        
+        .calendar-body {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+        
+        .calendar-day {
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+        
+        .calendar-day:last-child {
+            border-right: none;
+        }
+        
+        .calendar-day:hover:not(.empty) {
+            background-color: #f8f9fa;
+            transform: scale(1.05);
+        }
+        
+        .calendar-day.empty {
+            background-color: #f8f9fa;
+            cursor: default;
+        }
+        
+        .calendar-day.weekend {
+            background-color: #fff5f5;
+            color: #dc3545;
+        }
+        
+        .calendar-day.selected {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .calendar-day.selected:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .calendar-day {
+                min-height: 40px;
+                font-size: 14px;
+            }
+            
+            .calendar-day-header {
+                padding: 8px;
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -454,26 +537,80 @@
                             <p class="text-muted mb-0">查看和管理您的工作排班</p>
                         </div>
 
-                        <!-- 本週班表 -->
-                        <h4 class="mb-3">本週班表</h4>
-                        <div id="weeklySchedule">
-                            <div class="alert alert-custom alert-info border-info">
-                                <i class="fas fa-info-circle me-2"></i>
-                                載入排班資料中...
+                        <!-- 排班參數規則顯示 -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>排班規則參數</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="scheduleRules">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-spinner fa-spin me-2"></i>載入排班規則中...
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 排班操作 -->
-                        <div class="row mt-4">
-                            <div class="col-md-6">
-                                <button class="btn btn-gradient w-100" onclick="enterScheduleSystem()">
-                                    <i class="fas fa-edit me-2"></i>進入排班系統
-                                </button>
+                        <!-- 排班系統狀態 -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0"><i class="fas fa-clock me-2"></i>系統狀態</h5>
                             </div>
-                            <div class="col-md-6">
-                                <button class="btn btn-outline-danger w-100" onclick="exitScheduleSystem()">
-                                    <i class="fas fa-times me-2"></i>退出排班系統
-                                </button>
+                            <div class="card-body">
+                                <div id="scheduleSystemStatus">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-spinner fa-spin me-2"></i>檢查系統狀態中...
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <button id="enterScheduleBtn" class="btn btn-success w-100" onclick="enterScheduleSystem()" disabled>
+                                            <i class="fas fa-lock me-2"></i>系統關閉
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button id="exitScheduleBtn" class="btn btn-outline-danger w-100" onclick="exitScheduleSystem()" disabled>
+                                            <i class="fas fa-times me-2"></i>退出系統
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 排班日曆介面 (當系統開啟時顯示) -->
+                        <div id="scheduleCalendarContainer" style="display: none;">
+                            <div class="card border-0 shadow-sm mb-4">
+                                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i>排班月曆</h5>
+                                    <span id="scheduleTimeRemaining" class="badge bg-warning text-dark">時間剩餘: 05:00</span>
+                                </div>
+                                <div class="card-body">
+                                    <div id="scheduleCalendar">
+                                        <!-- 月曆將在這裡動態生成 -->
+                                    </div>
+                                    <div class="mt-3">
+                                        <button class="btn btn-primary me-2" onclick="confirmSchedule()">
+                                            <i class="fas fa-check me-2"></i>確認排班
+                                        </button>
+                                        <button class="btn btn-secondary" onclick="resetSchedule()">
+                                            <i class="fas fa-undo me-2"></i>重置排班
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 我的排班記錄 -->
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0"><i class="fas fa-history me-2"></i>我的排班記錄</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="myScheduleHistory">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-spinner fa-spin me-2"></i>載入排班記錄中...
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -626,14 +763,71 @@
                             <p class="text-muted mb-0">參與同事升遷投票</p>
                         </div>
 
-                        <div class="alert alert-custom alert-info border-info">
-                            <i class="fas fa-info-circle me-2"></i>
-                            此功能需要跳轉到專門的投票頁面進行操作
+                        <!-- 我的升遷資格檢查 -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-user-check me-2"></i>我的升遷資格</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="promotionEligibility">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-spinner fa-spin me-2"></i>檢查升遷資格中...
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <button class="btn btn-gradient btn-lg" onclick="window.open('/promotion.html', '_blank')">
-                            <i class="fas fa-external-link-alt me-2"></i>開啟升遷投票系統
-                        </button>
+                        <!-- 發起升遷投票 -->
+                        <div id="startPromotionContainer" class="card border-0 shadow-sm mb-4" style="display: none;">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0"><i class="fas fa-rocket me-2"></i>發起升遷投票</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="promotionStartForm">
+                                    <div class="mb-3">
+                                        <label class="form-label">目標職位</label>
+                                        <select class="form-select" id="targetPosition" required>
+                                            <option value="">請選擇目標職位</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">申請理由</label>
+                                        <textarea class="form-control" id="promotionReason" rows="4" required placeholder="請說明您認為自己適合升遷的理由..."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-play me-2"></i>發起升遷投票
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- 目前進行中的投票 -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0"><i class="fas fa-vote-yea me-2"></i>進行中的投票</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="activePromotions">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-spinner fa-spin me-2"></i>載入投票資訊中...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 職位階級說明 -->
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0"><i class="fas fa-layer-group me-2"></i>職位階級說明</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="positionLevels">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-spinner fa-spin me-2"></i>載入職位資訊中...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- 個人資料 -->
@@ -849,6 +1043,9 @@
                     break;
                 case 'maintenance':
                     await loadMaintenanceData();
+                    break;
+                case 'promotion':
+                    await loadPromotionData();
                     break;
                 case 'profile':
                     await loadProfileData();
@@ -1172,14 +1369,9 @@
             }
         }
 
-        // 載入其他區段資料（簡化版本）
+        // 載入排班系統資料
         async function loadScheduleData() {
-            document.getElementById('weeklySchedule').innerHTML = `
-                <div class="alert alert-custom alert-info border-info">
-                    <i class="fas fa-info-circle me-2"></i>
-                    排班功能開發中，敬請期待
-                </div>
-            `;
+            await loadScheduleSystem();
         }
 
         async function loadRevenueData() {
@@ -1281,13 +1473,818 @@
             window.location.href = '/login.html';
         }
 
-        // 排班系統功能
-        function enterScheduleSystem() {
-            showAlert('進入排班系統功能開發中', 'info');
+        // 排班系統全域變數
+        let scheduleTimer = null;
+        let scheduleTimeRemaining = 300; // 5分鐘 = 300秒
+        let selectedDates = [];
+        let currentScheduleMonth = '';
+
+        // 載入排班系統
+        async function loadScheduleSystem() {
+            try {
+                // 載入排班規則
+                await loadScheduleRules();
+                
+                // 檢查系統狀態
+                await checkScheduleSystemStatus();
+                
+                // 載入我的排班記錄
+                await loadMyScheduleHistory();
+            } catch (error) {
+                console.error('載入排班系統失敗:', error);
+                showAlert('載入排班系統失敗: ' + error.message, 'danger');
+            }
         }
 
-        function exitScheduleSystem() {
-            showAlert('退出排班系統功能開發中', 'info');
+        // 載入排班規則
+        async function loadScheduleRules() {
+            try {
+                const response = await fetch('/api/schedule/settings', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    const settings = result.data;
+                    document.getElementById('scheduleRules').innerHTML = `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-calendar-week text-primary me-2"></i><strong>排班月份:</strong> ${settings.schedule_month}</li>
+                                    <li><i class="fas fa-user-times text-warning me-2"></i><strong>每人休假上限:</strong> ${settings.max_leave_days}天</li>
+                                    <li><i class="fas fa-users text-info me-2"></i><strong>每日休假總上限:</strong> ${settings.daily_leave_limit}人</li>
+                                    <li><i class="fas fa-store text-success me-2"></i><strong>同店每日休假上限:</strong> ${settings.store_daily_leave_limit}人</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-weekend text-danger me-2"></i><strong>假日休假上限:</strong> ${settings.weekend_leave_limit}天</li>
+                                    <li><i class="fas fa-clock text-warning me-2"></i><strong>操作時間限制:</strong> ${settings.operation_time_limit}分鐘</li>
+                                    <li><i class="fas fa-calendar-plus text-primary me-2"></i><strong>開啟時間:</strong> 每月${settings.open_day}號 ${settings.open_time}</li>
+                                    <li><i class="fas fa-calendar-minus text-danger me-2"></i><strong>關閉時間:</strong> 每月${settings.close_day}號 ${settings.close_time}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                    currentScheduleMonth = settings.schedule_month;
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                document.getElementById('scheduleRules').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>載入排班規則失敗: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // 檢查排班系統狀態
+        async function checkScheduleSystemStatus() {
+            try {
+                const response = await fetch('/api/schedule/status', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    const status = result.data;
+                    const enterBtn = document.getElementById('enterScheduleBtn');
+                    const exitBtn = document.getElementById('exitScheduleBtn');
+                    
+                    if (status.is_open && !status.is_in_use) {
+                        // 系統開啟且無人使用
+                        document.getElementById('scheduleSystemStatus').innerHTML = `
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>
+                                <strong>系統開啟中</strong> - 可以進入排班系統
+                            </div>
+                        `;
+                        enterBtn.disabled = false;
+                        enterBtn.innerHTML = '<i class="fas fa-door-open me-2"></i>進入系統';
+                        enterBtn.className = 'btn btn-success w-100';
+                    } else if (status.is_open && status.is_in_use) {
+                        // 系統開啟但有人在使用
+                        document.getElementById('scheduleSystemStatus').innerHTML = `
+                            <div class="alert alert-warning">
+                                <i class="fas fa-user-clock me-2"></i>
+                                <strong>系統使用中</strong> - ${status.current_user}正在排班
+                                <br><small>預計${status.estimated_end_time}結束</small>
+                            </div>
+                        `;
+                        enterBtn.disabled = true;
+                        enterBtn.innerHTML = '<i class="fas fa-user-clock me-2"></i>系統使用中';
+                        enterBtn.className = 'btn btn-warning w-100';
+                    } else {
+                        // 系統關閉
+                        document.getElementById('scheduleSystemStatus').innerHTML = `
+                            <div class="alert alert-secondary">
+                                <i class="fas fa-lock me-2"></i>
+                                <strong>系統關閉</strong> - 排班時間：每月16-21號 02:00開放
+                                <br><small>下次開放時間：${status.next_open_time}</small>
+                            </div>
+                        `;
+                        enterBtn.disabled = true;
+                        enterBtn.innerHTML = '<i class="fas fa-lock me-2"></i>系統關閉';
+                        enterBtn.className = 'btn btn-secondary w-100';
+                    }
+                    
+                    // 如果當前用戶在系統中，顯示退出按鈕
+                    if (status.current_user_id === getCurrentUserId()) {
+                        exitBtn.disabled = false;
+                        exitBtn.style.display = 'block';
+                    } else {
+                        exitBtn.disabled = true;
+                        exitBtn.style.display = 'none';
+                    }
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                document.getElementById('scheduleSystemStatus').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>檢查系統狀態失敗: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // 載入我的排班記錄
+        async function loadMyScheduleHistory() {
+            try {
+                const response = await fetch('/api/schedule/my-schedule', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    const schedule = result.data;
+                    if (schedule && schedule.leave_dates.length > 0) {
+                        document.getElementById('myScheduleHistory').innerHTML = `
+                            <div class="alert alert-success">
+                                <h6><i class="fas fa-calendar-check me-2"></i>已完成排班 - ${schedule.schedule_month}</h6>
+                                <p class="mb-2"><strong>休假日期:</strong></p>
+                                <div class="d-flex flex-wrap gap-2">
+                                    ${schedule.leave_dates.map(date => 
+                                        `<span class="badge bg-primary">${date}</span>`
+                                    ).join('')}
+                                </div>
+                                <hr>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>提交時間: ${new Date(schedule.submitted_at).toLocaleString('zh-TW')}
+                                </small>
+                                <div class="mt-2">
+                                    <button class="btn btn-sm btn-outline-danger" onclick="voidMySchedule()">
+                                        <i class="fas fa-trash me-1"></i>作廢排班
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        document.getElementById('myScheduleHistory').innerHTML = `
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                本月尚未完成排班，請在系統開放時間內進行排班
+                            </div>
+                        `;
+                    }
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                document.getElementById('myScheduleHistory').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>載入排班記錄失敗: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // 進入排班系統
+        async function enterScheduleSystem() {
+            try {
+                const response = await fetch('/api/schedule/enter', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    showAlert('成功進入排班系統！請在5分鐘內完成排班', 'success');
+                    
+                    // 顯示月曆介面
+                    document.getElementById('scheduleCalendarContainer').style.display = 'block';
+                    
+                    // 生成月曆
+                    generateScheduleCalendar();
+                    
+                    // 開始倒數計時
+                    startScheduleTimer();
+                    
+                    // 更新按鈕狀態
+                    document.getElementById('enterScheduleBtn').disabled = true;
+                    document.getElementById('exitScheduleBtn').disabled = false;
+                    document.getElementById('exitScheduleBtn').style.display = 'block';
+                    
+                } else {
+                    showAlert('進入排班系統失敗: ' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('進入排班系統失敗: ' + error.message, 'danger');
+            }
+        }
+
+        // 退出排班系統
+        async function exitScheduleSystem() {
+            try {
+                const response = await fetch('/api/schedule/exit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    showAlert('已退出排班系統', 'info');
+                    
+                    // 隱藏月曆介面
+                    document.getElementById('scheduleCalendarContainer').style.display = 'none';
+                    
+                    // 停止計時
+                    if (scheduleTimer) {
+                        clearInterval(scheduleTimer);
+                        scheduleTimer = null;
+                    }
+                    
+                    // 重新檢查系統狀態
+                    await checkScheduleSystemStatus();
+                    
+                } else {
+                    showAlert('退出排班系統失敗: ' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('退出排班系統失敗: ' + error.message, 'danger');
+            }
+        }
+
+        // 生成排班月曆
+        function generateScheduleCalendar() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1; // 下個月
+            
+            const calendarHtml = `
+                <div class="text-center mb-3">
+                    <h5>${year}年 ${month}月 排班表</h5>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div id="calendarGrid" class="calendar-grid">
+                            ${generateCalendarGrid(year, month)}
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <p class="text-muted small">
+                        <i class="fas fa-info-circle me-1"></i>
+                        點擊日期選擇休假日，已選擇的日期會以藍色顯示
+                    </p>
+                </div>
+            `;
+            
+            document.getElementById('scheduleCalendar').innerHTML = calendarHtml;
+        }
+
+        // 生成月曆網格
+        function generateCalendarGrid(year, month) {
+            const firstDay = new Date(year, month - 1, 1);
+            const lastDay = new Date(year, month, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDayOfWeek = firstDay.getDay();
+            
+            let html = '<div class="calendar-header">';
+            const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
+            dayNames.forEach(day => {
+                html += `<div class="calendar-day-header">${day}</div>`;
+            });
+            html += '</div><div class="calendar-body">';
+            
+            // 空白格子
+            for (let i = 0; i < startingDayOfWeek; i++) {
+                html += '<div class="calendar-day empty"></div>';
+            }
+            
+            // 日期格子
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isWeekend = new Date(year, month - 1, day).getDay() === 0 || new Date(year, month - 1, day).getDay() === 6;
+                const classes = ['calendar-day'];
+                
+                if (isWeekend) classes.push('weekend');
+                if (selectedDates.includes(dateStr)) classes.push('selected');
+                
+                html += `<div class="${classes.join(' ')}" onclick="toggleDateSelection('${dateStr}')">${day}</div>`;
+            }
+            
+            html += '</div>';
+            return html;
+        }
+
+        // 切換日期選擇
+        function toggleDateSelection(dateStr) {
+            const index = selectedDates.indexOf(dateStr);
+            if (index > -1) {
+                selectedDates.splice(index, 1);
+            } else {
+                selectedDates.push(dateStr);
+            }
+            
+            // 重新生成月曆以更新顯示
+            generateScheduleCalendar();
+        }
+
+        // 開始排班計時
+        function startScheduleTimer() {
+            scheduleTimeRemaining = 300; // 5分鐘
+            updateTimerDisplay();
+            
+            scheduleTimer = setInterval(() => {
+                scheduleTimeRemaining--;
+                updateTimerDisplay();
+                
+                if (scheduleTimeRemaining <= 0) {
+                    clearInterval(scheduleTimer);
+                    scheduleTimer = null;
+                    showAlert('排班時間已到，系統將自動退出', 'warning');
+                    exitScheduleSystem();
+                }
+            }, 1000);
+        }
+
+        // 更新計時顯示
+        function updateTimerDisplay() {
+            const minutes = Math.floor(scheduleTimeRemaining / 60);
+            const seconds = scheduleTimeRemaining % 60;
+            const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            const timerElement = document.getElementById('scheduleTimeRemaining');
+            if (timerElement) {
+                timerElement.textContent = `時間剩餘: ${timeStr}`;
+                
+                if (scheduleTimeRemaining <= 60) {
+                    timerElement.className = 'badge bg-danger text-white';
+                } else if (scheduleTimeRemaining <= 120) {
+                    timerElement.className = 'badge bg-warning text-dark';
+                }
+            }
+        }
+
+        // 確認排班
+        async function confirmSchedule() {
+            if (selectedDates.length === 0) {
+                showAlert('請至少選擇一個休假日期', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/schedule/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    },
+                    body: JSON.stringify({
+                        leave_dates: selectedDates,
+                        schedule_month: currentScheduleMonth
+                    })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    showAlert('排班提交成功！', 'success');
+                    
+                    // 退出系統
+                    await exitScheduleSystem();
+                    
+                    // 重新載入記錄
+                    await loadMyScheduleHistory();
+                    
+                } else {
+                    showAlert('排班提交失敗: ' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('排班提交失敗: ' + error.message, 'danger');
+            }
+        }
+
+        // 重置排班
+        function resetSchedule() {
+            selectedDates = [];
+            generateScheduleCalendar();
+            showAlert('已重置排班選擇', 'info');
+        }
+
+        // 作廢我的排班
+        async function voidMySchedule() {
+            if (!confirm('確定要作廢本月排班嗎？作廢後需要重新排班。')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/schedule/my-schedule', {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    showAlert('排班記錄已作廢', 'success');
+                    await loadMyScheduleHistory();
+                } else {
+                    showAlert('作廢排班失敗: ' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('作廢排班失敗: ' + error.message, 'danger');
+            }
+        }
+
+        // 獲取當前用戶ID (假設從JWT token中獲取)
+        function getCurrentUserId() {
+            const token = localStorage.getItem('jwt_token');
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    return payload.id;
+                } catch (error) {
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        // ==================== 升遷投票系統 ====================
+
+        // 載入升遷投票系統
+        async function loadPromotionData() {
+            try {
+                // 檢查升遷資格
+                await checkPromotionEligibility();
+                
+                // 載入進行中的投票
+                await loadActivePromotions();
+                
+                // 載入職位階級
+                await loadPositionLevels();
+                
+                // 設置表單事件
+                setupPromotionFormEvents();
+            } catch (error) {
+                console.error('載入升遷投票系統失敗:', error);
+                showAlert('載入升遷投票系統失敗: ' + error.message, 'danger');
+            }
+        }
+
+        // 檢查升遷資格
+        async function checkPromotionEligibility() {
+            try {
+                const response = await fetch('/api/promotion/check-eligibility', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    if (result.data.canStart) {
+                        document.getElementById('promotionEligibility').innerHTML = `
+                            <div class="alert alert-success">
+                                <h6><i class="fas fa-check-circle me-2"></i>您符合升遷條件！</h6>
+                                <ul class="list-unstyled mb-2">
+                                    <li><i class="fas fa-user me-2"></i><strong>目前職位:</strong> ${result.data.currentPosition}</li>
+                                    <li><i class="fas fa-calendar me-2"></i><strong>任職天數:</strong> ${result.data.daysSinceStart}天</li>
+                                    <li><i class="fas fa-clock me-2"></i><strong>在職天數:</strong> ${result.data.totalDays}天</li>
+                                </ul>
+                                <p class="mb-0">可以發起升遷投票！</p>
+                            </div>
+                        `;
+                        
+                        // 顯示發起投票區塊
+                        document.getElementById('startPromotionContainer').style.display = 'block';
+                        
+                        // 載入可升遷的職位
+                        await loadAvailablePositions();
+                    } else {
+                        document.getElementById('promotionEligibility').innerHTML = `
+                            <div class="alert alert-warning">
+                                <h6><i class="fas fa-clock me-2"></i>暫未符合升遷條件</h6>
+                                <p class="mb-2"><strong>原因:</strong> ${result.data.reason}</p>
+                                <ul class="list-unstyled mb-2">
+                                    <li><i class="fas fa-user me-2"></i><strong>目前職位:</strong> ${result.data.currentPosition || '未知'}</li>
+                                    <li><i class="fas fa-calendar me-2"></i><strong>任職天數:</strong> ${result.data.daysSinceStart || 0}天</li>
+                                </ul>
+                                <small class="text-muted">請繼續努力，達到條件後即可發起升遷投票！</small>
+                            </div>
+                        `;
+                        
+                        // 隱藏發起投票區塊
+                        document.getElementById('startPromotionContainer').style.display = 'none';
+                    }
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                document.getElementById('promotionEligibility').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>檢查升遷資格失敗: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // 載入可升遷的職位
+        async function loadAvailablePositions() {
+            try {
+                const response = await fetch('/api/promotion/available-positions', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    const select = document.getElementById('targetPosition');
+                    select.innerHTML = '<option value="">請選擇目標職位</option>';
+                    
+                    result.data.forEach(position => {
+                        select.innerHTML += `
+                            <option value="${position.level}">
+                                ${position.name} (薪資: $${position.salary.toLocaleString()}, 
+                                需要天數: ${position.required_days}天)
+                            </option>
+                        `;
+                    });
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                showAlert('載入可升遷職位失敗: ' + error.message, 'danger');
+            }
+        }
+
+        // 載入進行中的投票
+        async function loadActivePromotions() {
+            try {
+                const response = await fetch('/api/promotion/active', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    const promotions = result.data;
+                    
+                    if (promotions.length === 0) {
+                        document.getElementById('activePromotions').innerHTML = `
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>目前沒有進行中的升遷投票
+                            </div>
+                        `;
+                    } else {
+                        let html = '';
+                        promotions.forEach(promotion => {
+                            const endDate = new Date(promotion.vote_end_date);
+                            const now = new Date();
+                            const daysLeft = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
+                            
+                            html += `
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="card-title">${promotion.candidate_name}</h6>
+                                                <p class="text-muted mb-2">
+                                                    <i class="fas fa-arrow-up me-1"></i>
+                                                    ${promotion.current_position} → ${promotion.target_position}
+                                                </p>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    剩餘 ${daysLeft} 天 | 
+                                                    <i class="fas fa-users me-1"></i>
+                                                    ${promotion.votes_for}/${promotion.total_voters} 同意
+                                                </small>
+                                            </div>
+                                            <div class="text-end">
+                                                ${promotion.user_vote === null ? `
+                                                    <div class="btn-group-vertical">
+                                                        <button class="btn btn-sm btn-success" onclick="vote(${promotion.id}, true)">
+                                                            <i class="fas fa-thumbs-up me-1"></i>同意
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger" onclick="vote(${promotion.id}, false)">
+                                                            <i class="fas fa-thumbs-down me-1"></i>反對
+                                                        </button>
+                                                    </div>
+                                                ` : `
+                                                    <div class="alert alert-sm alert-${promotion.user_vote ? 'success' : 'danger'} mb-0">
+                                                        <i class="fas fa-${promotion.user_vote ? 'thumbs-up' : 'thumbs-down'} me-1"></i>
+                                                        已投票：${promotion.user_vote ? '同意' : '反對'}
+                                                        <br>
+                                                        <button class="btn btn-link btn-sm p-0" onclick="changeVote(${promotion.id})">
+                                                            修改投票
+                                                        </button>
+                                                    </div>
+                                                `}
+                                            </div>
+                                        </div>
+                                        
+                                        ${promotion.reason ? `
+                                            <div class="mt-2">
+                                                <small class="text-muted">申請理由：</small>
+                                                <p class="small mb-0">${promotion.reason}</p>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        
+                        document.getElementById('activePromotions').innerHTML = html;
+                    }
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                document.getElementById('activePromotions').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>載入投票資訊失敗: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // 載入職位階級說明
+        async function loadPositionLevels() {
+            try {
+                const response = await fetch('/api/promotion/position-levels', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    const levels = result.data;
+                    let html = '<div class="table-responsive"><table class="table table-sm">';
+                    html += `
+                        <thead>
+                            <tr>
+                                <th>階級</th>
+                                <th>薪資</th>
+                                <th>獎金比例</th>
+                                <th>任職天數</th>
+                                <th>名額</th>
+                                <th>同意比例</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                    `;
+                    
+                    levels.forEach(level => {
+                        html += `
+                            <tr>
+                                <td><strong>${level.name}</strong></td>
+                                <td>$${level.salary.toLocaleString()}</td>
+                                <td>${(level.bonus_rate * 100).toFixed(1)}%</td>
+                                <td>${level.required_days}天</td>
+                                <td>${level.quota}人</td>
+                                <td>${(level.approval_rate * 100).toFixed(0)}%</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    html += '</tbody></table></div>';
+                    document.getElementById('positionLevels').innerHTML = html;
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                document.getElementById('positionLevels').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>載入職位資訊失敗: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // 設置表單事件
+        function setupPromotionFormEvents() {
+            const form = document.getElementById('promotionStartForm');
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await startPromotion();
+                });
+            }
+        }
+
+        // 發起升遷投票
+        async function startPromotion() {
+            const targetPosition = document.getElementById('targetPosition').value;
+            const reason = document.getElementById('promotionReason').value;
+            
+            if (!targetPosition || !reason) {
+                showAlert('請填寫所有必填欄位', 'warning');
+                return;
+            }
+            
+            if (!confirm('確定要發起升遷投票嗎？一旦發起將無法取消。')) {
+                return;
+            }
+            
+            try {
+                const submitBtn = document.querySelector('#promotionStartForm button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>發起中...';
+                
+                const response = await fetch('/api/promotion/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    },
+                    body: JSON.stringify({
+                        target_position: targetPosition,
+                        reason
+                    })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    showAlert('升遷投票發起成功！投票期間為5天', 'success');
+                    
+                    // 清空表單
+                    document.getElementById('promotionStartForm').reset();
+                    
+                    // 重新載入頁面
+                    await loadPromotionData();
+                } else {
+                    showAlert('發起升遷投票失敗: ' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('發起升遷投票失敗: ' + error.message, 'danger');
+            } finally {
+                const submitBtn = document.querySelector('#promotionStartForm button[type="submit"]');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-play me-2"></i>發起升遷投票';
+            }
+        }
+
+        // 投票
+        async function vote(promotionId, support) {
+            try {
+                const response = await fetch(`/api/promotion/${promotionId}/vote`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    },
+                    body: JSON.stringify({ support })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    showAlert('投票成功！', 'success');
+                    await loadActivePromotions(); // 重新載入投票狀態
+                } else {
+                    showAlert('投票失敗: ' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('投票失敗: ' + error.message, 'danger');
+            }
+        }
+
+        // 修改投票
+        async function changeVote(promotionId) {
+            const newVote = confirm('您之前已經投票，要修改為相反的選擇嗎？\n點擊確定=修改，點擊取消=保持原投票');
+            if (newVote !== null) {
+                // 獲取當前投票狀態並反轉
+                const currentVoteElement = document.querySelector(`button[onclick="changeVote(${promotionId})"]`).closest('.alert');
+                const isCurrentlySupport = currentVoteElement.classList.contains('alert-success');
+                await vote(promotionId, !isCurrentlySupport);
+            }
         }
     </script>
 </body>

@@ -325,7 +325,7 @@ app.post('/api/auth/verify', authenticateToken, async (req, res) => {
 
 // ==================== 員工管理API ====================
 
-app.get('/api/employees', authenticateToken, async (req, res) => {
+app.get('/api/employees', authenticateToken, requireAdmin, async (req, res) => {
     try {
         const employees = await db.getAllEmployees();
         res.json({
@@ -456,6 +456,7 @@ app.post('/api/attendance/clock-in', authenticateToken, async (req, res) => {
                 timestamp: new Date().toISOString(),
                 location: location,
                 gps_accuracy: accuracy,
+                distance_meters: result.distance_meters,
                 device_info: device_fingerprint ? device_fingerprint.substring(0, 16) + '...' : 'unknown'
             };
             
@@ -791,11 +792,27 @@ function requireAdmin(req, res, next) {
 // 獲取所有出勤記錄（管理員用）
 app.get('/api/admin/attendance', authenticateToken, requireAdmin, async (req, res) => {
     try {
-        const attendance = await db.allQuery('SELECT * FROM attendance ORDER BY date DESC LIMIT 100');
+        const attendanceData = await db.readTable('attendance');
+        
+        // 按日期排序，取最近100筆記錄
+        const sortedAttendance = attendanceData
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+            .slice(0, 100);
+
+        // 為每筆記錄添加員工資訊
+        const employees = await db.readTable('employees');
+        const enrichedAttendance = sortedAttendance.map(record => {
+            const employee = employees.find(emp => emp.id === record.employee_id);
+            return {
+                ...record,
+                employee_name: employee ? employee.name : '未知員工',
+                employee_position: employee ? employee.position : '未知職位'
+            };
+        });
         
         res.json({
             success: true,
-            data: attendance,
+            data: enrichedAttendance,
             message: '出勤記錄獲取成功'
         });
     } catch (error) {
@@ -967,6 +984,83 @@ app.get('/api/admin/orders', authenticateToken, requireAdmin, async (req, res) =
     }
 });
 
+// 管理員審核叫貨訂單（新增）
+app.post('/api/admin/orders/:id/approve', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const orderId = parseInt(req.params.id);
+        const { action, reason } = req.body; // action: 'approve' 或 'reject'
+        
+        const result = await db.updateOrderStatus(orderId, action, reason);
+        
+        res.json({
+            success: true,
+            data: result,
+            message: `訂單已${action === 'approve' ? '批准' : '拒絕'}`
+        });
+    } catch (error) {
+        console.error('處理訂單失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '處理訂單失敗: ' + error.message
+        });
+    }
+});
+
+// 管理員查看庫存統計（新增）
+app.get('/api/admin/inventory/stats', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const products = await db.readTable('products');
+        const orders = await db.readTable('orders');
+        
+        // 計算庫存統計
+        const totalProducts = products.length;
+        const lowStockProducts = products.filter(p => p.current_stock <= p.min_stock).length;
+        const outOfStockProducts = products.filter(p => p.current_stock === 0).length;
+        
+        // 本月訂單統計
+        const currentMonth = new Date().toISOString().substring(0, 7);
+        const monthlyOrders = orders.filter(o => o.created_at.startsWith(currentMonth));
+        
+        const stats = {
+            inventory: {
+                totalProducts,
+                lowStockProducts,
+                outOfStockProducts,
+                stockValue: products.reduce((sum, p) => sum + (p.current_stock * p.cost_price || 0), 0)
+            },
+            orders: {
+                monthlyTotal: monthlyOrders.length,
+                pendingOrders: orders.filter(o => o.status === 'pending').length,
+                approvedOrders: orders.filter(o => o.status === 'approved').length
+            },
+            lowStockList: products.filter(p => p.current_stock <= p.min_stock)
+        };
+        
+        res.json({
+            success: true,
+            data: stats,
+            message: '庫存統計獲取成功'
+        });
+    } catch (error) {
+        console.error('獲取庫存統計失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '獲取庫存統計失敗: ' + error.message
+        });
+    }
+});
+
+// 分店列表API (公共端點)
+app.get('/api/stores', async (req, res) => {
+    try {
+        const stores = await db.getStores();
+        res.json(stores);
+    } catch (error) {
+        console.error('獲取分店列表失敗:', error);
+        res.status(500).json({ error: '獲取分店列表失敗' });
+    }
+});
+
 // ==================== 升遷投票系統API ====================
 
 // 獲取職位階級列表
@@ -988,6 +1082,182 @@ app.get('/api/positions', authenticateToken, async (req, res) => {
 });
 
 // 檢查員工是否可以發起升遷
+// ==================== 管理員排班分配 API ====================
+
+// 取得分店員工列表
+app.get('/api/admin/employees', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const storeId = req.query.store;
+        let employees = await db.getAllEmployees();
+        
+        if (storeId) {
+            employees = employees.filter(emp => emp.store_id === storeId);
+        }
+        
+        res.json({
+            success: true,
+            data: employees
+        });
+    } catch (error) {
+        console.error('取得員工列表失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '取得員工列表失敗'
+        });
+    }
+});
+
+// 取得分店列表
+app.get('/api/admin/stores', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const stores = await db.getAllStores();
+        res.json({
+            success: true,
+            data: stores
+        });
+    } catch (error) {
+        console.error('取得分店列表失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '取得分店列表失敗'
+        });
+    }
+});
+
+// 取得指定月份排班資料
+app.get('/api/admin/schedule/:year/:month', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { year, month } = req.params;
+        const storeId = req.query.store;
+        
+        const scheduleData = await db.getScheduleData(year, month, storeId);
+        
+        res.json({
+            success: true,
+            data: scheduleData
+        });
+    } catch (error) {
+        console.error('取得排班資料失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '取得排班資料失敗'
+        });
+    }
+});
+
+// 儲存排班資料
+app.post('/api/admin/schedule', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { store_id, year, month, schedule_data } = req.body;
+        
+        const result = await db.saveScheduleData({
+            store_id,
+            year,
+            month,
+            schedule_data,
+            updated_by: req.user.id,
+            updated_at: new Date().toISOString()
+        });
+        
+        // 發送Telegram通知
+        if (telegramNotifier) {
+            await telegramNotifier.notifyScheduleUpdate({
+                store_id,
+                year,
+                month,
+                admin_name: req.user.name,
+                total_assignments: Object.keys(schedule_data).length
+            });
+        }
+        
+        res.json({
+            success: true,
+            message: '排班資料儲存成功',
+            data: result
+        });
+    } catch (error) {
+        console.error('儲存排班資料失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '儲存排班資料失敗'
+        });
+    }
+});
+
+// 智能排班分配
+app.post('/api/admin/schedule/auto-assign', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { store_id, year, month } = req.body;
+        
+        // 取得分店員工和基本排班資料
+        const employees = await db.getEmployeesByStore(store_id);
+        const existingSchedule = await db.getScheduleData(year, month, store_id);
+        
+        // 智能分配邏輯
+        const autoAssignedSchedule = await db.generateAutoSchedule({
+            store_id,
+            year,
+            month,
+            employees,
+            existing_schedule: existingSchedule
+        });
+        
+        res.json({
+            success: true,
+            message: '智能排班分配完成',
+            data: {
+                schedule_data: autoAssignedSchedule
+            }
+        });
+    } catch (error) {
+        console.error('智能排班分配失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '智能排班分配失敗'
+        });
+    }
+});
+
+// ==================== 排班系統時間控制 API ====================
+
+// 檢查排班系統狀態
+app.get('/api/schedule/status', authenticateToken, async (req, res) => {
+    try {
+        const scheduleStatus = await db.getScheduleSystemStatus();
+        
+        res.json({
+            success: true,
+            data: scheduleStatus
+        });
+    } catch (error) {
+        console.error('檢查排班系統狀態失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '檢查排班系統狀態失敗'
+        });
+    }
+});
+
+// 獲取我的排班記錄
+app.get('/api/schedule/my-schedule', authenticateToken, async (req, res) => {
+    try {
+        const mySchedule = await db.getEmployeeSchedule(req.user.employee_id);
+        
+        res.json({
+            success: true,
+            data: mySchedule
+        });
+    } catch (error) {
+        console.error('獲取排班記錄失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '獲取排班記錄失敗'
+        });
+    }
+});
+
+// ==================== 升遷系統 API ====================
+
 app.get('/api/promotion/check-eligibility', authenticateToken, async (req, res) => {
     try {
         const result = await db.canEmployeeStartPromotion(req.user.employee_id);
@@ -1109,6 +1379,62 @@ app.post('/api/admin/promotion/:id/complete', authenticateToken, requireAdmin, a
         res.status(400).json({
             success: false,
             message: '完成投票失敗: ' + error.message
+        });
+    }
+});
+
+// 管理員查看所有升遷投票（新增）
+app.get('/api/admin/promotions', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const promotions = await db.readTable('promotions');
+        const employees = await db.readTable('employees');
+        const votes = await db.readTable('promotion_votes');
+        
+        // 為升遷記錄添加員工資訊和投票統計
+        const enrichedPromotions = promotions.map(promotion => {
+            const employee = employees.find(emp => emp.id === promotion.employee_id);
+            const promotionVotes = votes.filter(vote => vote.promotion_id === promotion.id);
+            
+            const agreeVotes = promotionVotes.filter(vote => vote.vote === 'agree').length;
+            const disagreeVotes = promotionVotes.filter(vote => vote.vote === 'disagree').length;
+            const totalVotes = promotionVotes.length;
+            
+            return {
+                ...promotion,
+                employee_name: employee ? employee.name : '未知員工',
+                employee_position: employee ? employee.position : '未知職位',
+                voting_stats: {
+                    agreeVotes,
+                    disagreeVotes,
+                    totalVotes,
+                    agreeRate: totalVotes > 0 ? Math.round((agreeVotes / totalVotes) * 100) : 0
+                }
+            };
+        });
+        
+        // 按狀態分類
+        const activePromotions = enrichedPromotions.filter(p => p.status === 'active');
+        const completedPromotions = enrichedPromotions.filter(p => p.status === 'completed');
+        
+        res.json({
+            success: true,
+            data: {
+                all: enrichedPromotions,
+                active: activePromotions,
+                completed: completedPromotions,
+                statistics: {
+                    total: enrichedPromotions.length,
+                    active: activePromotions.length,
+                    completed: completedPromotions.length
+                }
+            },
+            message: '升遷投票資料獲取成功'
+        });
+    } catch (error) {
+        console.error('獲取升遷投票資料失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '獲取升遷投票資料失敗: ' + error.message
         });
     }
 });
@@ -1586,6 +1912,99 @@ app.get('/api/revenue/stats', authenticateToken, async (req, res) => {
     }
 });
 
+// 管理員審核營收記錄
+app.post('/api/admin/revenue/:id/approve', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { action, reason } = req.body; // action: 'approve' 或 'reject'
+        const revenueId = parseInt(req.params.id);
+        
+        if (!action || !['approve', 'reject'].includes(action)) {
+            return res.status(400).json({
+                success: false,
+                message: '請提供有效的審核操作 (approve/reject)'
+            });
+        }
+        
+        const result = await db.updateRevenueStatus(revenueId, action, reason, req.user.id);
+        
+        // 發送Telegram通知
+        try {
+            await telegramNotifier.notifyRevenueApproval({
+                revenue_id: revenueId,
+                action,
+                reason,
+                reviewer: req.user.name,
+                employee_name: result.employee_name
+            });
+        } catch (notificationError) {
+            console.error('營收審核Telegram通知發送失敗:', notificationError);
+        }
+        
+        res.json({
+            success: true,
+            data: result,
+            message: action === 'approve' ? '營收記錄已核准' : '營收記錄已拒絕'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '營收記錄審核失敗: ' + error.message
+        });
+    }
+});
+
+// 管理員查看所有營收記錄（包含待審核）
+app.get('/api/admin/revenue/all', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { status, store_id, employee_id, date_from, date_to } = req.query;
+        
+        const filters = {
+            status, // 可以是 'pending', 'active', 'rejected'
+            store_id: store_id ? parseInt(store_id) : null,
+            employee_id: employee_id ? parseInt(employee_id) : null,
+            date_from,
+            date_to
+        };
+        
+        const revenues = await db.getRevenueRecords(filters);
+        
+        // 重新計算所有記錄的獎金（確保一致性）
+        const enrichedRevenues = revenues.map(record => {
+            const bonus = db.calculateBonusAmount(record);
+            return {
+                ...record,
+                calculated_bonus: bonus.amount,
+                calculated_bonus_type: bonus.type,
+                calculated_bonus_reason: bonus.reason,
+                revenue_items: JSON.parse(record.revenue_items || '[]'),
+                expense_items: JSON.parse(record.expense_items || '[]'),
+                photos: JSON.parse(record.photos || '[]')
+            };
+        });
+        
+        res.json({
+            success: true,
+            data: {
+                revenues: enrichedRevenues,
+                summary: {
+                    total: enrichedRevenues.length,
+                    pending: enrichedRevenues.filter(r => r.status === 'pending').length,
+                    active: enrichedRevenues.filter(r => r.status === 'active').length,
+                    rejected: enrichedRevenues.filter(r => r.status === 'rejected').length,
+                    total_revenue: enrichedRevenues.reduce((sum, r) => sum + (r.total_revenue || 0), 0),
+                    total_bonus: enrichedRevenues.reduce((sum, r) => sum + (r.bonus_amount || 0), 0)
+                }
+            },
+            message: '管理員營收記錄獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取管理員營收記錄失敗: ' + error.message
+        });
+    }
+});
+
 // ==================== 其他APIs ====================
 
 // 員工班表API
@@ -1699,6 +2118,94 @@ app.get('/api/admin/employees', authenticateToken, requireAdmin, async (req, res
     }
 });
 
+// 管理員審核員工申請（新增）
+app.post('/api/admin/employees/:id/approve', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const employeeId = parseInt(req.params.id);
+        const { action, position, store_id, join_date, reason } = req.body;
+        
+        if (!['approve', 'reject'].includes(action)) {
+            return res.status(400).json({
+                success: false,
+                message: '無效的審核動作'
+            });
+        }
+
+        const employees = await db.readTable('employees');
+        const employee = employees.find(emp => emp.id === employeeId);
+        
+        if (!employee) {
+            return res.status(404).json({
+                success: false,
+                message: '找不到該員工'
+            });
+        }
+
+        if (action === 'approve') {
+            // 審核通過：更新員工狀態和資料
+            employee.status = '在職';
+            employee.position = position || '實習生';
+            employee.store_id = store_id || 1;
+            employee.join_date = join_date || new Date().toISOString().split('T')[0];
+            employee.updated_at = new Date().toISOString();
+            
+            await db.writeTable('employees', employees);
+            
+            // 發送歡迎通知
+            try {
+                await telegramNotifier.notifyEmployeeApproved({
+                    ...employee,
+                    store_name: '內壢忠孝店'
+                });
+            } catch (notificationError) {
+                console.error('員工審核通過通知發送失敗:', notificationError);
+            }
+        } else {
+            // 審核拒絕：更新狀態
+            employee.status = '拒絕';
+            employee.reject_reason = reason || '不符合錄用條件';
+            employee.updated_at = new Date().toISOString();
+            
+            await db.writeTable('employees', employees);
+        }
+        
+        res.json({
+            success: true,
+            data: employee,
+            message: `員工申請已${action === 'approve' ? '批准' : '拒絕'}`
+        });
+    } catch (error) {
+        console.error('審核員工申請失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '審核員工申請失敗: ' + error.message
+        });
+    }
+});
+
+// 管理員查看待審核員工（新增）
+app.get('/api/admin/employees/pending', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const employees = await db.readTable('employees');
+        const pendingEmployees = employees.filter(emp => emp.status === 'pending');
+        
+        res.json({
+            success: true,
+            data: {
+                employees: pendingEmployees,
+                count: pendingEmployees.length
+            },
+            message: '待審核員工列表獲取成功'
+        });
+    } catch (error) {
+        console.error('獲取待審核員工失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '獲取待審核員工失敗: ' + error.message
+        });
+    }
+});
+
 // Telegram連線測試
 app.post('/api/telegram/test', authenticateToken, requireAdmin, async (req, res) => {
     try {
@@ -1781,6 +2288,70 @@ app.post('/api/admin/schedule/save-settings', authenticateToken, requireAdmin, a
         res.status(500).json({
             success: false,
             message: '儲存排班設定失敗: ' + error.message
+        });
+    }
+});
+
+// 管理員查看所有員工排班（新增）
+app.get('/api/admin/schedule/all', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { month } = req.query;
+        const settings = await db.getScheduleSettings();
+        const targetMonth = month || settings.schedule_month;
+        
+        const schedules = await db.getMonthSchedules(targetMonth);
+        const employees = await db.readTable('employees');
+        
+        // 為排班記錄添加員工詳細資訊
+        const enrichedSchedules = schedules.map(schedule => {
+            const employee = employees.find(emp => emp.id === schedule.employee_id);
+            return {
+                ...schedule,
+                employee_name: employee ? employee.name : '未知員工',
+                employee_position: employee ? employee.position : '未知職位',
+                store_name: employee ? employee.store_name : '未知分店'
+            };
+        });
+        
+        // 統計資訊
+        const totalEmployees = employees.filter(emp => emp.status === '在職').length;
+        const submittedCount = schedules.length;
+        const pendingCount = totalEmployees - submittedCount;
+        
+        // 每日休假統計
+        const dailyStats = {};
+        schedules.forEach(schedule => {
+            if (schedule.leave_dates && Array.isArray(schedule.leave_dates)) {
+                schedule.leave_dates.forEach(date => {
+                    if (!dailyStats[date]) {
+                        dailyStats[date] = 0;
+                    }
+                    dailyStats[date]++;
+                });
+            }
+        });
+        
+        res.json({
+            success: true,
+            data: {
+                schedules: enrichedSchedules,
+                statistics: {
+                    totalEmployees,
+                    submittedCount,
+                    pendingCount,
+                    submissionRate: Math.round((submittedCount / totalEmployees) * 100)
+                },
+                dailyStats,
+                settings,
+                targetMonth
+            },
+            message: '管理員排班資料獲取成功'
+        });
+    } catch (error) {
+        console.error('獲取管理員排班資料失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '獲取排班資料失敗: ' + error.message
         });
     }
 });
