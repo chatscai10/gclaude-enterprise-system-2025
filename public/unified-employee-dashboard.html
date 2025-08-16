@@ -627,23 +627,169 @@
                             <div class="card-body">
                                 <h5 class="card-title">新增營收記錄</h5>
                                 <form id="revenueForm">
-                                    <div class="row">
-                                        <div class="col-md-6">
+                                    <!-- 基本資訊 -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
                                             <div class="mb-3">
-                                                <label class="form-label">營收類別</label>
-                                                <select class="form-select" id="revenueCategory" required>
-                                                    <option value="">請選擇類別</option>
-                                                    <option value="food">餐飲銷售</option>
-                                                    <option value="retail">零售商品</option>
-                                                    <option value="service">服務收入</option>
-                                                    <option value="other">其他收入</option>
+                                                <label class="form-label">選擇日期 <span class="text-danger">*</span></label>
+                                                <input type="date" class="form-control" id="revenueDate" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">分店 <span class="text-danger">*</span></label>
+                                                <select class="form-select" id="revenueStore" required>
+                                                    <option value="">請選擇分店</option>
+                                                    <option value="1">內壢忠孝店</option>
+                                                    <option value="2">桃園龍安店</option>
+                                                    <option value="3">中壢龍崗店</option>
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <div class="mb-3">
-                                                <label class="form-label">金額</label>
-                                                <input type="number" class="form-control" id="revenueAmount" min="0" step="0.01" required>
+                                                <label class="form-label">獎金類別 <span class="text-danger">*</span></label>
+                                                <select class="form-select" id="revenueBonusType" required>
+                                                    <option value="">請選擇類別</option>
+                                                    <option value="平日獎金">平日獎金</option>
+                                                    <option value="假日獎金">假日獎金</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 訂單數量 -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">訂單數量</label>
+                                                <input type="number" class="form-control" id="revenueOrderCount" min="0" value="0">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 收入項目 - 全部列出 -->
+                                    <div class="card mb-3">
+                                        <div class="card-header bg-success text-white">
+                                            <h6 class="mb-0"><i class="fas fa-plus-circle me-2"></i>收入項目</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">現場營業額</label>
+                                                        <input type="number" class="form-control revenue-income" 
+                                                               data-name="現場營業額" 
+                                                               data-service-fee="0" 
+                                                               data-include-bonus="true" 
+                                                               min="0" step="0.01" value="0">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">線上點餐</label>
+                                                        <input type="number" class="form-control revenue-income" 
+                                                               data-name="線上點餐" 
+                                                               data-service-fee="0" 
+                                                               data-include-bonus="true" 
+                                                               min="0" step="0.01" value="0">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">熊貓點餐 <small class="text-muted">(服務費35%)</small></label>
+                                                        <input type="number" class="form-control revenue-income" 
+                                                               data-name="熊貓點餐" 
+                                                               data-service-fee="0.35" 
+                                                               data-include-bonus="true" 
+                                                               min="0" step="0.01" value="0">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">uber點餐 <small class="text-muted">(服務費35%)</small></label>
+                                                        <input type="number" class="form-control revenue-income" 
+                                                               data-name="uber點餐" 
+                                                               data-service-fee="0.35" 
+                                                               data-include-bonus="true" 
+                                                               min="0" step="0.01" value="0">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">廢油回收 <small class="text-muted">(不計入獎金)</small></label>
+                                                        <input type="number" class="form-control revenue-income" 
+                                                               data-name="廢油回收" 
+                                                               data-service-fee="0" 
+                                                               data-include-bonus="false" 
+                                                               min="0" step="0.01" value="0">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 支出項目 - 下拉選單動態新增 -->
+                                    <div class="card mb-3">
+                                        <div class="card-header bg-danger text-white">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h6 class="mb-0"><i class="fas fa-minus-circle me-2"></i>支出項目</h6>
+                                                <button type="button" class="btn btn-sm btn-light" id="addExpenseBtn">
+                                                    <i class="fas fa-plus me-1"></i>新增支出
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="expenseItems">
+                                                <!-- 動態新增的支出項目會顯示在這裡 -->
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 照片上傳 -->
+                                    <div class="card mb-3">
+                                        <div class="card-header bg-info text-white">
+                                            <h6 class="mb-0"><i class="fas fa-camera me-2"></i>照片上傳</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">照片類別</label>
+                                                        <select class="form-select" id="revenuePhotoCategory">
+                                                            <option value="">請選擇類別</option>
+                                                            <option value="廢油回收">廢油回收</option>
+                                                            <option value="器具保養">器具保養</option>
+                                                            <option value="貨款單據">貨款單據</option>
+                                                            <option value="其他開支">其他開支</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">選擇照片</label>
+                                                        <input type="file" class="form-control" id="revenuePhotos" 
+                                                               accept="image/*" multiple>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 備註 -->
+                                    <div class="mb-3">
+                                        <label class="form-label">備註欄位</label>
+                                        <textarea class="form-control" id="revenueNotes" rows="3" placeholder="請輸入備註..."></textarea>
+                                    </div>
+
+                                    <!-- 獎金計算預覽 -->
+                                    <div class="card mb-3">
+                                        <div class="card-header bg-warning text-dark">
+                                            <h6 class="mb-0"><i class="fas fa-calculator me-2"></i>獎金預算計算</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="bonusCalculation">
+                                                <div class="text-muted">請填寫收入項目以計算獎金</div>
                                             </div>
                                         </div>
                                     </div>
@@ -752,76 +898,131 @@
                     <div id="orders" class="section-content">
                         <div class="content-header">
                             <h2><i class="fas fa-shopping-cart me-2"></i>叫貨系統</h2>
-                            <p class="text-muted mb-0">管理庫存並提交進貨申請</p>
+                            <p class="text-muted mb-0">選擇分店、分類品項，加入購物車統一下單</p>
                         </div>
 
-                        <!-- 叫貨申請表單 -->
+                        <!-- 叫貨基本設定 -->
                         <div class="card border-0 shadow-sm mb-4">
                             <div class="card-body">
-                                <h5 class="card-title">新增叫貨申請</h5>
-                                <form id="orderForm">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">商品類別</label>
-                                                <select class="form-select" id="orderCategory" required>
-                                                    <option value="">請選擇類別</option>
-                                                    <option value="food">食材原料</option>
-                                                    <option value="beverage">飲料用品</option>
-                                                    <option value="packaging">包裝材料</option>
-                                                    <option value="cleaning">清潔用品</option>
-                                                    <option value="equipment">設備配件</option>
-                                                    <option value="other">其他用品</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">緊急程度</label>
-                                                <select class="form-select" id="orderPriority" required>
-                                                    <option value="low">低 - 正常補貨</option>
-                                                    <option value="medium">中 - 庫存不足</option>
-                                                    <option value="high">高 - 緊急缺貨</option>
-                                                </select>
-                                            </div>
+                                <h5 class="card-title">叫貨基本設定</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">選擇分店 <span class="text-danger">*</span></label>
+                                            <select class="form-select" id="orderStoreSelect" required>
+                                                <option value="">請選擇分店</option>
+                                                <option value="1">總店 - 台北市中正區</option>
+                                                <option value="2">分店A - 台北市信義區</option>
+                                                <option value="3">分店B - 新北市板橋區</option>
+                                                <option value="4">分店C - 桃園市中壢區</option>
+                                                <option value="5">分店D - 台中市西屯區</option>
+                                            </select>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-8">
-                                            <div class="mb-3">
-                                                <label class="form-label">商品名稱</label>
-                                                <input type="text" class="form-control" id="orderItemName" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label class="form-label">申請數量</label>
-                                                <input type="number" class="form-control" id="orderQuantity" min="1" required>
-                                            </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">緊急程度</label>
+                                            <select class="form-select" id="orderPriority">
+                                                <option value="normal">正常補貨</option>
+                                                <option value="urgent">庫存不足</option>
+                                                <option value="emergency">緊急缺貨</option>
+                                            </select>
                                         </div>
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">需求說明</label>
-                                        <textarea class="form-control" id="orderDescription" rows="3" placeholder="請說明商品規格、用途等詳細需求..."></textarea>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">預計用量時間</label>
-                                                <input type="date" class="form-control" id="orderNeededDate" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">聯絡人員</label>
-                                                <input type="text" class="form-control" id="orderContact" required>
-                                            </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">預計到貨日期</label>
+                                            <input type="date" class="form-control" id="orderNeededDate" required>
                                         </div>
                                     </div>
-                                    <button type="submit" id="submitOrderBtn" class="btn btn-gradient">
-                                        <i class="fas fa-paper-plane me-2"></i>提交叫貨申請
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">聯絡人員</label>
+                                            <input type="text" class="form-control" id="orderContact" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 商品分類選擇 -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">選擇商品分類</h5>
+                                <div class="row" id="categoryTabs">
+                                    <div class="col-12">
+                                        <div class="btn-group mb-3" role="group">
+                                            <button type="button" class="btn btn-outline-primary category-tab active" data-category="all">全部</button>
+                                            <button type="button" class="btn btn-outline-primary category-tab" data-category="food">食材原料</button>
+                                            <button type="button" class="btn btn-outline-primary category-tab" data-category="beverage">飲料用品</button>
+                                            <button type="button" class="btn btn-outline-primary category-tab" data-category="packaging">包裝材料</button>
+                                            <button type="button" class="btn btn-outline-primary category-tab" data-category="cleaning">清潔用品</button>
+                                            <button type="button" class="btn btn-outline-primary category-tab" data-category="equipment">設備配件</button>
+                                            <button type="button" class="btn btn-outline-primary category-tab" data-category="other">其他用品</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 品項清單 -->
+                                <div id="itemsList">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>請先選擇分店和商品分類
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 購物車 -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>購物車 <span id="cartItemCount" class="badge bg-light text-dark">0</span></h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="cartItems">
+                                    <div class="text-center py-4 text-muted">
+                                        <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+                                        <p>購物車是空的</p>
+                                        <small>請選擇商品並點擊"加入購物車"</small>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <button type="button" class="btn btn-outline-danger" onclick="clearCart()">
+                                        <i class="fas fa-trash me-2"></i>清空購物車
                                     </button>
-                                </form>
+                                    <button type="button" class="btn btn-gradient" onclick="submitOrder()" id="submitOrderBtn" disabled>
+                                        <i class="fas fa-paper-plane me-2"></i>送出叫貨申請
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 照片上傳區域 -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">照片上傳</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">照片類別</label>
+                                            <select class="form-select" id="orderPhotoCategory">
+                                                <option value="">選擇照片類別</option>
+                                                <option value="inventory_status">庫存狀況</option>
+                                                <option value="product_sample">商品樣本</option>
+                                                <option value="damage_proof">損壞證明</option>
+                                                <option value="other">其他</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">上傳照片</label>
+                                            <input type="file" class="form-control" id="orderPhotos" multiple accept="image/*">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="photoPreview" class="row"></div>
                             </div>
                         </div>
 
@@ -970,6 +1171,46 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 統一員工工作台載入完成');
             initializeApp();
+            
+            // 綁定營業額系統的即時計算事件
+            setTimeout(() => {
+                // 為所有收入欄位綁定事件
+                document.querySelectorAll('.revenue-income').forEach(input => {
+                    input.addEventListener('input', updateBonusPreview);
+                });
+                
+                // 為獎金類型選擇綁定事件
+                const bonusTypeSelect = document.getElementById('revenueBonusType');
+                if (bonusTypeSelect) {
+                    bonusTypeSelect.addEventListener('change', updateBonusPreview);
+                }
+                
+                // 綁定叫貨系統的分類選擇事件
+                document.querySelectorAll('.category-tab').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const category = btn.dataset.category;
+                        selectCategory(category);
+                    });
+                });
+                
+                // 綁定分店選擇事件
+                const orderStoreSelect = document.getElementById('orderStoreSelect');
+                if (orderStoreSelect) {
+                    orderStoreSelect.addEventListener('change', () => {
+                        const activeCategory = document.querySelector('.category-tab.active');
+                        if (activeCategory) {
+                            selectCategory(activeCategory.dataset.category);
+                        }
+                    });
+                }
+                
+                // 綁定照片上傳預覽
+                const orderPhotos = document.getElementById('orderPhotos');
+                if (orderPhotos) {
+                    orderPhotos.addEventListener('change', handlePhotoPreview);
+                }
+            }, 1000);
         });
 
         // 應用初始化
@@ -1433,27 +1674,83 @@
         async function handleRevenueSubmit(e) {
             e.preventDefault();
             
-            const category = document.getElementById('revenueCategory').value;
-            const amount = parseFloat(document.getElementById('revenueAmount').value);
+            // 收集基本資訊
+            const date = document.getElementById('revenueDate').value;
+            const storeId = document.getElementById('revenueStore').value;
+            const bonusType = document.getElementById('revenueBonusType').value;
+            const orderCount = parseInt(document.getElementById('revenueOrderCount').value) || 0;
             const notes = document.getElementById('revenueNotes').value;
             
-            // 構建符合新API格式的數據
-            const revenueData = {
-                date: new Date().toISOString().split('T')[0], // 當前日期
-                store_id: 1, // 預設分店ID
-                bonus_type: '平日獎金', // 預設獎金類型
-                order_count: 1,
-                revenue_items: [
-                    {
-                        name: category,
+            // 驗證必填欄位
+            if (!date || !storeId || !bonusType) {
+                showAlert('請填寫所有必填欄位', 'warning');
+                return;
+            }
+            
+            // 收集收入項目
+            const revenueItems = [];
+            let totalRevenue = 0;
+            let bonusEligibleRevenue = 0;
+            
+            document.querySelectorAll('.revenue-income').forEach(input => {
+                const amount = parseFloat(input.value) || 0;
+                if (amount > 0) {
+                    const name = input.dataset.name;
+                    const serviceFee = parseFloat(input.dataset.serviceFee) || 0;
+                    const includeBonus = input.dataset.includeBonus === 'true';
+                    
+                    // 計算實際收入 (扣除服務費)
+                    const actualAmount = amount * (1 - serviceFee);
+                    
+                    revenueItems.push({
+                        name: name,
                         amount: amount,
-                        serviceFee: 0
+                        serviceFee: serviceFee,
+                        actualAmount: actualAmount,
+                        includeInBonus: includeBonus
+                    });
+                    
+                    totalRevenue += amount;
+                    if (includeBonus) {
+                        bonusEligibleRevenue += actualAmount;
                     }
-                ],
-                expense_items: [],
-                total_revenue: amount,
-                total_expense: 0,
-                net_revenue: amount,
+                }
+            });
+            
+            // 收集支出項目
+            const expenseItems = [];
+            let totalExpense = 0;
+            
+            document.querySelectorAll('.expense-item').forEach(item => {
+                const category = item.querySelector('.expense-category').value;
+                const amount = parseFloat(item.querySelector('.expense-amount').value) || 0;
+                
+                if (category && amount > 0) {
+                    expenseItems.push({
+                        name: category,
+                        amount: amount
+                    });
+                    totalExpense += amount;
+                }
+            });
+            
+            // 計算獎金
+            const bonusCalculation = calculateBonus(bonusType, bonusEligibleRevenue);
+            
+            // 構建完整的營收數據
+            const revenueData = {
+                date: date,
+                store_id: parseInt(storeId),
+                bonus_type: bonusType,
+                order_count: orderCount,
+                revenue_items: revenueItems,
+                expense_items: expenseItems,
+                total_revenue: totalRevenue,
+                total_expense: totalExpense,
+                net_revenue: totalRevenue - totalExpense,
+                bonus_eligible_revenue: bonusEligibleRevenue,
+                calculated_bonus: bonusCalculation.amount,
+                bonus_status: bonusCalculation.status,
                 notes: notes
             };
 
@@ -1479,6 +1776,541 @@
                 }
             } catch (error) {
                 console.error('營收提交失敗:', error);
+                showAlert('提交失敗，請稍後再試', 'danger');
+            }
+        }
+
+        // 獎金計算公式實現 (按照系統邏輯.txt)
+        function calculateBonus(bonusType, bonusEligibleRevenue) {
+            let bonusAmount = 0;
+            let status = '符合條件';
+            let formula = '';
+            
+            // 根據獎金類型計算
+            switch(bonusType) {
+                case 'daily_sales':
+                    // 日營業額獎金: 12000以上 3%, 15000以上 4%, 18000以上 5%
+                    if (bonusEligibleRevenue >= 18000) {
+                        bonusAmount = bonusEligibleRevenue * 0.05;
+                        formula = '營業額 × 5%';
+                    } else if (bonusEligibleRevenue >= 15000) {
+                        bonusAmount = bonusEligibleRevenue * 0.04;
+                        formula = '營業額 × 4%';
+                    } else if (bonusEligibleRevenue >= 12000) {
+                        bonusAmount = bonusEligibleRevenue * 0.03;
+                        formula = '營業額 × 3%';
+                    } else {
+                        status = '未達標準 (需達12000元)';
+                        formula = '最低12000元';
+                    }
+                    break;
+                    
+                case 'weekly_sales':
+                    // 週營業額獎金: 80000以上 2.5%, 100000以上 3.5%, 120000以上 4.5%
+                    if (bonusEligibleRevenue >= 120000) {
+                        bonusAmount = bonusEligibleRevenue * 0.045;
+                        formula = '營業額 × 4.5%';
+                    } else if (bonusEligibleRevenue >= 100000) {
+                        bonusAmount = bonusEligibleRevenue * 0.035;
+                        formula = '營業額 × 3.5%';
+                    } else if (bonusEligibleRevenue >= 80000) {
+                        bonusAmount = bonusEligibleRevenue * 0.025;
+                        formula = '營業額 × 2.5%';
+                    } else {
+                        status = '未達標準 (需達80000元)';
+                        formula = '最低80000元';
+                    }
+                    break;
+                    
+                case 'monthly_sales':
+                    // 月營業額獎金: 300000以上 2%, 400000以上 3%, 500000以上 4%
+                    if (bonusEligibleRevenue >= 500000) {
+                        bonusAmount = bonusEligibleRevenue * 0.04;
+                        formula = '營業額 × 4%';
+                    } else if (bonusEligibleRevenue >= 400000) {
+                        bonusAmount = bonusEligibleRevenue * 0.03;
+                        formula = '營業額 × 3%';
+                    } else if (bonusEligibleRevenue >= 300000) {
+                        bonusAmount = bonusEligibleRevenue * 0.02;
+                        formula = '營業額 × 2%';
+                    } else {
+                        status = '未達標準 (需達300000元)';
+                        formula = '最低300000元';
+                    }
+                    break;
+                    
+                case 'special_bonus':
+                    // 特殊獎金: 固定計算方式
+                    if (bonusEligibleRevenue >= 20000) {
+                        bonusAmount = 1000; // 固定獎金
+                        formula = '固定1000元';
+                    } else {
+                        status = '未達標準 (需達20000元)';
+                        formula = '最低20000元';
+                    }
+                    break;
+                    
+                default:
+                    status = '無效的獎金類型';
+                    formula = '請選擇正確的獎金類型';
+            }
+            
+            return {
+                amount: Math.round(bonusAmount),
+                status: status,
+                formula: formula,
+                baseRevenue: bonusEligibleRevenue
+            };
+        }
+
+        // 動態支出項目管理
+        function addExpenseItem() {
+            const container = document.getElementById('expenseItemsContainer');
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'expense-item';
+            itemDiv.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: center;';
+            
+            itemDiv.innerHTML = `
+                <select class="expense-category" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">選擇支出項目</option>
+                    <option value="食材成本">食材成本</option>
+                    <option value="人事費用">人事費用</option>
+                    <option value="租金水電">租金水電</option>
+                    <option value="設備維修">設備維修</option>
+                    <option value="清潔用品">清潔用品</option>
+                    <option value="包裝材料">包裝材料</option>
+                    <option value="外送費用">外送費用</option>
+                    <option value="廣告宣傳">廣告宣傳</option>
+                    <option value="其他雜費">其他雜費</option>
+                </select>
+                <input type="number" class="expense-amount" placeholder="金額" step="0.01" min="0" 
+                       style="width: 120px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                <button type="button" onclick="removeExpenseItem(this)" 
+                        style="padding: 8px 12px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">刪除</button>
+            `;
+            
+            container.appendChild(itemDiv);
+            
+            // 綁定即時計算事件
+            const amountInput = itemDiv.querySelector('.expense-amount');
+            amountInput.addEventListener('input', updateBonusPreview);
+        }
+        
+        function removeExpenseItem(element) {
+            const item = element.closest('.expense-item');
+            item.remove();
+            updateBonusPreview();
+        }
+
+        // 即時獎金計算預覽
+        function updateBonusPreview() {
+            const bonusType = document.getElementById('revenueBonusType').value;
+            if (!bonusType) {
+                document.getElementById('bonusPreview').innerHTML = '<p style="color: #666;">請先選擇獎金類型</p>';
+                return;
+            }
+            
+            // 計算可獲獎金的營業額
+            let bonusEligibleRevenue = 0;
+            document.querySelectorAll('.revenue-income').forEach(input => {
+                const amount = parseFloat(input.value) || 0;
+                if (amount > 0 && input.dataset.includeBonus === 'true') {
+                    const serviceFee = parseFloat(input.dataset.serviceFee) || 0;
+                    bonusEligibleRevenue += amount * (1 - serviceFee);
+                }
+            });
+            
+            // 計算獎金
+            const bonusCalculation = calculateBonus(bonusType, bonusEligibleRevenue);
+            
+            // 計算總支出
+            let totalExpense = 0;
+            document.querySelectorAll('.expense-item').forEach(item => {
+                const amount = parseFloat(item.querySelector('.expense-amount').value) || 0;
+                totalExpense += amount;
+            });
+            
+            // 計算淨營收
+            const netRevenue = bonusEligibleRevenue - totalExpense;
+            
+            // 更新預覽顯示
+            const previewHtml = `
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef;">
+                    <h4 style="margin: 0 0 10px 0; color: #495057;">獎金計算預覽</h4>
+                    <div style="margin-bottom: 8px;">可獲獎金營業額: <strong style="color: #28a745;">$${bonusEligibleRevenue.toLocaleString()}</strong></div>
+                    <div style="margin-bottom: 8px;">總支出: <strong style="color: #dc3545;">$${totalExpense.toLocaleString()}</strong></div>
+                    <div style="margin-bottom: 8px;">淨營收: <strong style="color: ${netRevenue >= 0 ? '#28a745' : '#dc3545'};">$${netRevenue.toLocaleString()}</strong></div>
+                    <div style="margin-bottom: 8px;">計算公式: <span style="color: #6c757d;">${bonusCalculation.formula}</span></div>
+                    <div style="margin-bottom: 8px;">獎金狀態: <span style="color: ${bonusCalculation.amount > 0 ? '#28a745' : '#dc3545'};">${bonusCalculation.status}</span></div>
+                    <div style="font-size: 18px; font-weight: bold; color: #495057;">預估獎金: <span style="color: #007bff;">$${bonusCalculation.amount.toLocaleString()}</span></div>
+                </div>
+            `;
+            
+            document.getElementById('bonusPreview').innerHTML = previewHtml;
+        }
+
+        // 叫貨系統 - 商品數據庫
+        const itemsDatabase = {
+            food: [
+                { id: 'f001', name: '新鮮牛肉', unit: '公斤', spec: '冷藏牛肉片' },
+                { id: 'f002', name: '豬肉絲', unit: '公斤', spec: '新鮮豬肉絲' },
+                { id: 'f003', name: '雞胸肉', unit: '公斤', spec: '去骨雞胸肉' },
+                { id: 'f004', name: '蝦仁', unit: '公斤', spec: '冷凍白蝦仁' },
+                { id: 'f005', name: '高麗菜', unit: '顆', spec: '新鮮高麗菜' },
+                { id: 'f006', name: '蔥', unit: '公斤', spec: '青蔥' },
+                { id: 'f007', name: '薑', unit: '公斤', spec: '老薑' },
+                { id: 'f008', name: '蒜頭', unit: '公斤', spec: '新鮮蒜頭' },
+                { id: 'f009', name: '米', unit: '包', spec: '20公斤裝白米' },
+                { id: 'f010', name: '麵條', unit: '包', spec: '新鮮手工麵條' }
+            ],
+            beverage: [
+                { id: 'b001', name: '可樂', unit: '箱', spec: '24瓶裝' },
+                { id: 'b002', name: '礦泉水', unit: '箱', spec: '24瓶裝 600ml' },
+                { id: 'b003', name: '茶葉', unit: '公斤', spec: '烏龍茶葉' },
+                { id: 'b004', name: '咖啡豆', unit: '公斤', spec: '阿拉比卡咖啡豆' },
+                { id: 'b005', name: '果汁', unit: '箱', spec: '12瓶裝柳橙汁' },
+                { id: 'b006', name: '牛奶', unit: '箱', spec: '12瓶裝鮮奶' },
+                { id: 'b007', name: '豆漿', unit: '箱', spec: '12瓶裝無糖豆漿' },
+                { id: 'b008', name: '汽水', unit: '箱', spec: '24罐裝雪碧' }
+            ],
+            packaging: [
+                { id: 'p001', name: '外帶盒', unit: '個', spec: '紙質外帶餐盒' },
+                { id: 'p002', name: '塑膠袋', unit: '包', spec: '100個裝購物袋' },
+                { id: 'p003', name: '湯匙', unit: '包', spec: '100支裝免洗湯匙' },
+                { id: 'p004', name: '筷子', unit: '包', spec: '100雙裝免洗筷' },
+                { id: 'p005', name: '紙巾', unit: '包', spec: '餐桌紙巾' },
+                { id: 'p006', name: '吸管', unit: '包', spec: '100支裝紙吸管' },
+                { id: 'p007', name: '鋁箔紙', unit: '捲', spec: '廚房用鋁箔紙' }
+            ],
+            cleaning: [
+                { id: 'c001', name: '洗碗精', unit: '瓶', spec: '1公升裝' },
+                { id: 'c002', name: '漂白水', unit: '瓶', spec: '1公升裝' },
+                { id: 'c003', name: '廚房清潔劑', unit: '瓶', spec: '500ml裝' },
+                { id: 'c004', name: '地板清潔劑', unit: '瓶', spec: '1公升裝' },
+                { id: 'c005', name: '垃圾袋', unit: '包', spec: '100個裝大型垃圾袋' },
+                { id: 'c006', name: '抹布', unit: '包', spec: '10條裝廚房抹布' },
+                { id: 'c007', name: '橡膠手套', unit: '雙', spec: '廚房用橡膠手套' }
+            ],
+            equipment: [
+                { id: 'e001', name: '瓦斯爐管', unit: '條', spec: '瓦斯爐連接管' },
+                { id: 'e002', name: '濾水器濾芯', unit: '個', spec: '廚房濾水器濾芯' },
+                { id: 'e003', name: '燈泡', unit: '個', spec: 'LED省電燈泡' },
+                { id: 'e004', name: '插座', unit: '個', spec: '三孔插座' },
+                { id: 'e005', name: '保險絲', unit: '個', spec: '15A保險絲' }
+            ],
+            other: [
+                { id: 'o001', name: '文具用品', unit: '組', spec: '辦公文具組合' },
+                { id: 'o002', name: '計算機', unit: '台', spec: '桌上型計算機' },
+                { id: 'o003', name: '收銀紙', unit: '捲', spec: '感熱紙收銀紙' },
+                { id: 'o004', name: '原子筆', unit: '支', spec: '藍色原子筆' }
+            ]
+        };
+
+        // 購物車數據
+        let shoppingCart = [];
+
+        // 叫貨系統 - 分類選擇
+        function selectCategory(category) {
+            // 更新分類按鈕狀態
+            document.querySelectorAll('.category-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-category="${category}"]`).classList.add('active');
+            
+            // 載入該分類的商品
+            loadItemsByCategory(category);
+        }
+
+        // 載入分類商品
+        function loadItemsByCategory(category) {
+            const storeId = document.getElementById('orderStoreSelect').value;
+            if (!storeId) {
+                document.getElementById('itemsList').innerHTML = `
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>請先選擇分店
+                    </div>
+                `;
+                return;
+            }
+
+            let items = [];
+            if (category === 'all') {
+                // 顯示所有分類的商品
+                Object.values(itemsDatabase).forEach(categoryItems => {
+                    items = items.concat(categoryItems);
+                });
+            } else {
+                items = itemsDatabase[category] || [];
+            }
+
+            displayItems(items, category);
+        }
+
+        // 顯示商品清單
+        function displayItems(items, category) {
+            if (items.length === 0) {
+                document.getElementById('itemsList').innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>此分類暫無商品
+                    </div>
+                `;
+                return;
+            }
+
+            const itemsHtml = items.map(item => `
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card h-100 border-1 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="card-title">${item.name}</h6>
+                            <p class="card-text text-muted small">${item.spec}</p>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="text-muted">單位: ${item.unit}</span>
+                                <div class="input-group" style="width: 100px;">
+                                    <input type="number" class="form-control form-control-sm item-quantity" 
+                                           id="qty_${item.id}" min="1" value="1" style="font-size: 12px;">
+                                </div>
+                            </div>
+                            <button class="btn btn-outline-success btn-sm w-100 mt-2" 
+                                    onclick="addToCart('${item.id}', '${item.name}', '${item.unit}', '${item.spec}')">
+                                <i class="fas fa-plus me-1"></i>加入購物車
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('itemsList').innerHTML = `
+                <div class="row">
+                    ${itemsHtml}
+                </div>
+            `;
+        }
+
+        // 加入購物車
+        function addToCart(itemId, itemName, itemUnit, itemSpec) {
+            const quantityInput = document.getElementById(`qty_${itemId}`);
+            const quantity = parseInt(quantityInput.value) || 1;
+
+            // 檢查是否已在購物車中
+            const existingIndex = shoppingCart.findIndex(item => item.id === itemId);
+            
+            if (existingIndex >= 0) {
+                // 更新數量
+                shoppingCart[existingIndex].quantity += quantity;
+            } else {
+                // 新增到購物車
+                shoppingCart.push({
+                    id: itemId,
+                    name: itemName,
+                    unit: itemUnit,
+                    spec: itemSpec,
+                    quantity: quantity
+                });
+            }
+
+            updateCartDisplay();
+            quantityInput.value = 1; // 重置數量
+            
+            // 顯示成功訊息
+            showAlert(`已加入 ${quantity} ${itemUnit} ${itemName} 到購物車`, 'success');
+        }
+
+        // 更新購物車顯示
+        function updateCartDisplay() {
+            const cartItemsContainer = document.getElementById('cartItems');
+            const cartItemCount = document.getElementById('cartItemCount');
+            const submitBtn = document.getElementById('submitOrderBtn');
+
+            cartItemCount.textContent = shoppingCart.length;
+
+            if (shoppingCart.length === 0) {
+                cartItemsContainer.innerHTML = `
+                    <div class="text-center py-4 text-muted">
+                        <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+                        <p>購物車是空的</p>
+                        <small>請選擇商品並點擊"加入購物車"</small>
+                    </div>
+                `;
+                submitBtn.disabled = true;
+                return;
+            }
+
+            const cartHtml = shoppingCart.map((item, index) => `
+                <div class="d-flex align-items-center justify-content-between border-bottom py-2">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">${item.name}</h6>
+                        <small class="text-muted">${item.spec}</small>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="input-group" style="width: 100px;">
+                            <button class="btn btn-outline-secondary btn-sm" onclick="updateCartItemQuantity(${index}, -1)">-</button>
+                            <input type="number" class="form-control form-control-sm text-center" value="${item.quantity}" 
+                                   onchange="updateCartItemQuantity(${index}, this.value, true)" min="1">
+                            <button class="btn btn-outline-secondary btn-sm" onclick="updateCartItemQuantity(${index}, 1)">+</button>
+                        </div>
+                        <span class="text-muted">${item.unit}</span>
+                        <button class="btn btn-outline-danger btn-sm" onclick="removeFromCart(${index})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            cartItemsContainer.innerHTML = cartHtml;
+            submitBtn.disabled = false;
+        }
+
+        // 更新購物車商品數量
+        function updateCartItemQuantity(index, change, absolute = false) {
+            if (absolute) {
+                shoppingCart[index].quantity = Math.max(1, parseInt(change) || 1);
+            } else {
+                shoppingCart[index].quantity = Math.max(1, shoppingCart[index].quantity + change);
+            }
+            updateCartDisplay();
+        }
+
+        // 從購物車移除
+        function removeFromCart(index) {
+            const item = shoppingCart[index];
+            shoppingCart.splice(index, 1);
+            updateCartDisplay();
+            showAlert(`已移除 ${item.name}`, 'info');
+        }
+
+        // 清空購物車
+        function clearCart() {
+            if (shoppingCart.length === 0) return;
+            
+            if (confirm('確定要清空購物車嗎？')) {
+                shoppingCart = [];
+                updateCartDisplay();
+                showAlert('購物車已清空', 'info');
+            }
+        }
+
+        // 照片上傳預覽處理
+        function handlePhotoPreview(event) {
+            const files = event.target.files;
+            const previewContainer = document.getElementById('photoPreview');
+            
+            // 清空之前的預覽
+            previewContainer.innerHTML = '';
+            
+            if (files.length === 0) return;
+            
+            Array.from(files).forEach((file, index) => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const photoDiv = document.createElement('div');
+                        photoDiv.className = 'col-md-3 mb-3';
+                        photoDiv.innerHTML = `
+                            <div class="card">
+                                <img src="${e.target.result}" class="card-img-top" style="height: 150px; object-fit: cover;">
+                                <div class="card-body p-2">
+                                    <small class="text-muted">${file.name}</small>
+                                    <button type="button" class="btn btn-outline-danger btn-sm w-100 mt-1" 
+                                            onclick="removePhotoPreview(${index})">
+                                        <i class="fas fa-trash"></i> 移除
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        previewContainer.appendChild(photoDiv);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // 移除照片預覽
+        function removePhotoPreview(index) {
+            const fileInput = document.getElementById('orderPhotos');
+            const dt = new DataTransfer();
+            const files = fileInput.files;
+            
+            for (let i = 0; i < files.length; i++) {
+                if (i !== index) {
+                    dt.items.add(files[i]);
+                }
+            }
+            
+            fileInput.files = dt.files;
+            handlePhotoPreview({ target: fileInput });
+        }
+
+        // 送出叫貨申請
+        async function submitOrder() {
+            const storeId = document.getElementById('orderStoreSelect').value;
+            const priority = document.getElementById('orderPriority').value;
+            const neededDate = document.getElementById('orderNeededDate').value;
+            const contact = document.getElementById('orderContact').value;
+            const photoCategory = document.getElementById('orderPhotoCategory').value;
+            const photoFiles = document.getElementById('orderPhotos').files;
+
+            // 驗證必填欄位
+            if (!storeId) {
+                showAlert('請選擇分店', 'warning');
+                return;
+            }
+            if (shoppingCart.length === 0) {
+                showAlert('購物車不能為空', 'warning');
+                return;
+            }
+            if (!neededDate || !contact) {
+                showAlert('請填寫到貨日期和聯絡人員', 'warning');
+                return;
+            }
+
+            // 使用FormData來支持文件上傳
+            const formData = new FormData();
+            formData.append('store_id', storeId);
+            formData.append('priority', priority);
+            formData.append('needed_date', neededDate);
+            formData.append('contact', contact);
+            formData.append('items', JSON.stringify(shoppingCart));
+            formData.append('photo_category', photoCategory);
+            formData.append('total_items', shoppingCart.reduce((sum, item) => sum + item.quantity, 0));
+            formData.append('notes', `共 ${shoppingCart.length} 項商品，總數量 ${shoppingCart.reduce((sum, item) => sum + item.quantity, 0)} 件`);
+
+            // 添加照片文件
+            if (photoFiles.length > 0) {
+                Array.from(photoFiles).forEach(file => {
+                    formData.append('photos', file);
+                });
+            }
+
+            try {
+                const response = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        // 不要設置Content-Type，讓瀏覽器自動設置multipart/form-data
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('叫貨申請提交成功！', 'success');
+                    // 清空購物車和表單
+                    shoppingCart = [];
+                    updateCartDisplay();
+                    document.getElementById('orderStoreSelect').value = '';
+                    document.getElementById('orderNeededDate').value = '';
+                    document.getElementById('orderContact').value = '';
+                    document.getElementById('orderPhotoCategory').value = '';
+                    document.getElementById('orderPhotos').value = '';
+                    document.getElementById('photoPreview').innerHTML = '';
+                    // 重新載入叫貨記錄
+                    await loadOrderHistory();
+                } else {
+                    showAlert(data.message || '提交失敗', 'danger');
+                }
+            } catch (error) {
+                console.error('叫貨申請失敗:', error);
                 showAlert('提交失敗，請稍後再試', 'danger');
             }
         }

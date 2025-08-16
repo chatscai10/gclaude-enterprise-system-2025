@@ -315,6 +315,9 @@
                         <button class="nav-link" data-section="scheduling">
                             <i class="fas fa-calendar-alt"></i>排班管理
                         </button>
+                        <button class="nav-link" data-section="photos">
+                            <i class="fas fa-images"></i>照片管理
+                        </button>
                         <button class="nav-link" data-section="settings">
                             <i class="fas fa-cog"></i>系統設定
                         </button>
@@ -745,6 +748,147 @@
                         </button>
                     </div>
 
+                    <!-- 照片管理 -->
+                    <div id="photos" class="section-content">
+                        <div class="content-header">
+                            <h2><i class="fas fa-images me-2"></i>照片管理</h2>
+                            <p class="text-muted mb-0">查看、篩選、管理系統所有照片</p>
+                        </div>
+
+                        <!-- 照片篩選器 -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">照片篩選</h5>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">分店</label>
+                                            <select class="form-select" id="photoStoreFilter">
+                                                <option value="">全部分店</option>
+                                                <option value="1">總店</option>
+                                                <option value="2">分店A</option>
+                                                <option value="3">分店B</option>
+                                                <option value="4">分店C</option>
+                                                <option value="5">分店D</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">系統類別</label>
+                                            <select class="form-select" id="photoSystemFilter">
+                                                <option value="">全部系統</option>
+                                                <option value="revenue">營收系統</option>
+                                                <option value="orders">叫貨系統</option>
+                                                <option value="maintenance">維修系統</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">開始日期</label>
+                                            <input type="date" class="form-control" id="photoStartDate">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">結束日期</label>
+                                            <input type="date" class="form-control" id="photoEndDate">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">照片類別</label>
+                                            <select class="form-select" id="photoCategoryFilter">
+                                                <option value="">全部類別</option>
+                                                <option value="inventory_status">庫存狀況</option>
+                                                <option value="product_sample">商品樣本</option>
+                                                <option value="damage_proof">損壞證明</option>
+                                                <option value="receipt">收據明細</option>
+                                                <option value="other">其他</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">&nbsp;</label>
+                                            <div>
+                                                <button type="button" class="btn btn-primary me-2" onclick="filterPhotos()">
+                                                    <i class="fas fa-search me-1"></i>篩選
+                                                </button>
+                                                <button type="button" class="btn btn-outline-secondary" onclick="resetPhotoFilters()">
+                                                    <i class="fas fa-undo me-1"></i>重置
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 照片網格顯示 -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">照片列表</h5>
+                                <div>
+                                    <span id="photoCount" class="text-muted">共 0 張照片</span>
+                                    <button class="btn btn-outline-danger btn-sm ms-2" onclick="deleteSelectedPhotos()" id="deleteSelectedBtn" disabled>
+                                        <i class="fas fa-trash me-1"></i>刪除選中
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="selectAllPhotos" onchange="toggleSelectAll()">
+                                    <label class="form-check-label" for="selectAllPhotos">
+                                        全選
+                                    </label>
+                                </div>
+                                <div id="photosGrid" class="row">
+                                    <div class="col-12 text-center py-5">
+                                        <i class="fas fa-images fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">請使用篩選器查看照片</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 照片統計 -->
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">照片統計</h5>
+                                <div class="row" id="photoStats">
+                                    <div class="col-md-3">
+                                        <div class="text-center">
+                                            <h4 class="text-primary mb-1" id="totalPhotosCount">0</h4>
+                                            <small class="text-muted">總照片數</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-center">
+                                            <h4 class="text-success mb-1" id="revenuePhotosCount">0</h4>
+                                            <small class="text-muted">營收照片</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-center">
+                                            <h4 class="text-warning mb-1" id="orderPhotosCount">0</h4>
+                                            <small class="text-muted">叫貨照片</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-center">
+                                            <h4 class="text-info mb-1" id="maintenancePhotosCount">0</h4>
+                                            <small class="text-muted">維修照片</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- 報表分析 -->
                     <div id="reports" class="section-content">
                         <div class="content-header">
@@ -919,6 +1063,9 @@
                 case 'stores':
                     await loadStoreData();
                     break;
+                case 'photos':
+                    await loadPhotosManagement();
+                    break;
                 case 'attendance':
                     await loadAttendanceManagement();
                     break;
@@ -1004,11 +1151,14 @@
                                 </td>
                                 <td>${formatDate(employee.created_at)}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-primary" onclick="approveEmployee(${employee.id})">
-                                        <i class="fas fa-check"></i>
+                                    <button class="btn btn-sm btn-primary me-1" onclick="editEmployee(${employee.id}, '${employee.name}', '${employee.id_card}', '${employee.phone}', '${employee.position}', '${employee.store_id}')">
+                                        <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="rejectEmployee(${employee.id})">
-                                        <i class="fas fa-times"></i>
+                                    <button class="btn btn-sm btn-warning me-1" onclick="toggleEmployeeStatus(${employee.id}, '${employee.status}')">
+                                        <i class="fas fa-toggle-on"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteEmployee(${employee.id}, '${employee.name}')">
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
                             </tr>
@@ -1345,6 +1495,259 @@
                     升遷管理功能開發中
                 </div>
             `;
+        }
+
+        // 照片管理功能
+        let selectedPhotos = new Set();
+
+        async function loadPhotosManagement() {
+            // 載入時自動篩選照片
+            await filterPhotos();
+        }
+
+        async function filterPhotos() {
+            const storeId = document.getElementById('photoStoreFilter').value;
+            const systemType = document.getElementById('photoSystemFilter').value;
+            const startDate = document.getElementById('photoStartDate').value;
+            const endDate = document.getElementById('photoEndDate').value;
+            const category = document.getElementById('photoCategoryFilter').value;
+
+            const params = new URLSearchParams();
+            if (storeId) params.append('store_id', storeId);
+            if (systemType) params.append('system_type', systemType);
+            if (startDate) params.append('start_date', startDate);
+            if (endDate) params.append('end_date', endDate);
+            if (category) params.append('category', category);
+
+            try {
+                const response = await fetch(`/api/photos?${params.toString()}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    displayPhotos(data.photos);
+                    updatePhotoStats(data.photos);
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('載入照片失敗:', error);
+                document.getElementById('photosGrid').innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            載入照片失敗: ${error.message}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function displayPhotos(photos) {
+            const photosGrid = document.getElementById('photosGrid');
+            document.getElementById('photoCount').textContent = `共 ${photos.length} 張照片`;
+
+            if (photos.length === 0) {
+                photosGrid.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-images fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">沒有找到符合條件的照片</p>
+                    </div>
+                `;
+                return;
+            }
+
+            photosGrid.innerHTML = photos.map(photo => `
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header p-2">
+                            <div class="form-check">
+                                <input class="form-check-input photo-checkbox" type="checkbox" 
+                                       value="${photo.id}" onchange="updateSelectedPhotos()">
+                                <small class="text-muted ms-2">
+                                    ${new Date(photo.upload_date).toLocaleDateString('zh-TW')}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="position-relative">
+                            <img src="data:${photo.mimetype};base64,${photo.buffer}" 
+                                 class="card-img-top" style="height: 200px; object-fit: cover;"
+                                 onclick="viewPhotoModal('${photo.id}', '${photo.original_name}', '${photo.mimetype}', '${photo.buffer}')">
+                            <div class="position-absolute top-0 end-0 m-2">
+                                <span class="badge bg-primary">${getSystemTypeName(photo.system_type)}</span>
+                            </div>
+                        </div>
+                        <div class="card-body p-2">
+                            <h6 class="card-title small mb-1">${photo.original_name}</h6>
+                            <p class="card-text small text-muted mb-1">
+                                <i class="fas fa-store me-1"></i>分店${photo.store_id || '未知'}
+                            </p>
+                            <p class="card-text small text-muted mb-1">
+                                <i class="fas fa-tag me-1"></i>${photo.category || '無分類'}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">${formatFileSize(photo.size)}</small>
+                                <button class="btn btn-outline-danger btn-sm" 
+                                        onclick="deletePhoto('${photo.id}', '${photo.original_name}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updatePhotoStats(photos) {
+            const total = photos.length;
+            const revenueCount = photos.filter(p => p.system_type === 'revenue').length;
+            const orderCount = photos.filter(p => p.system_type === 'orders').length;
+            const maintenanceCount = photos.filter(p => p.system_type === 'maintenance').length;
+
+            document.getElementById('totalPhotosCount').textContent = total;
+            document.getElementById('revenuePhotosCount').textContent = revenueCount;
+            document.getElementById('orderPhotosCount').textContent = orderCount;
+            document.getElementById('maintenancePhotosCount').textContent = maintenanceCount;
+        }
+
+        function getSystemTypeName(type) {
+            const types = {
+                'revenue': '營收',
+                'orders': '叫貨',
+                'maintenance': '維修'
+            };
+            return types[type] || type;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function updateSelectedPhotos() {
+            selectedPhotos.clear();
+            document.querySelectorAll('.photo-checkbox:checked').forEach(checkbox => {
+                selectedPhotos.add(checkbox.value);
+            });
+            
+            const deleteBtn = document.getElementById('deleteSelectedBtn');
+            deleteBtn.disabled = selectedPhotos.size === 0;
+            
+            if (selectedPhotos.size > 0) {
+                deleteBtn.textContent = `刪除選中 (${selectedPhotos.size})`;
+            } else {
+                deleteBtn.innerHTML = '<i class="fas fa-trash me-1"></i>刪除選中';
+            }
+        }
+
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAllPhotos');
+            const photoCheckboxes = document.querySelectorAll('.photo-checkbox');
+            
+            photoCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+            
+            updateSelectedPhotos();
+        }
+
+        async function deletePhoto(photoId, fileName) {
+            if (!confirm(`確定要刪除照片 "${fileName}" 嗎？`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/photos/${photoId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    showAlert('照片已刪除', 'success');
+                    await filterPhotos(); // 重新載入
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('刪除照片失敗:', error);
+                showAlert('刪除失敗: ' + error.message, 'danger');
+            }
+        }
+
+        async function deleteSelectedPhotos() {
+            if (selectedPhotos.size === 0) return;
+            
+            if (!confirm(`確定要刪除選中的 ${selectedPhotos.size} 張照片嗎？`)) {
+                return;
+            }
+
+            const deletePromises = Array.from(selectedPhotos).map(photoId => 
+                fetch(`/api/photos/${photoId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                })
+            );
+
+            try {
+                await Promise.all(deletePromises);
+                showAlert(`已刪除 ${selectedPhotos.size} 張照片`, 'success');
+                selectedPhotos.clear();
+                await filterPhotos(); // 重新載入
+            } catch (error) {
+                console.error('批量刪除失敗:', error);
+                showAlert('批量刪除失敗: ' + error.message, 'danger');
+            }
+        }
+
+        function resetPhotoFilters() {
+            document.getElementById('photoStoreFilter').value = '';
+            document.getElementById('photoSystemFilter').value = '';
+            document.getElementById('photoStartDate').value = '';
+            document.getElementById('photoEndDate').value = '';
+            document.getElementById('photoCategoryFilter').value = '';
+            filterPhotos();
+        }
+
+        // 照片查看Modal (需要在HTML中添加)
+        function viewPhotoModal(photoId, fileName, mimeType, buffer) {
+            // 創建或更新照片查看Modal
+            let modal = document.getElementById('photoViewModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.className = 'modal fade';
+                modal.id = 'photoViewModal';
+                modal.innerHTML = `
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="photoModalTitle"></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img id="photoModalImage" class="img-fluid" style="max-height: 500px;">
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+            
+            document.getElementById('photoModalTitle').textContent = fileName;
+            document.getElementById('photoModalImage').src = `data:${mimeType};base64,${buffer}`;
+            
+            const bootstrapModal = new bootstrap.Modal(modal);
+            bootstrapModal.show();
         }
 
         async function loadReportsAnalysis() {
@@ -1932,11 +2335,206 @@
             loadStoreOptions();
         }
 
+        // 員工管理功能
+        function editEmployee(id, name, idCard, phone, position, storeId) {
+            document.getElementById('editEmployeeId').value = id;
+            document.getElementById('editEmployeeName').value = name || '';
+            document.getElementById('editEmployeeIdCard').value = idCard || '';
+            document.getElementById('editEmployeePhone').value = phone || '';
+            document.getElementById('editEmployeePosition').value = position || 'employee';
+            document.getElementById('editEmployeeStore').value = storeId || '1';
+            
+            const modal = new bootstrap.Modal(document.getElementById('editEmployeeModal'));
+            modal.show();
+        }
+
+        async function handleEditEmployeeSubmit(e) {
+            e.preventDefault();
+            
+            const employeeId = document.getElementById('editEmployeeId').value;
+            const employeeData = {
+                name: document.getElementById('editEmployeeName').value,
+                id_card: document.getElementById('editEmployeeIdCard').value,
+                phone: document.getElementById('editEmployeePhone').value,
+                position: document.getElementById('editEmployeePosition').value,
+                store_id: parseInt(document.getElementById('editEmployeeStore').value),
+                salary: parseFloat(document.getElementById('editEmployeeSalary').value) || 0,
+                notes: document.getElementById('editEmployeeNotes').value
+            };
+
+            try {
+                const response = await fetch(`/api/admin/employees/${employeeId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    },
+                    body: JSON.stringify(employeeData)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    showAlert('員工資料更新成功', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('editEmployeeModal')).hide();
+                    await loadEmployeeData(); // 重新載入
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('更新員工資料失敗:', error);
+                showAlert('更新失敗: ' + error.message, 'danger');
+            }
+        }
+
+        async function toggleEmployeeStatus(employeeId, currentStatus) {
+            const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+            const statusText = newStatus === 'active' ? '啟用' : '停用';
+            
+            if (!confirm(`確定要${statusText}此員工嗎？`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/employees/${employeeId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    showAlert(`員工已${statusText}`, 'success');
+                    await loadEmployeeData();
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('更新員工狀態失敗:', error);
+                showAlert('操作失敗: ' + error.message, 'danger');
+            }
+        }
+
+        async function deleteEmployee(employeeId, employeeName) {
+            if (!confirm(`確定要刪除員工 "${employeeName}" 嗎？此操作無法復原！`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/employees/${employeeId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    showAlert('員工已刪除', 'success');
+                    await loadEmployeeData();
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('刪除員工失敗:', error);
+                showAlert('刪除失敗: ' + error.message, 'danger');
+            }
+        }
+
+        // 綁定員工編輯表單提交事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const editForm = document.getElementById('editEmployeeForm');
+            if (editForm) {
+                editForm.addEventListener('submit', handleEditEmployeeSubmit);
+            }
+        });
+
         function logout() {
             localStorage.removeItem('jwt_token');
             localStorage.removeItem('user_data');
             window.location.href = '/login.html';
         }
     </script>
+
+    <!-- 員工編輯Modal -->
+    <div class="modal fade" id="editEmployeeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">編輯員工資料</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="editEmployeeForm">
+                    <div class="modal-body">
+                        <input type="hidden" id="editEmployeeId">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">姓名 <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="editEmployeeName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">身分證號 <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="editEmployeeIdCard" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">聯絡電話</label>
+                                    <input type="tel" class="form-control" id="editEmployeePhone">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">職位</label>
+                                    <select class="form-select" id="editEmployeePosition">
+                                        <option value="employee">一般員工</option>
+                                        <option value="manager">店長</option>
+                                        <option value="admin">管理員</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">所屬分店</label>
+                                    <select class="form-select" id="editEmployeeStore">
+                                        <option value="1">總店</option>
+                                        <option value="2">分店A</option>
+                                        <option value="3">分店B</option>
+                                        <option value="4">分店C</option>
+                                        <option value="5">分店D</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">薪資 (月薪)</label>
+                                    <input type="number" class="form-control" id="editEmployeeSalary" min="0">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">備註</label>
+                            <textarea class="form-control" id="editEmployeeNotes" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>保存修改
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

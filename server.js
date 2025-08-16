@@ -21,7 +21,7 @@ const DatabaseOperations = require('./database/json-database');
 const TelegramNotifier = require('./modules/telegram-notifier');
 
 const app = express();
-const PORT = process.env.PORT || 3010;
+const PORT = process.env.PORT || 3009;
 const JWT_SECRET = process.env.JWT_SECRET || 'gclaude-enterprise-secret-key';
 
 // 初始化資料庫和通知系統
@@ -1000,21 +1000,57 @@ app.get('/api/products/low-stock', authenticateToken, async (req, res) => {
 });
 
 // 創建叫貨訂單
-app.post('/api/orders', authenticateToken, async (req, res) => {
+app.post('/api/orders', authenticateToken, upload.array('photos', 10), async (req, res) => {
     try {
-        const { items, notes } = req.body;
+        // 處理上傳的照片
+        let photoData = [];
+        if (req.files && req.files.length > 0) {
+            photoData = req.files.map(file => ({
+                filename: `order_${Date.now()}_${Math.random().toString(36).substring(7)}.${file.mimetype.split('/')[1]}`,
+                originalname: file.originalname,
+                mimetype: file.mimetype,
+                size: file.size,
+                buffer: file.buffer.toString('base64') // 轉為base64存儲
+            }));
+        }
+
+        const { store_id, priority, needed_date, contact, items, photo_category, total_items, notes } = req.body;
+        
+        if (!store_id) {
+            return res.status(400).json({
+                success: false,
+                message: '請選擇分店'
+            });
+        }
         
         if (!items || !Array.isArray(items) || items.length === 0) {
             return res.status(400).json({
                 success: false,
-                message: '訂單項目不能為空'
+                message: '購物車不能為空'
+            });
+        }
+        
+        if (!needed_date || !contact) {
+            return res.status(400).json({
+                success: false,
+                message: '請填寫到貨日期和聯絡人員'
             });
         }
 
+        // 轉換新格式的商品項目為舊格式
+        const formattedItems = items.map(item => ({
+            product_name: item.name,
+            quantity: item.quantity,
+            unit: item.unit,
+            spec: item.spec,
+            supplier: '待指定',
+            unit_price: 0 // 價格由採購部門填寫
+        }));
+
         const result = await db.createOrder(
             req.user.employee_id,
-            req.user.store_id,
-            items,
+            store_id,
+            formattedItems,
             notes || ''
         );
 
@@ -1024,17 +1060,19 @@ app.post('/api/orders', authenticateToken, async (req, res) => {
                 created_at: new Date().toISOString(),
                 employee_name: req.user.name || '未知員工',
                 store_name: req.user.store_name || '未知分店',
-                items: items.map(item => ({
-                    product_name: item.product_name,
-                    quantity: item.quantity,
-                    unit_price: item.unit_price,
-                    supplier: item.supplier
-                })),
+                store_id: store_id,
+                priority: priority,
+                needed_date: needed_date,
+                contact: contact,
+                total_items: total_items,
+                photo_category: photo_category,
+                photo_count: photoData.length,
+                items: formattedItems,
                 notes: notes || ''
             };
 
             // 檢查進貨異常
-            const anomalies = await db.checkOrderingAnomalies(req.user.store_id, items);
+            const anomalies = await db.checkOrderingAnomalies(store_id, formattedItems);
             
             await telegramNotifier.notifyOrdering(orderData, anomalies);
         } catch (notificationError) {
