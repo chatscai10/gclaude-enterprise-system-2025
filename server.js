@@ -3473,7 +3473,7 @@ app.post('/api/admin/orders/:id/review', authenticateToken, requireAdmin, async 
     }
 });
 
-// 叫貨異常分析函數
+// 叫貨異常分析函數 - 使用品項個別設定
 async function analyzeOrderingAnomalies(currentOrder, storeId) {
     try {
         const allOrders = await db.readTable('orders');
@@ -3483,6 +3483,12 @@ async function analyzeOrderingAnomalies(currentOrder, storeId) {
         // 檢查每個商品的叫貨頻率
         for (const item of currentOrder.items) {
             const productName = item.product_name;
+            
+            // 取得該商品的個別異常設定
+            const itemSetting = await db.getItemAnomalySetting(productName, storeId);
+            const minDays = itemSetting.min_days || 1;
+            const maxDays = itemSetting.max_days || 7;
+            
             const productOrders = storeOrders.filter(order => 
                 order.items && order.items.some(i => i.product_name === productName)
             ).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -3493,13 +3499,17 @@ async function analyzeOrderingAnomalies(currentOrder, storeId) {
                 
                 const lastItem = lastOrder.items.find(i => i.product_name === productName);
                 
-                if (daysSince >= 3 || daysSince <= 1) {
+                // 使用品項個別設定來判斷異常
+                if (daysSince >= maxDays || daysSince <= minDays) {
                     anomalies.push({
                         product_name: productName,
                         days_since_last_order: daysSince,
                         last_order_date: lastOrder.created_at,
                         last_quantity: lastItem ? lastItem.quantity : 0,
-                        unit: item.unit || '個'
+                        unit: item.unit || '個',
+                        min_days: minDays,
+                        max_days: maxDays,
+                        anomaly_type: daysSince <= minDays ? 'frequent' : 'long_gap'
                     });
                 }
             }
@@ -3511,6 +3521,88 @@ async function analyzeOrderingAnomalies(currentOrder, storeId) {
         return [];
     }
 }
+
+// ==================== 品項異常設定管理API ====================
+
+// 獲取品項異常設定
+app.get('/api/item-anomaly-settings', authenticateToken, async (req, res) => {
+    try {
+        const storeId = req.query.store_id || req.user.store_id;
+        const settings = await db.getItemAnomalySettings(storeId);
+        
+        res.json({
+            success: true,
+            data: settings,
+            message: '品項異常設定獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取品項異常設定失敗'
+        });
+    }
+});
+
+// 更新品項異常設定
+app.put('/api/item-anomaly-settings/:productName', authenticateToken, async (req, res) => {
+    try {
+        const { productName } = req.params;
+        const { min_days, max_days, store_id } = req.body;
+        const targetStoreId = store_id || req.user.store_id;
+        
+        if (min_days < 0 || max_days < 0) {
+            return res.status(400).json({
+                success: false,
+                message: '天數設定不能為負數'
+            });
+        }
+        
+        if (min_days >= max_days) {
+            return res.status(400).json({
+                success: false,
+                message: '最小天數必須小於最大天數'
+            });
+        }
+        
+        const result = await db.updateItemAnomalySetting(
+            productName, 
+            targetStoreId, 
+            min_days, 
+            max_days
+        );
+        
+        res.json({
+            success: true,
+            data: result,
+            message: '品項異常設定更新成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '更新品項異常設定失敗'
+        });
+    }
+});
+
+// 刪除品項異常設定
+app.delete('/api/item-anomaly-settings/:productName', authenticateToken, async (req, res) => {
+    try {
+        const { productName } = req.params;
+        const storeId = req.query.store_id || req.user.store_id;
+        
+        await db.deleteItemAnomalySetting(productName, storeId);
+        
+        res.json({
+            success: true,
+            message: '品項異常設定刪除成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '刪除品項異常設定失敗'
+        });
+    }
+});
 
 // ==================== 測試用API ====================
 

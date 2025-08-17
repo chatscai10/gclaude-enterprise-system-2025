@@ -31,7 +31,8 @@ class JsonDatabase {
             schedule_settings: 'schedule_settings.json',
             income_items: 'income_items.json',
             expense_items: 'expense_items.json',
-            revenue_params: 'revenue_params.json'
+            revenue_params: 'revenue_params.json',
+            item_anomaly_settings: 'item_anomaly_settings.json'
         };
         
         this.initializeData();
@@ -451,6 +452,66 @@ class JsonDatabase {
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
             }]);
+
+            // 初始化品項異常設定
+            await this.initializeTable('item_anomaly_settings', [
+                {
+                    id: 1,
+                    product_name: '牛肉',
+                    min_days: 1,  // 少於1天重複叫貨算頻繁
+                    max_days: 5,  // 超過5天沒叫貨算久未叫貨
+                    store_id: 1,
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 2,
+                    product_name: '豬肉',
+                    min_days: 2,  // 少於2天重複叫貨算頻繁
+                    max_days: 7,  // 超過7天沒叫貨算久未叫貨
+                    store_id: 1,
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 3,
+                    product_name: '雞肉',
+                    min_days: 1,  // 少於1天重複叫貨算頻繁
+                    max_days: 4,  // 超過4天沒叫貨算久未叫貨
+                    store_id: 1,
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 4,
+                    product_name: '魚肉',
+                    min_days: 0,  // 當天重複叫貨算頻繁
+                    max_days: 3,  // 超過3天沒叫貨算久未叫貨
+                    store_id: 1,
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 5,
+                    product_name: '麵條',
+                    min_days: 3,  // 少於3天重複叫貨算頻繁
+                    max_days: 10, // 超過10天沒叫貨算久未叫貨
+                    store_id: 1,
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 6,
+                    product_name: '米',
+                    min_days: 5,  // 少於5天重複叫貨算頻繁
+                    max_days: 15, // 超過15天沒叫貨算久未叫貨
+                    store_id: 1,
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 7,
+                    product_name: '油',
+                    min_days: 7,  // 少於7天重複叫貨算頻繁
+                    max_days: 20, // 超過20天沒叫貨算久未叫貨
+                    store_id: 1,
+                    created_at: new Date().toISOString()
+                }
+            ]);
 
             // 初始化其他空白資料表
             const emptyTables = ['attendance', 'revenue', 'maintenance', 'leave_requests', 'inventory_logs', 'orders', 'order_items', 'promotions', 'promotion_votes', 'schedules'];
@@ -2866,6 +2927,103 @@ class JsonDatabase {
             return summary;
         } catch (error) {
             console.error('獲取月營收統計失敗:', error);
+            throw error;
+        }
+    }
+
+    // ==================== 品項異常設定相關方法 ====================
+    
+    // 獲取品項異常設定
+    async getItemAnomalySettings(storeId = null) {
+        try {
+            const settings = await this.readTable('item_anomaly_settings');
+            if (storeId) {
+                return settings.filter(s => s.store_id === storeId);
+            }
+            return settings;
+        } catch (error) {
+            console.error('獲取品項異常設定失敗:', error);
+            return [];
+        }
+    }
+    
+    // 獲取特定品項的異常設定
+    async getItemAnomalySetting(productName, storeId) {
+        try {
+            const settings = await this.readTable('item_anomaly_settings');
+            const setting = settings.find(s => 
+                s.product_name === productName && s.store_id === storeId
+            );
+            
+            // 如果沒有設定，返回預設值
+            if (!setting) {
+                return {
+                    product_name: productName,
+                    min_days: 1,  // 預設：少於1天算頻繁
+                    max_days: 7,  // 預設：超過7天算久未叫貨
+                    store_id: storeId
+                };
+            }
+            
+            return setting;
+        } catch (error) {
+            console.error('獲取品項異常設定失敗:', error);
+            // 返回預設設定
+            return {
+                product_name: productName,
+                min_days: 1,
+                max_days: 7,
+                store_id: storeId
+            };
+        }
+    }
+    
+    // 更新品項異常設定
+    async updateItemAnomalySetting(productName, storeId, minDays, maxDays) {
+        try {
+            const settings = await this.readTable('item_anomaly_settings');
+            const existingIndex = settings.findIndex(s => 
+                s.product_name === productName && s.store_id === storeId
+            );
+            
+            const settingData = {
+                product_name: productName,
+                min_days: minDays,
+                max_days: maxDays,
+                store_id: storeId,
+                updated_at: new Date().toISOString()
+            };
+            
+            if (existingIndex >= 0) {
+                // 更新現有設定
+                settings[existingIndex] = { ...settings[existingIndex], ...settingData };
+            } else {
+                // 新增設定
+                settingData.id = Date.now();
+                settingData.created_at = new Date().toISOString();
+                settings.push(settingData);
+            }
+            
+            await this.writeTable('item_anomaly_settings', settings);
+            return settingData;
+        } catch (error) {
+            console.error('更新品項異常設定失敗:', error);
+            throw error;
+        }
+    }
+    
+    // 刪除品項異常設定
+    async deleteItemAnomalySetting(productName, storeId) {
+        try {
+            const settings = await this.readTable('item_anomaly_settings');
+            const filteredSettings = settings.filter(s => 
+                !(s.product_name === productName && s.store_id === storeId)
+            );
+            
+            await this.writeTable('item_anomaly_settings', filteredSettings);
+            return true;
+        } catch (error) {
+            console.error('刪除品項異常設定失敗:', error);
             throw error;
         }
     }

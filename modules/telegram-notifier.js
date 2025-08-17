@@ -188,22 +188,27 @@ ${data.action === 'approve' ?
             });
         });
 
-        // 添加異常天數分析
+        // 添加異常天數分析 - 使用品項個別設定
         if (anomalies.length > 0) {
-            bossMessage += '\n\n';
+            bossMessage += '\n\n🔍 <b>叫貨異常分析:</b>';
             anomalies.forEach(anomaly => {
                 const productName = this.safeGet(anomaly, 'product_name', '未知商品');
                 const daysSince = Number(anomaly.days_since_last_order || 0);
                 const lastOrderDate = this.formatDate(anomaly.last_order_date);
                 const lastQuantity = Number(anomaly.last_quantity || 0);
                 const unit = this.safeGet(anomaly, 'unit', '個');
+                const minDays = Number(anomaly.min_days || 1);
+                const maxDays = Number(anomaly.max_days || 7);
+                const anomalyType = this.safeGet(anomaly, 'anomaly_type', 'unknown');
                 
-                if (daysSince >= 3) {
-                    bossMessage += `\n⚠️ 品項 ${productName} 已經${daysSince}天沒有叫貨`;
-                    bossMessage += `\n上次叫貨${lastOrderDate}-${productName}${lastQuantity}${unit}\n`;
-                } else if (daysSince <= 1) {
-                    bossMessage += `\n🔄 品項 ${productName} 已經${daysSince}天內頻繁叫貨`;
-                    bossMessage += `\n上次叫貨${lastOrderDate}-${productName}${lastQuantity}${unit}\n`;
+                if (anomalyType === 'long_gap') {
+                    bossMessage += `\n⚠️ 品項 <b>${productName}</b> 已經${daysSince}天沒有叫貨`;
+                    bossMessage += `\n   ⏰ 標準: 超過${maxDays}天算久未叫貨`;
+                    bossMessage += `\n   📅 上次叫貨: ${lastOrderDate} - ${productName}${lastQuantity}${unit}\n`;
+                } else if (anomalyType === 'frequent') {
+                    bossMessage += `\n🔄 品項 <b>${productName}</b> 在${daysSince}天內頻繁叫貨`;
+                    bossMessage += `\n   ⏰ 標準: 少於${minDays}天算頻繁叫貨`;
+                    bossMessage += `\n   📅 上次叫貨: ${lastOrderDate} - ${productName}${lastQuantity}${unit}\n`;
                 }
             });
         }
