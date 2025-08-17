@@ -953,40 +953,35 @@
 
         // 檢查認證狀態
         async function checkAuthStatus() {
-            const token = localStorage.getItem('jwt_token');
+            const token = localStorage.getItem('token');
             if (!token) {
-                throw new Error('未找到認證token');
+                throw new Error('未找到登入令牌');
             }
-
+            
             try {
                 const response = await fetch('/api/auth/verify', {
-                    method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
+                        'Authorization': 'Bearer ' + token
                     }
                 });
-
-                if (!response.ok) {
-                    throw new Error('Token驗證失敗');
-                }
-
-                const data = await response.json();
-                if (data.success) {
-                    currentUser = data.user;
-                    updateUserInfo();
+                
+                if (response.ok) {
+                    const userData = await response.json();
+                    currentUser = userData.user; // 確保設定currentUser
+                    
+                    // 檢查管理員權限
+                    if (!currentUser || currentUser.role !== 'admin') {
+                        throw new Error('需要管理員權限');
+                    }
+                    
+                    return currentUser;
                 } else {
-                    throw new Error('用戶驗證失敗');
+                    throw new Error('權限驗證失敗');
                 }
             } catch (error) {
-                console.error('認證檢查失敗:', error);
-                localStorage.removeItem('jwt_token');
-                localStorage.removeItem('user_data');
-                throw error;
-            }
-        }
-
-        // 更新用戶資訊顯示
+                localStorage.removeItem('token');
+                throw new Error('登入已過期，請重新登入');
+            }\n        }\n\n        // 更新用戶資訊顯示
         function updateUserInfo() {
             if (currentUser) {
                 document.getElementById('adminName').textContent = currentUser.name || '管理員';

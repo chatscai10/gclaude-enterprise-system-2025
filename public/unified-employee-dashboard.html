@@ -1246,7 +1246,61 @@
                 throw error;
             }
         }
-        </script>
+        
+        // 檢查排班系統時段
+        function checkScheduleTimeValidation() {
+            const now = new Date();
+            const currentDay = now.getDate();
+            const currentHour = now.getHours();
+            
+            // 排班系統開放時間：每月16號02:00 ~ 21號02:00
+            const isSchedulePeriod = (currentDay >= 16 && currentDay <= 21);
+            const isValidTime = (currentDay === 16 && currentHour >= 2) || 
+                               (currentDay > 16 && currentDay < 21) || 
+                               (currentDay === 21 && currentHour < 2);
+            
+            const enterBtn = document.getElementById('enterScheduleBtn');
+            if (enterBtn) {
+                if (isSchedulePeriod && isValidTime) {
+                    enterBtn.disabled = false;
+                    enterBtn.textContent = '進入排班系統';
+                    enterBtn.className = 'btn btn-success w-100';
+                } else {
+                    enterBtn.disabled = true;
+                    enterBtn.textContent = '系統關閉';
+                    enterBtn.className = 'btn btn-secondary w-100';
+                }
+            }
+            
+            return isSchedulePeriod && isValidTime;
+        }
+        
+        // 排班限制檢查
+        function validateScheduleSelection(selectedDates) {
+            const rules = {
+                maxLeaveDays: 8,
+                maxDailyLeave: 2,
+                maxWeekendDays: 3
+            };
+            
+            if (selectedDates.length > rules.maxLeaveDays) {
+                showAlert(`每月休假不可超過${rules.maxLeaveDays}天`, 'warning');
+                return false;
+            }
+            
+            // 檢查週末休假限制
+            const weekendDays = selectedDates.filter(date => {
+                const dayOfWeek = new Date(date).getDay();
+                return dayOfWeek === 5 || dayOfWeek === 6 || dayOfWeek === 0; // 五六日
+            });
+            
+            if (weekendDays.length > rules.maxWeekendDays) {
+                showAlert(`週末休假不可超過${rules.maxWeekendDays}天`, 'warning');
+                return false;
+            }
+            
+            return true;
+        }\n        </script>
     <script>
         // 全域變數
         let currentUser = null;
@@ -1257,6 +1311,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 統一員工工作台載入完成');
             initializeApp();
+                    await loadUserInfo();
             loadUserInfo();
             
             // 綁定營業額系統的即時計算事件
@@ -1511,1021 +1566,1057 @@
         // 載入本月營收
         async function loadMonthlyRevenue() {
             try {
-                const response = await fetch('/api/revenue/monthly', {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
-                    }
-                });
-
+                const response = await fetch('/api/revenue/monthly?year=2025&month=' + (new Date().getMonth() + 1));
+                
                 if (response.ok) {
                     const data = await response.json();
-                    document.getElementById('monthlyRevenue').textContent = 
-                        `$${data.data ? data.data.total.toLocaleString() : '0'}`;
-                }
-            } catch (error) {
-                console.error('載入本月營收失敗:', error);
-            }
-        }
-
-        // 載入待處理任務
-        async function loadPendingTasks() {
-            document.getElementById('pendingTasks').textContent = '0';
-        }
-
-        // 載入最近動態
-        async function loadRecentActivities() {
-            const activitiesContainer = document.getElementById('recentActivities');
-            activitiesContainer.innerHTML = `
-                <div class="alert alert-custom alert-success border-success">
-                    <i class="fas fa-check-circle me-2"></i>
-                    歡迎使用統一員工工作台！
-                </div>
-            `;
-        }
-
-        // 載入出勤資料
-        async function loadAttendanceData() {
-            updateCurrentTime();
-            await loadTodayAttendanceRecords();
-        }
-
-        // 更新當前時間
-        function updateCurrentTime() {
-            const now = new Date();
-            document.getElementById('currentTime').textContent = 
-                now.toLocaleTimeString('zh-TW');
-        }
-
-        // 載入今日打卡記錄
-        async function loadTodayAttendanceRecords() {
-            try {
-                const response = await fetch('/api/attendance/today', {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
-                    }
-                });
-
-                const recordsContainer = document.getElementById('attendanceRecords');
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.data) {
-                        recordsContainer.innerHTML = `
-                            <div class="card border-0 shadow-sm">
-                                <div class="card-body">
-                                    <h6>上班時間：${data.data.clock_in_time || '未打卡'}</h6>
-                                    <h6>下班時間：${data.data.clock_out_time || '尚未下班'}</h6>
-                                    <h6>工作地點：${data.data.location || '未知'}</h6>
+                    const totalRevenue = data.total || 0; // 確保有預設值
+                    
+                    const monthlyRevenueEl = document.getElementById('monthlyRevenue');
+                    if (monthlyRevenueEl) {
+                        monthlyRevenueEl.textContent = '()}<br>
+                                                            <strong>總支出:</strong> $${totalExpense.toLocaleString()}<br>
+                                                            <strong>淨利:</strong> $${(totalRevenue - totalExpense).toLocaleString()}
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        ${record.notes ? `<p class="card-text"><strong>備註:</strong> ${record.notes}</p>` : ''}
+                                                        <small class="text-muted">提交時間: ${new Date(record.created_at).toLocaleString('zh-TW')}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="ms-3">
+                                                ${record.status === 'pending' ? `
+                                                    <button class="btn btn-sm btn-outline-danger" onclick="voidRevenueRecord(${record.id})">
+                                                        <i class="fas fa-trash me-1"></i>作廢
+                                                    </button>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        `;
-
-                        // 更新打卡按鈕狀態
-                        if (data.data.clock_in_time && !data.data.clock_out_time) {
-                            document.getElementById('clockInBtn').disabled = true;
-                            document.getElementById('clockOutBtn').disabled = false;
-                            
-                            // 安全的時間解析
-                            try {
-                                const clockInTimeStr = data.data.clock_in_time;
-                                clockInTime = new Date(clockInTimeStr);
-                                
-                                // 驗證時間是否有效
-                                if (isNaN(clockInTime.getTime())) {
-                                    console.warn('⚠️ 打卡時間格式無效:', clockInTimeStr);
-                                    clockInTime = null;
-                                    // 重置狀態
-                                    document.getElementById('clockInBtn').disabled = false;
-                                    document.getElementById('clockOutBtn').disabled = true;
-                                    document.getElementById('workingHours').textContent = '時間錯誤';
-                                    return;
-                                }
-                                
-                                console.log('📋 載入已存在的打卡記錄:', clockInTime);
-                                // 啟動工作時數計時器
-                                startWorkingTimer();
-                            } catch (error) {
-                                console.error('❌ 時間解析錯誤:', error);
-                                clockInTime = null;
-                                document.getElementById('workingHours').textContent = '解析錯誤';
-                            }
-                        } else {
-                            // 確保清理狀態
-                            stopWorkingTimer();
-                            clockInTime = null;
-                            document.getElementById('clockInBtn').disabled = false;
-                            document.getElementById('clockOutBtn').disabled = true;
-                        }
-                    } else {
-                        recordsContainer.innerHTML = `
-                            <div class="alert alert-custom alert-info border-info">
-                                <i class="fas fa-info-circle me-2"></i>
-                                今日尚未打卡
-                            </div>
-                        `;
+                            `;
+                        });
                     }
-                }
-            } catch (error) {
-                console.error('載入打卡記錄失敗:', error);
-            }
-        }
-
-        // 處理上班打卡
-        async function handleClockIn() {
-            if (!navigator.geolocation) {
-                showAlert('您的瀏覽器不支援GPS定位', 'warning');
-                return;
-            }
-
-            showLoading(true);
-
-            try {
-                const position = await getCurrentPosition();
-                
-                const response = await fetch('/api/attendance/clock-in', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        location: '工作地點',
-                        device_fingerprint: generateDeviceFingerprint(),
-                        accuracy: position.coords.accuracy,
-                        gps_coords: {
-                            latitude: position.coords.latitude,
-                            longitude: position.coords.longitude
-                        }
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showAlert('上班打卡成功！', 'success');
-                    // 設定上班時間並啟動計時器
-                    clockInTime = new Date();
-                    document.getElementById('clockInBtn').disabled = true;
-                    document.getElementById('clockOutBtn').disabled = false;
-                    startWorkingTimer();
-                    await loadAttendanceData();
+                    
+                    // 找到營收記錄容器並顯示
+                    const container = document.getElementById('revenueHistory') || 
+                                    document.querySelector('[data-section="revenue"] .revenue-records');
+                    if (container) {
+                        container.innerHTML = html;
+                    }
                 } else {
-                    showAlert(data.message || '打卡失敗', 'danger');
+                    throw new Error(result.message);
                 }
             } catch (error) {
-                console.error('上班打卡失敗:', error);
-                showAlert('打卡失敗，請稍後再試', 'danger');
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        // 處理下班打卡
-        async function handleClockOut() {
-            if (!navigator.geolocation) {
-                showAlert('您的瀏覽器不支援GPS定位', 'warning');
-                return;
-            }
-
-            showLoading(true);
-
-            try {
-                const position = await getCurrentPosition();
-                
-                const response = await fetch('/api/attendance/clock-out', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        location: '工作地點',
-                        device_fingerprint: generateDeviceFingerprint(),
-                        accuracy: position.coords.accuracy,
-                        gps_coords: {
-                            latitude: position.coords.latitude,
-                            longitude: position.coords.longitude
-                        }
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showAlert('下班打卡成功！', 'success');
-                    // 停止計時器並清除上班時間
-                    stopWorkingTimer();
-                    clockInTime = null;
-                    document.getElementById('clockInBtn').disabled = false;
-                    document.getElementById('clockOutBtn').disabled = true;
-                    document.getElementById('workingHours').textContent = '未開始';
-                    await loadAttendanceData();
-                } else {
-                    showAlert(data.message || '打卡失敗', 'danger');
-                }
-            } catch (error) {
-                console.error('下班打卡失敗:', error);
-                showAlert('打卡失敗，請稍後再試', 'danger');
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        // 獲取GPS位置
-        function getCurrentPosition() {
-            return new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(resolve, reject, {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 60000
-                });
-            });
-        }
-
-        // 生成設備指紋
-        function generateDeviceFingerprint() {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            ctx.textBaseline = 'top';
-            ctx.font = '14px Arial';
-            ctx.fillText('Device fingerprint', 2, 2);
-            
-            return btoa(
-                navigator.userAgent + 
-                screen.width + screen.height + 
-                canvas.toDataURL()
-            ).substring(0, 32);
-        }
-
-        // 處理營收提交
-        async function handleRevenueSubmit(e) {
-            e.preventDefault();
-            
-            // 收集基本資訊
-            const date = document.getElementById('revenueDate').value;
-            const storeId = document.getElementById('revenueStore').value;
-            const bonusType = document.getElementById('revenueBonusType').value;
-            const orderCount = parseInt(document.getElementById('revenueOrderCount').value) || 0;
-            const notes = document.getElementById('revenueNotes').value;
-            
-            // 驗證必填欄位
-            if (!date || !storeId || !bonusType) {
-                showAlert('請填寫所有必填欄位', 'warning');
-                return;
-            }
-            
-            // 收集收入項目
-            const revenueItems = [];
-            let totalRevenue = 0;
-            let bonusEligibleRevenue = 0;
-            
-            document.querySelectorAll('.revenue-income').forEach(input => {
-                const amount = parseFloat(input.value) || 0;
-                if (amount > 0) {
-                    const name = input.dataset.name;
-                    const serviceFee = parseFloat(input.dataset.serviceFee) || 0;
-                    const includeBonus = input.dataset.includeBonus === 'true';
-                    
-                    // 計算實際收入 (扣除服務費)
-                    const actualAmount = amount * (1 - serviceFee);
-                    
-                    revenueItems.push({
-                        name: name,
-                        amount: amount,
-                        serviceFee: serviceFee,
-                        actualAmount: actualAmount,
-                        includeInBonus: includeBonus
-                    });
-                    
-                    totalRevenue += amount;
-                    if (includeBonus) {
-                        bonusEligibleRevenue += actualAmount;
-                    }
-                }
-            });
-            
-            // 收集支出項目
-            const expenseItems = [];
-            let totalExpense = 0;
-            
-            document.querySelectorAll('.expense-item').forEach(item => {
-                const category = item.querySelector('.expense-category').value;
-                const amount = parseFloat(item.querySelector('.expense-amount').value) || 0;
-                
-                if (category && amount > 0) {
-                    expenseItems.push({
-                        name: category,
-                        amount: amount
-                    });
-                    totalExpense += amount;
-                }
-            });
-            
-            // 計算獎金
-            const bonusCalculation = calculateBonus(bonusType, bonusEligibleRevenue);
-            
-            // 構建完整的營收數據
-            const revenueData = {
-                date: date,
-                store_id: parseInt(storeId),
-                bonus_type: bonusType,
-                order_count: orderCount,
-                revenue_items: revenueItems,
-                expense_items: expenseItems,
-                total_revenue: totalRevenue,
-                total_expense: totalExpense,
-                net_revenue: totalRevenue - totalExpense,
-                bonus_eligible_revenue: bonusEligibleRevenue,
-                calculated_bonus: bonusCalculation.amount,
-                bonus_status: bonusCalculation.status,
-                notes: notes
-            };
-
-            try {
-                const response = await fetch('/api/revenue', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(revenueData)
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showAlert('營收記錄新增成功！', 'success');
-                    e.target.reset();
-                    // 重新載入營收記錄
-                    await loadMyRevenueRecords();
-                } else {
-                    showAlert(data.message || '新增失敗', 'danger');
-                }
-            } catch (error) {
-                console.error('營收提交失敗:', error);
-                showAlert('提交失敗，請稍後再試', 'danger');
-            }
-        }
-
-        // 獎金計算公式實現 (按照系統邏輯.txt)
-        function calculateBonus(bonusType, bonusEligibleRevenue) {
-            let bonusAmount = 0;
-            let status = '符合條件';
-            let formula = '';
-            
-            // 根據獎金類型計算
-            switch(bonusType) {
-                case 'daily_sales':
-                    // 日營業額獎金: 12000以上 3%, 15000以上 4%, 18000以上 5%
-                    if (bonusEligibleRevenue >= 18000) {
-                        bonusAmount = bonusEligibleRevenue * 0.05;
-                        formula = '營業額 × 5%';
-                    } else if (bonusEligibleRevenue >= 15000) {
-                        bonusAmount = bonusEligibleRevenue * 0.04;
-                        formula = '營業額 × 4%';
-                    } else if (bonusEligibleRevenue >= 12000) {
-                        bonusAmount = bonusEligibleRevenue * 0.03;
-                        formula = '營業額 × 3%';
-                    } else {
-                        status = '未達標準 (需達12000元)';
-                        formula = '最低12000元';
-                    }
-                    break;
-                    
-                case 'weekly_sales':
-                    // 週營業額獎金: 80000以上 2.5%, 100000以上 3.5%, 120000以上 4.5%
-                    if (bonusEligibleRevenue >= 120000) {
-                        bonusAmount = bonusEligibleRevenue * 0.045;
-                        formula = '營業額 × 4.5%';
-                    } else if (bonusEligibleRevenue >= 100000) {
-                        bonusAmount = bonusEligibleRevenue * 0.035;
-                        formula = '營業額 × 3.5%';
-                    } else if (bonusEligibleRevenue >= 80000) {
-                        bonusAmount = bonusEligibleRevenue * 0.025;
-                        formula = '營業額 × 2.5%';
-                    } else {
-                        status = '未達標準 (需達80000元)';
-                        formula = '最低80000元';
-                    }
-                    break;
-                    
-                case 'monthly_sales':
-                    // 月營業額獎金: 300000以上 2%, 400000以上 3%, 500000以上 4%
-                    if (bonusEligibleRevenue >= 500000) {
-                        bonusAmount = bonusEligibleRevenue * 0.04;
-                        formula = '營業額 × 4%';
-                    } else if (bonusEligibleRevenue >= 400000) {
-                        bonusAmount = bonusEligibleRevenue * 0.03;
-                        formula = '營業額 × 3%';
-                    } else if (bonusEligibleRevenue >= 300000) {
-                        bonusAmount = bonusEligibleRevenue * 0.02;
-                        formula = '營業額 × 2%';
-                    } else {
-                        status = '未達標準 (需達300000元)';
-                        formula = '最低300000元';
-                    }
-                    break;
-                    
-                case 'special_bonus':
-                    // 特殊獎金: 固定計算方式
-                    if (bonusEligibleRevenue >= 20000) {
-                        bonusAmount = 1000; // 固定獎金
-                        formula = '固定1000元';
-                    } else {
-                        status = '未達標準 (需達20000元)';
-                        formula = '最低20000元';
-                    }
-                    break;
-                    
-                default:
-                    status = '無效的獎金類型';
-                    formula = '請選擇正確的獎金類型';
-            }
-            
-            return {
-                amount: Math.round(bonusAmount),
-                status: status,
-                formula: formula,
-                baseRevenue: bonusEligibleRevenue
-            };
-        }
-
-        // 動態支出項目管理
-        function addExpenseItem() {
-            const container = document.getElementById('expenseItemsContainer');
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'expense-item';
-            itemDiv.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: center;';
-            
-            itemDiv.innerHTML = `
-                <select class="expense-category" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                    <option value="">選擇支出項目</option>
-                    <option value="食材成本">食材成本</option>
-                    <option value="人事費用">人事費用</option>
-                    <option value="租金水電">租金水電</option>
-                    <option value="設備維修">設備維修</option>
-                    <option value="清潔用品">清潔用品</option>
-                    <option value="包裝材料">包裝材料</option>
-                    <option value="外送費用">外送費用</option>
-                    <option value="廣告宣傳">廣告宣傳</option>
-                    <option value="其他雜費">其他雜費</option>
-                </select>
-                <input type="number" class="expense-amount" placeholder="金額" step="0.01" min="0" 
-                       style="width: 120px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                <button type="button" onclick="removeExpenseItem(this)" 
-                        style="padding: 8px 12px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">刪除</button>
-            `;
-            
-            container.appendChild(itemDiv);
-            
-            // 綁定即時計算事件
-            const amountInput = itemDiv.querySelector('.expense-amount');
-            amountInput.addEventListener('input', updateBonusPreview);
-        }
-        
-        function removeExpenseItem(element) {
-            const item = element.closest('.expense-item');
-            item.remove();
-            updateBonusPreview();
-        }
-
-        // 即時獎金計算預覽
-        function updateBonusPreview() {
-            const bonusType = document.getElementById('revenueBonusType').value;
-            if (!bonusType) {
-                document.getElementById('bonusPreview').innerHTML = '<p style="color: #666;">請先選擇獎金類型</p>';
-                return;
-            }
-            
-            // 計算可獲獎金的營業額
-            let bonusEligibleRevenue = 0;
-            document.querySelectorAll('.revenue-income').forEach(input => {
-                const amount = parseFloat(input.value) || 0;
-                if (amount > 0 && input.dataset.includeBonus === 'true') {
-                    const serviceFee = parseFloat(input.dataset.serviceFee) || 0;
-                    bonusEligibleRevenue += amount * (1 - serviceFee);
-                }
-            });
-            
-            // 計算獎金
-            const bonusCalculation = calculateBonus(bonusType, bonusEligibleRevenue);
-            
-            // 計算總支出
-            let totalExpense = 0;
-            document.querySelectorAll('.expense-item').forEach(item => {
-                const amount = parseFloat(item.querySelector('.expense-amount').value) || 0;
-                totalExpense += amount;
-            });
-            
-            // 計算淨營收
-            const netRevenue = bonusEligibleRevenue - totalExpense;
-            
-            // 更新預覽顯示
-            const previewHtml = `
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef;">
-                    <h4 style="margin: 0 0 10px 0; color: #495057;">獎金計算預覽</h4>
-                    <div style="margin-bottom: 8px;">可獲獎金營業額: <strong style="color: #28a745;">$${bonusEligibleRevenue.toLocaleString()}</strong></div>
-                    <div style="margin-bottom: 8px;">總支出: <strong style="color: #dc3545;">$${totalExpense.toLocaleString()}</strong></div>
-                    <div style="margin-bottom: 8px;">淨營收: <strong style="color: ${netRevenue >= 0 ? '#28a745' : '#dc3545'};">$${netRevenue.toLocaleString()}</strong></div>
-                    <div style="margin-bottom: 8px;">計算公式: <span style="color: #6c757d;">${bonusCalculation.formula}</span></div>
-                    <div style="margin-bottom: 8px;">獎金狀態: <span style="color: ${bonusCalculation.amount > 0 ? '#28a745' : '#dc3545'};">${bonusCalculation.status}</span></div>
-                    <div style="font-size: 18px; font-weight: bold; color: #495057;">預估獎金: <span style="color: #007bff;">$${bonusCalculation.amount.toLocaleString()}</span></div>
-                </div>
-            `;
-            
-            document.getElementById('bonusPreview').innerHTML = previewHtml;
-        }
-
-        // 叫貨系統 - 商品數據庫
-        const itemsDatabase = {
-            food: [
-                { id: 'f001', name: '新鮮牛肉', unit: '公斤', spec: '冷藏牛肉片' },
-                { id: 'f002', name: '豬肉絲', unit: '公斤', spec: '新鮮豬肉絲' },
-                { id: 'f003', name: '雞胸肉', unit: '公斤', spec: '去骨雞胸肉' },
-                { id: 'f004', name: '蝦仁', unit: '公斤', spec: '冷凍白蝦仁' },
-                { id: 'f005', name: '高麗菜', unit: '顆', spec: '新鮮高麗菜' },
-                { id: 'f006', name: '蔥', unit: '公斤', spec: '青蔥' },
-                { id: 'f007', name: '薑', unit: '公斤', spec: '老薑' },
-                { id: 'f008', name: '蒜頭', unit: '公斤', spec: '新鮮蒜頭' },
-                { id: 'f009', name: '米', unit: '包', spec: '20公斤裝白米' },
-                { id: 'f010', name: '麵條', unit: '包', spec: '新鮮手工麵條' }
-            ],
-            beverage: [
-                { id: 'b001', name: '可樂', unit: '箱', spec: '24瓶裝' },
-                { id: 'b002', name: '礦泉水', unit: '箱', spec: '24瓶裝 600ml' },
-                { id: 'b003', name: '茶葉', unit: '公斤', spec: '烏龍茶葉' },
-                { id: 'b004', name: '咖啡豆', unit: '公斤', spec: '阿拉比卡咖啡豆' },
-                { id: 'b005', name: '果汁', unit: '箱', spec: '12瓶裝柳橙汁' },
-                { id: 'b006', name: '牛奶', unit: '箱', spec: '12瓶裝鮮奶' },
-                { id: 'b007', name: '豆漿', unit: '箱', spec: '12瓶裝無糖豆漿' },
-                { id: 'b008', name: '汽水', unit: '箱', spec: '24罐裝雪碧' }
-            ],
-            packaging: [
-                { id: 'p001', name: '外帶盒', unit: '個', spec: '紙質外帶餐盒' },
-                { id: 'p002', name: '塑膠袋', unit: '包', spec: '100個裝購物袋' },
-                { id: 'p003', name: '湯匙', unit: '包', spec: '100支裝免洗湯匙' },
-                { id: 'p004', name: '筷子', unit: '包', spec: '100雙裝免洗筷' },
-                { id: 'p005', name: '紙巾', unit: '包', spec: '餐桌紙巾' },
-                { id: 'p006', name: '吸管', unit: '包', spec: '100支裝紙吸管' },
-                { id: 'p007', name: '鋁箔紙', unit: '捲', spec: '廚房用鋁箔紙' }
-            ],
-            cleaning: [
-                { id: 'c001', name: '洗碗精', unit: '瓶', spec: '1公升裝' },
-                { id: 'c002', name: '漂白水', unit: '瓶', spec: '1公升裝' },
-                { id: 'c003', name: '廚房清潔劑', unit: '瓶', spec: '500ml裝' },
-                { id: 'c004', name: '地板清潔劑', unit: '瓶', spec: '1公升裝' },
-                { id: 'c005', name: '垃圾袋', unit: '包', spec: '100個裝大型垃圾袋' },
-                { id: 'c006', name: '抹布', unit: '包', spec: '10條裝廚房抹布' },
-                { id: 'c007', name: '橡膠手套', unit: '雙', spec: '廚房用橡膠手套' }
-            ],
-            equipment: [
-                { id: 'e001', name: '瓦斯爐管', unit: '條', spec: '瓦斯爐連接管' },
-                { id: 'e002', name: '濾水器濾芯', unit: '個', spec: '廚房濾水器濾芯' },
-                { id: 'e003', name: '燈泡', unit: '個', spec: 'LED省電燈泡' },
-                { id: 'e004', name: '插座', unit: '個', spec: '三孔插座' },
-                { id: 'e005', name: '保險絲', unit: '個', spec: '15A保險絲' }
-            ],
-            other: [
-                { id: 'o001', name: '文具用品', unit: '組', spec: '辦公文具組合' },
-                { id: 'o002', name: '計算機', unit: '台', spec: '桌上型計算機' },
-                { id: 'o003', name: '收銀紙', unit: '捲', spec: '感熱紙收銀紙' },
-                { id: 'o004', name: '原子筆', unit: '支', spec: '藍色原子筆' }
-            ]
-        };
-
-        // 購物車數據
-        let shoppingCart = [];
-
-        // 叫貨系統 - 分類選擇
-        function selectCategory(category) {
-            // 更新分類按鈕狀態
-            document.querySelectorAll('.category-tab').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelector(`[data-category="${category}"]`).classList.add('active');
-            
-            // 載入該分類的商品
-            loadItemsByCategory(category);
-        }
-
-        // 載入分類商品
-        function loadItemsByCategory(category) {
-            const storeId = document.getElementById('orderStoreSelect').value;
-            if (!storeId) {
-                document.getElementById('itemsList').innerHTML = `
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-triangle me-2"></i>請先選擇分店
-                    </div>
-                `;
-                return;
-            }
-
-            let items = [];
-            if (category === 'all') {
-                // 顯示所有分類的商品
-                Object.values(itemsDatabase).forEach(categoryItems => {
-                    items = items.concat(categoryItems);
-                });
-            } else {
-                items = itemsDatabase[category] || [];
-            }
-
-            displayItems(items, category);
-        }
-
-        // 顯示商品清單
-        function displayItems(items, category) {
-            if (items.length === 0) {
-                document.getElementById('itemsList').innerHTML = `
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>此分類暫無商品
-                    </div>
-                `;
-                return;
-            }
-
-            const itemsHtml = items.map(item => `
-                <div class="col-md-6 col-lg-4 mb-3">
-                    <div class="card h-100 border-1 shadow-sm">
-                        <div class="card-body">
-                            <h6 class="card-title">${item.name}</h6>
-                            <p class="card-text text-muted small">${item.spec}</p>
-                            <div class="d-flex align-items-center justify-content-between">
-                                <span class="text-muted">單位: ${item.unit}</span>
-                                <div class="input-group" style="width: 100px;">
-                                    <input type="number" class="form-control form-control-sm item-quantity" 
-                                           id="qty_${item.id}" min="1" value="1" style="font-size: 12px;">
-                                </div>
-                            </div>
-                            <button class="btn btn-outline-success btn-sm w-100 mt-2" 
-                                    onclick="addToCart('${item.id}', '${item.name}', '${item.unit}', '${item.spec}')">
-                                <i class="fas fa-plus me-1"></i>加入購物車
-                            </button>
+                console.error('載入營收記錄失敗:', error);
+                const container = document.getElementById('revenueHistory') || 
+                                document.querySelector('[data-section="revenue"] .revenue-records');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>載入營收記錄失敗: ${error.message}
                         </div>
-                    </div>
-                </div>
-            `).join('');
-
-            document.getElementById('itemsList').innerHTML = `
-                <div class="row">
-                    ${itemsHtml}
-                </div>
-            `;
-        }
-
-        // 加入購物車
-        function addToCart(itemId, itemName, itemUnit, itemSpec) {
-            const quantityInput = document.getElementById(`qty_${itemId}`);
-            const quantity = parseInt(quantityInput.value) || 1;
-
-            // 檢查是否已在購物車中
-            const existingIndex = shoppingCart.findIndex(item => item.id === itemId);
-            
-            if (existingIndex >= 0) {
-                // 更新數量
-                shoppingCart[existingIndex].quantity += quantity;
-            } else {
-                // 新增到購物車
-                shoppingCart.push({
-                    id: itemId,
-                    name: itemName,
-                    unit: itemUnit,
-                    spec: itemSpec,
-                    quantity: quantity
-                });
-            }
-
-            updateCartDisplay();
-            quantityInput.value = 1; // 重置數量
-            
-            // 顯示成功訊息
-            showAlert(`已加入 ${quantity} ${itemUnit} ${itemName} 到購物車`, 'success');
-        }
-
-        // 更新購物車顯示
-        function updateCartDisplay() {
-            const cartItemsContainer = document.getElementById('cartItems');
-            const cartItemCount = document.getElementById('cartItemCount');
-            const submitBtn = document.getElementById('submitOrderBtn');
-
-            cartItemCount.textContent = shoppingCart.length;
-
-            if (shoppingCart.length === 0) {
-                cartItemsContainer.innerHTML = `
-                    <div class="text-center py-4 text-muted">
-                        <i class="fas fa-shopping-cart fa-3x mb-3"></i>
-                        <p>購物車是空的</p>
-                        <small>請選擇商品並點擊"加入購物車"</small>
-                    </div>
-                `;
-                submitBtn.disabled = true;
-                return;
-            }
-
-            const cartHtml = shoppingCart.map((item, index) => `
-                <div class="d-flex align-items-center justify-content-between border-bottom py-2">
-                    <div class="flex-grow-1">
-                        <h6 class="mb-1">${item.name}</h6>
-                        <small class="text-muted">${item.spec}</small>
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="input-group" style="width: 100px;">
-                            <button class="btn btn-outline-secondary btn-sm" onclick="updateCartItemQuantity(${index}, -1)">-</button>
-                            <input type="number" class="form-control form-control-sm text-center" value="${item.quantity}" 
-                                   onchange="updateCartItemQuantity(${index}, this.value, true)" min="1">
-                            <button class="btn btn-outline-secondary btn-sm" onclick="updateCartItemQuantity(${index}, 1)">+</button>
-                        </div>
-                        <span class="text-muted">${item.unit}</span>
-                        <button class="btn btn-outline-danger btn-sm" onclick="removeFromCart(${index})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-
-            cartItemsContainer.innerHTML = cartHtml;
-            submitBtn.disabled = false;
-        }
-
-        // 更新購物車商品數量
-        function updateCartItemQuantity(index, change, absolute = false) {
-            if (absolute) {
-                shoppingCart[index].quantity = Math.max(1, parseInt(change) || 1);
-            } else {
-                shoppingCart[index].quantity = Math.max(1, shoppingCart[index].quantity + change);
-            }
-            updateCartDisplay();
-        }
-
-        // 從購物車移除
-        function removeFromCart(index) {
-            const item = shoppingCart[index];
-            shoppingCart.splice(index, 1);
-            updateCartDisplay();
-            showAlert(`已移除 ${item.name}`, 'info');
-        }
-
-        // 清空購物車
-        function clearCart() {
-            if (shoppingCart.length === 0) return;
-            
-            if (confirm('確定要清空購物車嗎？')) {
-                shoppingCart = [];
-                updateCartDisplay();
-                showAlert('購物車已清空', 'info');
-            }
-        }
-
-        // 照片上傳預覽處理
-        function handlePhotoPreview(event) {
-            const files = event.target.files;
-            const previewContainer = document.getElementById('photoPreview');
-            
-            // 清空之前的預覽
-            previewContainer.innerHTML = '';
-            
-            if (files.length === 0) return;
-            
-            Array.from(files).forEach((file, index) => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const photoDiv = document.createElement('div');
-                        photoDiv.className = 'col-md-3 mb-3';
-                        photoDiv.innerHTML = `
-                            <div class="card">
-                                <img src="${e.target.result}" class="card-img-top" style="height: 150px; object-fit: cover;">
-                                <div class="card-body p-2">
-                                    <small class="text-muted">${file.name}</small>
-                                    <button type="button" class="btn btn-outline-danger btn-sm w-100 mt-1" 
-                                            onclick="removePhotoPreview(${index})">
-                                        <i class="fas fa-trash"></i> 移除
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                        previewContainer.appendChild(photoDiv);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-
-        // 移除照片預覽
-        function removePhotoPreview(index) {
-            const fileInput = document.getElementById('orderPhotos');
-            const dt = new DataTransfer();
-            const files = fileInput.files;
-            
-            for (let i = 0; i < files.length; i++) {
-                if (i !== index) {
-                    dt.items.add(files[i]);
+                    `;
                 }
             }
-            
-            fileInput.files = dt.files;
-            handlePhotoPreview({ target: fileInput });
         }
 
-        // 送出叫貨申請
-        async function submitOrder() {
-            const storeId = document.getElementById('orderStoreSelect').value;
-            const priority = document.getElementById('orderPriority').value;
-            const neededDate = document.getElementById('orderNeededDate').value;
-            const contact = document.getElementById('orderContact').value;
-            const photoCategory = document.getElementById('orderPhotoCategory').value;
-            const photoFiles = document.getElementById('orderPhotos').files;
-
-            // 驗證必填欄位
-            if (!storeId) {
-                showAlert('請選擇分店', 'warning');
+        // 作廢營收記錄
+        async function voidRevenueRecord(recordId) {
+            if (!confirm('確定要作廢此營收記錄嗎？')) {
                 return;
             }
-            if (shoppingCart.length === 0) {
-                showAlert('購物車不能為空', 'warning');
+            
+            const reason = prompt('請輸入作廢原因：');
+            if (!reason || !reason.trim()) {
+                showAlert('請輸入作廢原因', 'warning');
                 return;
             }
-            if (!neededDate || !contact) {
-                showAlert('請填寫到貨日期和聯絡人員', 'warning');
-                return;
-            }
-
-            // 使用FormData來支持文件上傳
-            const formData = new FormData();
-            formData.append('store_id', storeId);
-            formData.append('priority', priority);
-            formData.append('needed_date', neededDate);
-            formData.append('contact', contact);
-            formData.append('items', JSON.stringify(shoppingCart));
-            formData.append('photo_category', photoCategory);
-            formData.append('total_items', shoppingCart.reduce((sum, item) => sum + item.quantity, 0));
-            formData.append('notes', `共 ${shoppingCart.length} 項商品，總數量 ${shoppingCart.reduce((sum, item) => sum + item.quantity, 0)} 件`);
-
-            // 添加照片文件
-            if (photoFiles.length > 0) {
-                Array.from(photoFiles).forEach(file => {
-                    formData.append('photos', file);
-                });
-            }
-
+            
             try {
-                const response = await fetch('/api/orders', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
-                        // 不要設置Content-Type，讓瀏覽器自動設置multipart/form-data
-                    },
-                    body: formData
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showAlert('叫貨申請提交成功！', 'success');
-                    // 清空購物車和表單
-                    shoppingCart = [];
-                    updateCartDisplay();
-                    document.getElementById('orderStoreSelect').value = '';
-                    document.getElementById('orderNeededDate').value = '';
-                    document.getElementById('orderContact').value = '';
-                    document.getElementById('orderPhotoCategory').value = '';
-                    document.getElementById('orderPhotos').value = '';
-                    document.getElementById('photoPreview').innerHTML = '';
-                    // 重新載入叫貨記錄
-                    await loadOrderHistory();
-                } else {
-                    showAlert(data.message || '提交失敗', 'danger');
-                }
-            } catch (error) {
-                console.error('叫貨申請失敗:', error);
-                showAlert('提交失敗，請稍後再試', 'danger');
-            }
-        }
-
-        // 處理維修申請提交
-        async function handleMaintenanceSubmit(e) {
-            e.preventDefault();
-            
-            const maintenanceData = {
-                equipment_type: document.getElementById('equipmentType').value,
-                priority: document.getElementById('maintenancePriority').value,
-                title: document.getElementById('maintenanceTitle').value,
-                description: document.getElementById('maintenanceDescription').value,
-                location: document.getElementById('maintenanceLocation').value,
-                contact_phone: document.getElementById('maintenancePhone').value
-            };
-
-            try {
-                const response = await fetch('/api/maintenance', {
+                const response = await fetch(`/api/revenue/${recordId}/void`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(maintenanceData)
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showAlert('維修申請提交成功！', 'success');
-                    e.target.reset();
-                    await loadMaintenanceData();
-                } else {
-                    showAlert(data.message || '提交失敗', 'danger');
-                }
-            } catch (error) {
-                console.error('維修申請失敗:', error);
-                showAlert('提交失敗，請稍後再試', 'danger');
-            }
-        }
-
-        // 載入排班系統資料
-        async function loadScheduleData() {
-            await loadScheduleSystem();
-        }
-
-        async function loadRevenueData() {
-            document.getElementById('todayRevenueStats').innerHTML = `
-                <div class="alert alert-custom alert-success border-success">
-                    <i class="fas fa-check-circle me-2"></i>
-                    營收統計功能已準備就緒
-                </div>
-            `;
-            
-            // 載入我的營收記錄
-            await loadMyRevenueRecords();
-        }
-        
-        // 載入我的營收記錄
-        async function loadMyRevenueRecords() {
-            try {
-                const response = await fetch('/api/revenue/records', {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
-                    }
+                    body: JSON.stringify({ reason: reason.trim() })
                 });
                 
                 const result = await response.json();
                 
                 if (result.success) {
-                    const records = result.data;
-                    let html = '';
+                    showAlert('記錄作廢成功', 'success');
+                    await loadMyRevenueRecords(); // 重新載入記錄
+                } else {
+                    showAlert(result.message || '作廢失敗', 'danger');
+                }
+            } catch (error) {
+                console.error('作廢記錄失敗:', error);
+                showAlert('作廢失敗，請稍後再試', 'danger');
+            }
+        }
+
+        async function loadMaintenanceData() {
+            document.getElementById('maintenanceHistory').innerHTML = `
+                <div class="alert alert-custom alert-info border-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    載入維修申請記錄中...
+                </div>
+            `;
+        }
+
+        async function loadProfileData() {
+            if (currentUser) {
+                document.getElementById('employeeProfile').innerHTML = `
+                    <h5>${currentUser.name}</h5>
+                    <p class="text-muted">${currentUser.role === 'admin' ? '管理員' : '員工'}</p>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-4"><strong>用戶名：</strong></div>
+                        <div class="col-sm-8">${currentUser.username}</div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-4"><strong>角色：</strong></div>
+                        <div class="col-sm-8">${currentUser.role}</div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-4"><strong>最後登入：</strong></div>
+                        <div class="col-sm-8">${new Date().toLocaleString('zh-TW')}</div>
+                    </div>
+                `;
+            }
+        }
+
+        // 工具函數
+        function showLoading(show) {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.style.display = show ? 'flex' : 'none';
+        }
+
+        function showAlert(message, type) {
+            // 簡化的提醒顯示
+            const alertClass = type === 'success' ? 'alert-success' : 
+                             type === 'warning' ? 'alert-warning' : 'alert-danger';
+            
+            const alertHtml = `
+                <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+                     style="top: 20px; right: 20px; z-index: 9999;">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', alertHtml);
+            
+            // 3秒後自動關閉
+            setTimeout(() => {
+                const alerts = document.querySelectorAll('.alert-dismissible');
+                alerts.forEach(alert => {
+                    const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+                    bsAlert.close();
+                });
+            }, 3000);
+        }
+
+        // 定期更新
+        function startPeriodicUpdate() {
+            setInterval(() => {
+                if (currentSection === 'attendance') {
+                    updateCurrentTime();
+                    updateWorkingHours();
+                }
+            }, 1000);
+        }
+
+        // 啟動工作時數計時器
+        function startWorkingTimer() {
+            console.log('🚀 啟動工作時數計時器');
+            // 立即更新一次
+            updateWorkingHours();
+            // 確保定期更新已啟動
+            if (!window.workingTimerInterval) {
+                window.workingTimerInterval = setInterval(() => {
+                    if (clockInTime && currentSection === 'attendance') {
+                        updateWorkingHours();
+                    }
+                }, 1000);
+            }
+        }
+
+        // 停止工作時數計時器
+        function stopWorkingTimer() {
+            if (window.workingTimerInterval) {
+                clearInterval(window.workingTimerInterval);
+                window.workingTimerInterval = null;
+            }
+        }
+
+        // 更新工作時數
+        function updateWorkingHours() {
+            const workingHoursElement = document.getElementById('workingHours');
+            if (!workingHoursElement) {
+                console.warn('⚠️ workingHours 元素未找到');
+                return;
+            }
+
+            if (clockInTime) {
+                try {
+                    const now = new Date();
+                    const diff = now - clockInTime;
                     
-                    if (records.length === 0) {
-                        html = `
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle me-2"></i>暫無營收記錄
+                    // 檢查時間差值是否有效
+                    if (isNaN(diff) || diff < 0) {
+                        console.warn('⚠️ 時間計算異常:', { clockInTime, now, diff });
+                        workingHoursElement.textContent = '計算中...';
+                        return;
+                    }
+                    
+                    const hours = Math.floor(diff / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    
+                    // 檢查計算結果是否有效
+                    if (isNaN(hours) || isNaN(minutes)) {
+                        console.warn('⚠️ 時間格式異常:', { hours, minutes });
+                        workingHoursElement.textContent = '格式錯誤';
+                        return;
+                    }
+                    
+                    workingHoursElement.textContent = `${hours}小時${minutes}分鐘`;
+                    console.log(`⏰ 工作時數更新: ${hours}小時${minutes}分鐘`);
+                } catch (error) {
+                    console.error('❌ 工作時數計算錯誤:', error);
+                    workingHoursElement.textContent = '計算錯誤';
+                }
+            } else {
+                workingHoursElement.textContent = '未開始';
+            }
+        }
+
+        // 登出功能
+        function logout() {
+            localStorage.removeItem('jwt_token');
+            localStorage.removeItem('user_data');
+            window.location.href = '/login.html';
+        }
+
+        // 排班系統全域變數
+        let scheduleTimer = null;
+        let scheduleTimeRemaining = 300; // 5分鐘 = 300秒
+        let selectedDates = [];
+        let currentScheduleMonth = '';
+
+        // 載入排班系統
+        async function loadScheduleSystem() {
+            try {
+                // 載入排班規則
+                await loadScheduleRules();
+                
+                // 檢查系統狀態
+                await checkScheduleSystemStatus();
+                
+                // 載入我的排班記錄
+                await loadMyScheduleHistory();
+            } catch (error) {
+                console.error('載入排班系統失敗:', error);
+                showAlert('載入排班系統失敗: ' + error.message, 'danger');
+            }
+        }
+
+        // 載入排班規則
+        async function loadScheduleRules() {
+            try {
+                const response = await fetch('/api/schedule/settings', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    const settings = result.data;
+                    document.getElementById('scheduleRules').innerHTML = `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-calendar-week text-primary me-2"></i><strong>排班月份:</strong> ${settings.schedule_month}</li>
+                                    <li><i class="fas fa-user-times text-warning me-2"></i><strong>每人休假上限:</strong> ${settings.max_leave_days_per_person}天</li>
+                                    <li><i class="fas fa-users text-info me-2"></i><strong>每日休假總上限:</strong> ${settings.max_leave_people_per_day}人</li>
+                                    <li><i class="fas fa-store text-success me-2"></i><strong>同店每日休假上限:</strong> ${settings.max_same_store_leave_per_day}人</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-weekend text-danger me-2"></i><strong>假日休假上限:</strong> ${settings.max_weekend_leave_days}天</li>
+                                    <li><i class="fas fa-clock text-warning me-2"></i><strong>操作時間限制:</strong> ${settings.operation_time_minutes}分鐘</li>
+                                    <li><i class="fas fa-calendar-plus text-primary me-2"></i><strong>開啟時間:</strong> 每月${settings.system_open_date.split('-')[2]}號 ${settings.system_open_time}</li>
+                                    <li><i class="fas fa-calendar-minus text-danger me-2"></i><strong>關閉時間:</strong> 每月${settings.system_close_date.split('-')[2]}號 ${settings.system_close_time}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                    currentScheduleMonth = settings.schedule_month;
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                document.getElementById('scheduleRules').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>載入排班規則失敗: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // 檢查排班系統狀態
+        async function checkScheduleSystemStatus() {
+            try {
+                const response = await fetch('/api/schedule/status', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    const status = result.data;
+                    const enterBtn = document.getElementById('enterScheduleBtn');
+                    const exitBtn = document.getElementById('exitScheduleBtn');
+                    
+                    if (status.is_open && !status.is_in_use) {
+                        // 系統開啟且無人使用
+                        document.getElementById('scheduleSystemStatus').innerHTML = `
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>
+                                <strong>系統開啟中</strong> - 可以進入排班系統
+                            </div>
+                        `;
+                        enterBtn.disabled = false;
+                        enterBtn.innerHTML = '<i class="fas fa-door-open me-2"></i>進入系統';
+                        enterBtn.className = 'btn btn-success w-100';
+                    } else if (status.is_open && status.is_in_use) {
+                        // 系統開啟但有人在使用
+                        document.getElementById('scheduleSystemStatus').innerHTML = `
+                            <div class="alert alert-warning">
+                                <i class="fas fa-user-clock me-2"></i>
+                                <strong>系統使用中</strong> - ${status.current_user}正在排班
+                                <br><small>預計${status.estimated_end_time}結束</small>
+                            </div>
+                        `;
+                        enterBtn.disabled = true;
+                        enterBtn.innerHTML = '<i class="fas fa-user-clock me-2"></i>系統使用中';
+                        enterBtn.className = 'btn btn-warning w-100';
+                    } else {
+                        // 系統關閉
+                        document.getElementById('scheduleSystemStatus').innerHTML = `
+                            <div class="alert alert-secondary">
+                                <i class="fas fa-lock me-2"></i>
+                                <strong>系統關閉</strong> - 排班時間：每月16-21號 02:00開放
+                                <br><small>下次開放時間：${status.next_open_time}</small>
+                            </div>
+                        `;
+                        enterBtn.disabled = true;
+                        enterBtn.innerHTML = '<i class="fas fa-lock me-2"></i>系統關閉';
+                        enterBtn.className = 'btn btn-secondary w-100';
+                    }
+                    
+                    // 如果當前用戶在系統中，顯示退出按鈕
+                    if (status.current_user_id === getCurrentUserId()) {
+                        exitBtn.disabled = false;
+                        exitBtn.style.display = 'block';
+                    } else {
+                        exitBtn.disabled = true;
+                        exitBtn.style.display = 'none';
+                    }
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                document.getElementById('scheduleSystemStatus').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>檢查系統狀態失敗: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // 載入我的排班記錄
+        async function loadMyScheduleHistory() {
+            try {
+                const response = await fetch('/api/schedule/my-schedule', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    const schedule = result.data;
+                    if (schedule && schedule.leave_dates.length > 0) {
+                        document.getElementById('myScheduleHistory').innerHTML = `
+                            <div class="alert alert-success">
+                                <h6><i class="fas fa-calendar-check me-2"></i>已完成排班 - ${schedule.schedule_month}</h6>
+                                <p class="mb-2"><strong>休假日期:</strong></p>
+                                <div class="d-flex flex-wrap gap-2">
+                                    ${schedule.leave_dates.map(date => 
+                                        `<span class="badge bg-primary">${date}</span>`
+                                    ).join('')}
+                                </div>
+                                <hr>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>提交時間: ${new Date(schedule.submitted_at).toLocaleString('zh-TW')}
+                                </small>
+                                <div class="mt-2">
+                                    <button class="btn btn-sm btn-outline-danger" onclick="voidMySchedule()">
+                                        <i class="fas fa-trash me-1"></i>作廢排班
+                                    </button>
+                                </div>
                             </div>
                         `;
                     } else {
-                        records.forEach(record => {
-                            const status = record.status === 'pending' ? '待審核' : 
-                                         record.status === 'approved' ? '已審核' : '已拒絕';
-                            const statusClass = record.status === 'pending' ? 'warning' : 
-                                              record.status === 'approved' ? 'success' : 'danger';
-                            
-                            // 安全解析revenue_items和expense_items
-                            let revenueItems = [];
-                            let expenseItems = [];
-                            try {
-                                // 檢查並安全解析營收項目
-                                if (record.revenue_items && typeof record.revenue_items === 'string' && record.revenue_items.trim()) {
-                                    revenueItems = JSON.parse(record.revenue_items);
-                                } else if (Array.isArray(record.revenue_items)) {
-                                    revenueItems = record.revenue_items;
-                                }
-                                
-                                // 檢查並安全解析支出項目
-                                if (record.expense_items && typeof record.expense_items === 'string' && record.expense_items.trim()) {
-                                    expenseItems = JSON.parse(record.expense_items);
-                                } else if (Array.isArray(record.expense_items)) {
-                                    expenseItems = record.expense_items;
-                                }
-                            } catch (e) {
-                                console.warn('⚠️ 營收數據解析失敗，使用默認值:', {
-                                    error: e.message,
-                                    revenue_items: record.revenue_items,
-                                    expense_items: record.expense_items
-                                });
-                                revenueItems = [];
-                                expenseItems = [];
-                            }
-                            
-                            const totalRevenue = revenueItems.reduce((sum, item) => sum + (item.amount || 0), 0);
-                            const totalExpense = expenseItems.reduce((sum, item) => sum + (item.amount || 0), 0);
+                        document.getElementById('myScheduleHistory').innerHTML = `
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                本月尚未完成排班，請在系統開放時間內進行排班
+                            </div>
+                        `;
+                    }
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                document.getElementById('myScheduleHistory').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>載入排班記錄失敗: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // 進入排班系統
+        async function enterScheduleSystem() {
+            try {
+                const response = await fetch('/api/schedule/enter', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    showAlert('成功進入排班系統！請在5分鐘內完成排班', 'success');
+                    
+                    // 顯示月曆介面
+                    document.getElementById('scheduleCalendarContainer').style.display = 'block';
+                    
+                    // 生成月曆
+                    generateScheduleCalendar();
+                    
+                    // 開始倒數計時
+                    startScheduleTimer();
+                    
+                    // 更新按鈕狀態
+                    document.getElementById('enterScheduleBtn').disabled = true;
+                    document.getElementById('exitScheduleBtn').disabled = false;
+                    document.getElementById('exitScheduleBtn').style.display = 'block';
+                    
+                } else {
+                    showAlert('進入排班系統失敗: ' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('進入排班系統失敗: ' + error.message, 'danger');
+            }
+        }
+
+        // 退出排班系統
+        async function exitScheduleSystem() {
+            try {
+                const response = await fetch('/api/schedule/exit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    showAlert('已退出排班系統', 'info');
+                    
+                    // 隱藏月曆介面
+                    document.getElementById('scheduleCalendarContainer').style.display = 'none';
+                    
+                    // 停止計時
+                    if (scheduleTimer) {
+                        clearInterval(scheduleTimer);
+                        scheduleTimer = null;
+                    }
+                    
+                    // 重新檢查系統狀態
+                    await checkScheduleSystemStatus();
+                    
+                } else {
+                    showAlert('退出排班系統失敗: ' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('退出排班系統失敗: ' + error.message, 'danger');
+            }
+        }
+
+        // 生成排班月曆
+        function generateScheduleCalendar() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1; // 下個月
+            
+            const calendarHtml = `
+                <div class="text-center mb-3">
+                    <h5>${year}年 ${month}月 排班表</h5>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div id="calendarGrid" class="calendar-grid">
+                            ${generateCalendarGrid(year, month)}
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <p class="text-muted small">
+                        <i class="fas fa-info-circle me-1"></i>
+                        點擊日期選擇休假日，已選擇的日期會以藍色顯示
+                    </p>
+                </div>
+            `;
+            
+            document.getElementById('scheduleCalendar').innerHTML = calendarHtml;
+        }
+
+        // 生成月曆網格
+        function generateCalendarGrid(year, month) {
+            const firstDay = new Date(year, month - 1, 1);
+            const lastDay = new Date(year, month, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDayOfWeek = firstDay.getDay();
+            
+            let html = '<div class="calendar-header">';
+            const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
+            dayNames.forEach(day => {
+                html += `<div class="calendar-day-header">${day}</div>`;
+            });
+            html += '</div><div class="calendar-body">';
+            
+            // 空白格子
+            for (let i = 0; i < startingDayOfWeek; i++) {
+                html += '<div class="calendar-day empty"></div>';
+            }
+            
+            // 日期格子
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isWeekend = new Date(year, month - 1, day).getDay() === 0 || new Date(year, month - 1, day).getDay() === 6;
+                const classes = ['calendar-day'];
+                
+                if (isWeekend) classes.push('weekend');
+                if (selectedDates.includes(dateStr)) classes.push('selected');
+                
+                html += `<div class="${classes.join(' ')}" onclick="toggleDateSelection('${dateStr}')">${day}</div>`;
+            }
+            
+            html += '</div>';
+            return html;
+        }
+
+        // 切換日期選擇
+        function toggleDateSelection(dateStr) {
+            const index = selectedDates.indexOf(dateStr);
+            if (index > -1) {
+                selectedDates.splice(index, 1);
+            } else {
+                selectedDates.push(dateStr);
+            }
+            
+            // 重新生成月曆以更新顯示
+            generateScheduleCalendar();
+        }
+
+        // 開始排班計時
+        function startScheduleTimer() {
+            scheduleTimeRemaining = 300; // 5分鐘
+            updateTimerDisplay();
+            
+            scheduleTimer = setInterval(() => {
+                scheduleTimeRemaining--;
+                updateTimerDisplay();
+                
+                if (scheduleTimeRemaining <= 0) {
+                    clearInterval(scheduleTimer);
+                    scheduleTimer = null;
+                    showAlert('排班時間已到，系統將自動退出', 'warning');
+                    exitScheduleSystem();
+                }
+            }, 1000);
+        }
+
+        // 更新計時顯示
+        function updateTimerDisplay() {
+            const minutes = Math.floor(scheduleTimeRemaining / 60);
+            const seconds = scheduleTimeRemaining % 60;
+            const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            const timerElement = document.getElementById('scheduleTimeRemaining');
+            if (timerElement) {
+                timerElement.textContent = `時間剩餘: ${timeStr}`;
+                
+                if (scheduleTimeRemaining <= 60) {
+                    timerElement.className = 'badge bg-danger text-white';
+                } else if (scheduleTimeRemaining <= 120) {
+                    timerElement.className = 'badge bg-warning text-dark';
+                }
+            }
+        }
+
+        // 確認排班
+        async function confirmSchedule() {
+            if (selectedDates.length === 0) {
+                showAlert('請至少選擇一個休假日期', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/schedule/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    },
+                    body: JSON.stringify({
+                        leave_dates: selectedDates,
+                        schedule_month: currentScheduleMonth
+                    })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    showAlert('排班提交成功！', 'success');
+                    
+                    // 退出系統
+                    await exitScheduleSystem();
+                    
+                    // 重新載入記錄
+                    await loadMyScheduleHistory();
+                    
+                } else {
+                    showAlert('排班提交失敗: ' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('排班提交失敗: ' + error.message, 'danger');
+            }
+        }
+
+        // 重置排班
+        function resetSchedule() {
+            selectedDates = [];
+            generateScheduleCalendar();
+            showAlert('已重置排班選擇', 'info');
+        }
+
+        // 作廢我的排班
+        async function voidMySchedule() {
+            if (!confirm('確定要作廢本月排班嗎？作廢後需要重新排班。')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/schedule/my-schedule', {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    showAlert('排班記錄已作廢', 'success');
+                    await loadMyScheduleHistory();
+                } else {
+                    showAlert('作廢排班失敗: ' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('作廢排班失敗: ' + error.message, 'danger');
+            }
+        }
+
+        // 獲取當前用戶ID (假設從JWT token中獲取)
+        function getCurrentUserId() {
+            const token = localStorage.getItem('jwt_token');
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    return payload.id;
+                } catch (error) {
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        // ==================== 升遷投票系統 ====================
+
+        // 載入升遷投票系統
+        async function loadPromotionData() {
+            try {
+                // 檢查升遷資格
+                await checkPromotionEligibility();
+                
+                // 載入進行中的投票
+                await loadActivePromotions();
+                
+                // 載入職位階級
+                await loadPositionLevels();
+                
+                // 設置表單事件
+                setupPromotionFormEvents();
+            } catch (error) {
+                console.error('載入升遷投票系統失敗:', error);
+                showAlert('載入升遷投票系統失敗: ' + error.message, 'danger');
+            }
+        }
+
+        // 檢查升遷資格
+        async function checkPromotionEligibility() {
+            try {
+                const response = await fetch('/api/promotion/check-eligibility', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    if (result.data.canStart) {
+                        document.getElementById('promotionEligibility').innerHTML = `
+                            <div class="alert alert-success">
+                                <h6><i class="fas fa-check-circle me-2"></i>您符合升遷條件！</h6>
+                                <ul class="list-unstyled mb-2">
+                                    <li><i class="fas fa-user me-2"></i><strong>目前職位:</strong> ${result.data.currentPosition}</li>
+                                    <li><i class="fas fa-calendar me-2"></i><strong>任職天數:</strong> ${result.data.daysSinceStart}天</li>
+                                    <li><i class="fas fa-clock me-2"></i><strong>在職天數:</strong> ${result.data.totalDays}天</li>
+                                </ul>
+                                <p class="mb-0">可以發起升遷投票！</p>
+                            </div>
+                        `;
+                        
+                        // 顯示發起投票區塊
+                        document.getElementById('startPromotionContainer').style.display = 'block';
+                        
+                        // 載入可升遷的職位
+                        await loadAvailablePositions();
+                    } else {
+                        document.getElementById('promotionEligibility').innerHTML = `
+                            <div class="alert alert-warning">
+                                <h6><i class="fas fa-clock me-2"></i>暫未符合升遷條件</h6>
+                                <p class="mb-2"><strong>原因:</strong> ${result.data.reason}</p>
+                                <ul class="list-unstyled mb-2">
+                                    <li><i class="fas fa-user me-2"></i><strong>目前職位:</strong> ${result.data.currentPosition || '未知'}</li>
+                                    <li><i class="fas fa-calendar me-2"></i><strong>任職天數:</strong> ${result.data.daysSinceStart || 0}天</li>
+                                </ul>
+                                <small class="text-muted">請繼續努力，達到條件後即可發起升遷投票！</small>
+                            </div>
+                        `;
+                        
+                        // 隱藏發起投票區塊
+                        document.getElementById('startPromotionContainer').style.display = 'none';
+                    }
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                document.getElementById('promotionEligibility').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>檢查升遷資格失敗: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // 載入可升遷的職位
+        async function loadAvailablePositions() {
+            try {
+                const response = await fetch('/api/promotion/available-positions', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    const select = document.getElementById('targetPosition');
+                    select.innerHTML = '<option value="">請選擇目標職位</option>';
+                    
+                    result.data.forEach(position => {
+                        select.innerHTML += `
+                            <option value="${position.level}">
+                                ${position.name} (薪資: $${position.salary.toLocaleString()}, 
+                                需要天數: ${position.required_days}天)
+                            </option>
+                        `;
+                    });
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                showAlert('載入可升遷職位失敗: ' + error.message, 'danger');
+            }
+        }
+
+        // 載入進行中的投票
+        async function loadActivePromotions() {
+            try {
+                const response = await fetch('/api/promotion/active', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    const promotions = result.data;
+                    
+                    if (promotions.length === 0) {
+                        document.getElementById('activePromotions').innerHTML = `
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>目前沒有進行中的升遷投票
+                            </div>
+                        `;
+                    } else {
+                        let html = '';
+                        promotions.forEach(promotion => {
+                            const endDate = new Date(promotion.vote_end_date);
+                            const now = new Date();
+                            const daysLeft = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
                             
                             html += `
                                 <div class="card mb-3">
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between align-items-start">
-                                            <div class="flex-grow-1">
-                                                <h6 class="card-title">營收記錄 - ${record.revenue_date}</h6>
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <p class="card-text text-muted mb-2">
-                                                            <strong>狀態:</strong> <span class="badge bg-${statusClass}">${status}</span><br>
-                                                            <strong>總收入:</strong> $${totalRevenue.toLocaleString()}<br>
+                                            <div>
+                                                <h6 class="card-title">${promotion.candidate_name}</h6>
+                                                <p class="text-muted mb-2">
+                                                    <i class="fas fa-arrow-up me-1"></i>
+                                                    ${promotion.current_position} → ${promotion.target_position}
+                                                </p>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    剩餘 ${daysLeft} 天 | 
+                                                    <i class="fas fa-users me-1"></i>
+                                                    ${promotion.votes_for}/${promotion.total_voters} 同意
+                                                </small>
+                                            </div>
+                                            <div class="text-end">
+                                                ${promotion.user_vote === null ? `
+                                                    <div class="btn-group-vertical">
+                                                        <button class="btn btn-sm btn-success" onclick="vote(${promotion.id}, true)">
+                                                            <i class="fas fa-thumbs-up me-1"></i>同意
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger" onclick="vote(${promotion.id}, false)">
+                                                            <i class="fas fa-thumbs-down me-1"></i>反對
+                                                        </button>
+                                                    </div>
+                                                ` : `
+                                                    <div class="alert alert-sm alert-${promotion.user_vote ? 'success' : 'danger'} mb-0">
+                                                        <i class="fas fa-${promotion.user_vote ? 'thumbs-up' : 'thumbs-down'} me-1"></i>
+                                                        已投票：${promotion.user_vote ? '同意' : '反對'}
+                                                        <br>
+                                                        <button class="btn btn-link btn-sm p-0" onclick="changeVote(${promotion.id})">
+                                                            修改投票
+                                                        </button>
+                                                    </div>
+                                                `}
+                                            </div>
+                                        </div>
+                                        
+                                        ${promotion.reason ? `
+                                            <div class="mt-2">
+                                                <small class="text-muted">申請理由：</small>
+                                                <p class="small mb-0">${promotion.reason}</p>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        
+                        document.getElementById('activePromotions').innerHTML = html;
+                    }
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                document.getElementById('activePromotions').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>載入投票資訊失敗: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // 載入職位階級說明
+        async function loadPositionLevels() {
+            try {
+                const response = await fetch('/api/promotion/position-levels', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    const levels = result.data;
+                    let html = '<div class="table-responsive"><table class="table table-sm">';
+                    html += `
+                        <thead>
+                            <tr>
+                                <th>階級</th>
+                                <th>薪資</th>
+                                <th>獎金比例</th>
+                                <th>任職天數</th>
+                                <th>名額</th>
+                                <th>同意比例</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                    `;
+                    
+                    levels.forEach(level => {
+                        html += `
+                            <tr>
+                                <td><strong>${level.name}</strong></td>
+                                <td>$${level.salary.toLocaleString()}</td>
+                                <td>${(level.bonus_rate * 100).toFixed(1)}%</td>
+                                <td>${level.required_days}天</td>
+                                <td>${level.quota}人</td>
+                                <td>${(level.approval_rate * 100).toFixed(0)}%</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    html += '</tbody></table></div>';
+                    document.getElementById('positionLevels').innerHTML = html;
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                document.getElementById('positionLevels').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>載入職位資訊失敗: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // 設置表單事件
+        function setupPromotionFormEvents() {
+            const form = document.getElementById('promotionStartForm');
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await startPromotion();
+                });
+            }
+        }
+
+        // 發起升遷投票
+        async function startPromotion() {
+            const targetPosition = document.getElementById('targetPosition').value;
+            const reason = document.getElementById('promotionReason').value;
+            
+            if (!targetPosition || !reason) {
+                showAlert('請填寫所有必填欄位', 'warning');
+                return;
+            }
+            
+            if (!confirm('確定要發起升遷投票嗎？一旦發起將無法取消。')) {
+                return;
+            }
+            
+            try {
+                const submitBtn = document.querySelector('#promotionStartForm button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>發起中...';
+                
+                const response = await fetch('/api/promotion/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    },
+                    body: JSON.stringify({
+                        target_position: targetPosition,
+                        reason
+                    })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    showAlert('升遷投票發起成功！投票期間為5天', 'success');
+                    
+                    // 清空表單
+                    document.getElementById('promotionStartForm').reset();
+                    
+                    // 重新載入頁面
+                    await loadPromotionData();
+                } else {
+                    showAlert('發起升遷投票失敗: ' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('發起升遷投票失敗: ' + error.message, 'danger');
+            } finally {
+                const submitBtn = document.querySelector('#promotionStartForm button[type="submit"]');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-play me-2"></i>發起升遷投票';
+            }
+        }
+
+        // 投票
+        async function vote(promotionId, support) {
+            try {
+                const response = await fetch(`/api/promotion/${promotionId}/vote`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    },
+                    body: JSON.stringify({ support })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    showAlert('投票成功！', 'success');
+                    await loadActivePromotions(); // 重新載入投票狀態
+                } else {
+                    showAlert('投票失敗: ' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('投票失敗: ' + error.message, 'danger');
+            }
+        }
+
+        // 修改投票
+        async function changeVote(promotionId) {
+            const newVote = confirm('您之前已經投票，要修改為相反的選擇嗎？\n點擊確定=修改，點擊取消=保持原投票');
+            if (newVote !== null) {
+                // 獲取當前投票狀態並反轉
+                const currentVoteElement = document.querySelector(`button[onclick="changeVote(${promotionId})"]`).closest('.alert');
+                const isCurrentlySupport = currentVoteElement.classList.contains('alert-success');
+                await vote(promotionId, !isCurrentlySupport);
+            }
+        }
+    </script>
+</body>
+</html> + totalRevenue.toLocaleString()}<br>
                                                             <strong>總支出:</strong> $${totalExpense.toLocaleString()}<br>
                                                             <strong>淨利:</strong> $${(totalRevenue - totalExpense).toLocaleString()}
                                                         </p>
