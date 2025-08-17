@@ -1160,7 +1160,9 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 載入用戶資訊
         async function loadUserInfo() {
             try {
                 const token = localStorage.getItem('token');
@@ -1385,7 +1387,7 @@
 
         // 檢查認證狀態
         async function checkAuthStatus() {
-            const token = localStorage.getItem('jwt_token');
+            const token = localStorage.getItem('token');
             if (!token) {
                 throw new Error('未找到認證token');
             }
@@ -1412,7 +1414,7 @@
                 }
             } catch (error) {
                 console.error('認證檢查失敗:', error);
-                localStorage.removeItem('jwt_token');
+                localStorage.removeItem('token');
                 localStorage.removeItem('user_data');
                 throw error;
             }
@@ -1549,7 +1551,7 @@
             try {
                 const response = await fetch('/api/attendance/today', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -1638,7 +1640,7 @@
                 const response = await fetch(`/api/revenue/${recordId}/void`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`,
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ reason: reason.trim() })
@@ -1796,7 +1798,7 @@
 
         // 登出功能
         function logout() {
-            localStorage.removeItem('jwt_token');
+            localStorage.removeItem('token');
             localStorage.removeItem('user_data');
             window.location.href = '/login.html';
         }
@@ -1829,7 +1831,7 @@
             try {
                 const response = await fetch('/api/schedule/settings', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -1874,7 +1876,7 @@
             try {
                 const response = await fetch('/api/schedule/status', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -1946,7 +1948,7 @@
             try {
                 const response = await fetch('/api/schedule/my-schedule', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -2001,7 +2003,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -2038,7 +2040,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -2190,7 +2192,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     },
                     body: JSON.stringify({
                         leave_dates: selectedDates,
@@ -2233,7 +2235,7 @@
                 const response = await fetch('/api/schedule/my-schedule', {
                     method: 'DELETE',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -2251,7 +2253,7 @@
 
         // 獲取當前用戶ID (假設從JWT token中獲取)
         function getCurrentUserId() {
-            const token = localStorage.getItem('jwt_token');
+            const token = localStorage.getItem('token');
             if (token) {
                 try {
                     const payload = JSON.parse(atob(token.split('.')[1]));
@@ -2290,7 +2292,7 @@
             try {
                 const response = await fetch('/api/promotion/check-eligibility', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -2347,7 +2349,7 @@
             try {
                 const response = await fetch('/api/promotion/available-positions', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -2377,7 +2379,7 @@
             try {
                 const response = await fetch('/api/promotion/active', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -2468,7 +2470,7 @@
             try {
                 const response = await fetch('/api/promotion/position-levels', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -2551,7 +2553,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     },
                     body: JSON.stringify({
                         target_position: targetPosition,
@@ -2587,7 +2589,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     },
                     body: JSON.stringify({ support })
                 });
@@ -2680,7 +2682,7 @@
                 const response = await fetch(`/api/revenue/${recordId}/void`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`,
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ reason: reason.trim() })
@@ -2838,7 +2840,7 @@
 
         // 登出功能
         function logout() {
-            localStorage.removeItem('jwt_token');
+            localStorage.removeItem('token');
             localStorage.removeItem('user_data');
             window.location.href = '/login.html';
         }
@@ -2871,7 +2873,7 @@
             try {
                 const response = await fetch('/api/schedule/settings', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -2916,7 +2918,7 @@
             try {
                 const response = await fetch('/api/schedule/status', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -2988,7 +2990,7 @@
             try {
                 const response = await fetch('/api/schedule/my-schedule', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -3043,7 +3045,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -3080,7 +3082,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -3232,7 +3234,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     },
                     body: JSON.stringify({
                         leave_dates: selectedDates,
@@ -3275,7 +3277,7 @@
                 const response = await fetch('/api/schedule/my-schedule', {
                     method: 'DELETE',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -3293,7 +3295,7 @@
 
         // 獲取當前用戶ID (假設從JWT token中獲取)
         function getCurrentUserId() {
-            const token = localStorage.getItem('jwt_token');
+            const token = localStorage.getItem('token');
             if (token) {
                 try {
                     const payload = JSON.parse(atob(token.split('.')[1]));
@@ -3332,7 +3334,7 @@
             try {
                 const response = await fetch('/api/promotion/check-eligibility', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -3389,7 +3391,7 @@
             try {
                 const response = await fetch('/api/promotion/available-positions', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -3419,7 +3421,7 @@
             try {
                 const response = await fetch('/api/promotion/active', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -3510,7 +3512,7 @@
             try {
                 const response = await fetch('/api/promotion/position-levels', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -3593,7 +3595,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     },
                     body: JSON.stringify({
                         target_position: targetPosition,
@@ -3629,7 +3631,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     },
                     body: JSON.stringify({ support })
                 });

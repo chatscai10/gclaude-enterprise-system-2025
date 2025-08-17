@@ -21,7 +21,7 @@ const DatabaseOperations = require('./database/json-database');
 const TelegramNotifier = require('./modules/telegram-notifier');
 
 const app = express();
-const PORT = process.env.PORT || 4005;
+const PORT = process.env.PORT || 4006;
 const JWT_SECRET = process.env.JWT_SECRET || 'gclaude-enterprise-secret-key';
 
 // 初始化資料庫和通知系統
