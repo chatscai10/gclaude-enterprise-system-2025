@@ -2531,5 +2531,45 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // 載入用戶資訊 - 管理員Dashboard專用
+        async function loadUserInfo() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    throw new Error('未找到登入令牌');
+                }
+                
+                const response = await fetch('/api/auth/verify', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+                
+                if (response.ok) {
+                    const userData = await response.json();
+                    currentUser = userData.user;
+                    
+                    // 更新頁面上的用戶名顯示
+                    const adminNameEl = document.getElementById('adminName');
+                    if (adminNameEl && currentUser) {
+                        adminNameEl.textContent = currentUser.name || currentUser.username || '管理員';
+                    }
+                    
+                    return currentUser;
+                } else {
+                    throw new Error('用戶驗證失敗');
+                }
+            } catch (error) {
+                console.error('載入用戶資訊失敗:', error);
+                const adminNameEl = document.getElementById('adminName');
+                if (adminNameEl) {
+                    adminNameEl.textContent = '管理員';
+                }
+                return null;
+            }
+        }
+    </script>
 </body>
 </html>
