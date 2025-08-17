@@ -269,7 +269,9 @@ app.post('/api/auth/login', async (req, res) => {
                 username: user.username,
                 role: user.role,
                 employee_id: user.employee_id,
-                store_id: user.store_id
+                store_id: user.store_id,
+                name: user.employee_name,
+                store_name: user.store_name
             },
             JWT_SECRET,
             { expiresIn: '24h' }
@@ -338,7 +340,9 @@ app.post('/api/employee/login', async (req, res) => {
                 username: user.username,
                 role: user.role,
                 employee_id: user.employee_id,
-                store_id: user.store_id
+                store_id: user.store_id,
+                name: user.employee_name,
+                store_name: user.store_name
             },
             JWT_SECRET,
             { expiresIn: '24h' }
@@ -408,7 +412,9 @@ app.post('/api/admin/login', async (req, res) => {
                 username: user.username,
                 role: user.role,
                 employee_id: user.employee_id,
-                store_id: user.store_id
+                store_id: user.store_id,
+                name: user.employee_name,
+                store_name: user.store_name
             },
             JWT_SECRET,
             { expiresIn: '24h' }
@@ -1669,34 +1675,7 @@ app.post('/api/schedule/submit', authenticateToken, async (req, res) => {
     }
 });
 
-// 添加營收提交API別名，兼容前端調用
-app.post('/api/revenue/submit', authenticateToken, async (req, res) => {
-    try {
-        const revenueData = {
-            employee_id: req.user.employee_id,
-            amount: req.body.amount,
-            description: req.body.description || req.body.note,
-            date: req.body.date || new Date().toISOString().split('T')[0],
-            time: req.body.time || new Date().toTimeString().slice(0, 8),
-            category: req.body.category || 'general',
-            payment_method: req.body.payment_method || 'cash',
-            store_id: req.user.store_id || 1
-        };
-        
-        const result = await db.addRevenue(revenueData);
-        res.json({
-            success: true,
-            data: result,
-            message: '營收記錄提交成功'
-        });
-    } catch (error) {
-        console.error('營收提交錯誤:', error);
-        res.status(500).json({
-            success: false,
-            message: '營收提交失敗'
-        });
-    }
-});
+// 舊的營收提交API已移除，使用新的 ==================== 營業額管理API ====================
 
 // 獲取排班設定和狀態
 app.get('/api/schedule/settings', authenticateToken, async (req, res) => {
