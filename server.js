@@ -3286,7 +3286,9 @@ app.post('/api/revenue/submit', authenticateToken, async (req, res) => {
         };
 
         // 保存到資料庫
-        await db.writeToTable('revenue', revenueData);
+        const existingRevenue = await db.readTable('revenue');
+        existingRevenue.push(revenueData);
+        await db.writeTable('revenue', existingRevenue);
 
         // 發送Telegram通知
         if (telegramNotifier) {
@@ -3408,7 +3410,9 @@ app.post('/api/orders/submit', authenticateToken, async (req, res) => {
         };
 
         // 保存到資料庫
-        await db.writeToTable('orders', orderData);
+        const existingOrders = await db.readTable('orders');
+        existingOrders.push(orderData);
+        await db.writeTable('orders', existingOrders);
 
         // 分析叫貨異常
         const anomalies = await analyzeOrderingAnomalies(orderData, req.user.store_id);
