@@ -199,10 +199,10 @@ ${data.action === 'approve' ?
                 const unit = this.safeGet(anomaly, 'unit', '個');
                 
                 if (daysSince >= 3) {
-                    bossMessage += `\n品項 ${productName} 已經${daysSince}天沒有叫貨`;
+                    bossMessage += `\n⚠️ 品項 ${productName} 已經${daysSince}天沒有叫貨`;
                     bossMessage += `\n上次叫貨${lastOrderDate}-${productName}${lastQuantity}${unit}\n`;
-                } else if (daysSince <= 2) {
-                    bossMessage += `\n品項 ${productName} 已經${daysSince}天內頻繁叫貨`;
+                } else if (daysSince <= 1) {
+                    bossMessage += `\n🔄 品項 ${productName} 已經${daysSince}天內頻繁叫貨`;
                     bossMessage += `\n上次叫貨${lastOrderDate}-${productName}${lastQuantity}${unit}\n`;
                 }
             });
