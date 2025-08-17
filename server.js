@@ -3250,6 +3250,285 @@ app.get('/api/learning/progress', authenticateToken, async (req, res) => {
     }
 });
 
+// ==================== 營業額管理API ====================
+
+// 提交營業額記錄
+app.post('/api/revenue/submit', authenticateToken, async (req, res) => {
+    try {
+        const {
+            store_id,
+            date,
+            order_count,
+            total_revenue,
+            total_expense,
+            bonus_amount,
+            day_type,
+            notes
+        } = req.body;
+
+        // 創建營業額記錄
+        const revenueData = {
+            id: Date.now(),
+            employee_id: req.user.employee_id,
+            employee_name: req.user.name,
+            store_id: store_id || req.user.store_id,
+            store_name: req.user.store_name,
+            date,
+            order_count: order_count || 0,
+            total_revenue: total_revenue || 0,
+            total_expense: total_expense || 0,
+            bonus_amount: bonus_amount || 0,
+            day_type: day_type || 'weekday',
+            notes: notes || '',
+            status: 'pending',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+
+        // 保存到資料庫
+        await db.writeToTable('revenue', revenueData);
+
+        // 發送Telegram通知
+        if (telegramNotifier) {
+            try {
+                await telegramNotifier.notifyRevenue(revenueData);
+            } catch (telegramError) {
+                console.error('Telegram通知失敗:', telegramError);
+            }
+        }
+
+        res.json({
+            success: true,
+            data: revenueData,
+            message: '營業額提交成功'
+        });
+    } catch (error) {
+        console.error('營業額提交失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '營業額提交失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取營業額記錄
+app.get('/api/revenue/records', authenticateToken, async (req, res) => {
+    try {
+        const records = await db.readTable('revenue');
+        const userRecords = records.filter(r => r.employee_id === req.user.employee_id);
+        
+        res.json({
+            success: true,
+            data: userRecords.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)),
+            message: '營業額記錄獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取營業額記錄失敗'
+        });
+    }
+});
+
+// 營業額審核 (管理員)
+app.post('/api/admin/revenue/:id/review', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { action, reason } = req.body;
+        
+        const records = await db.readTable('revenue');
+        const recordIndex = records.findIndex(r => r.id == id);
+        
+        if (recordIndex === -1) {
+            return res.status(404).json({
+                success: false,
+                message: '營業額記錄不存在'
+            });
+        }
+        
+        records[recordIndex].status = action === 'approve' ? 'approved' : 'rejected';
+        records[recordIndex].review_reason = reason || '';
+        records[recordIndex].reviewed_by = req.user.id;
+        records[recordIndex].reviewed_at = new Date().toISOString();
+        
+        await db.writeTable('revenue', records);
+        
+        // 發送審核通知
+        if (telegramNotifier) {
+            try {
+                await telegramNotifier.notifyRevenueApproval({
+                    revenue_id: id,
+                    employee_name: records[recordIndex].employee_name,
+                    action,
+                    reason,
+                    reviewer: req.user.name
+                });
+            } catch (telegramError) {
+                console.error('Telegram審核通知失敗:', telegramError);
+            }
+        }
+        
+        res.json({
+            success: true,
+            message: `營業額記錄已${action === 'approve' ? '核准' : '拒絕'}`
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '營業額審核失敗'
+        });
+    }
+});
+
+// ==================== 叫貨管理API ====================
+
+// 提交叫貨記錄
+app.post('/api/orders/submit', authenticateToken, async (req, res) => {
+    try {
+        const {
+            store_id,
+            delivery_date,
+            items,
+            notes
+        } = req.body;
+
+        // 創建叫貨記錄
+        const orderData = {
+            id: Date.now(),
+            employee_id: req.user.employee_id,
+            employee_name: req.user.name,
+            store_id: store_id || req.user.store_id,
+            store_name: req.user.store_name,
+            delivery_date,
+            items: items || [],
+            notes: notes || '',
+            status: 'pending',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+
+        // 保存到資料庫
+        await db.writeToTable('orders', orderData);
+
+        // 分析叫貨異常
+        const anomalies = await analyzeOrderingAnomalies(orderData, req.user.store_id);
+
+        // 發送Telegram通知
+        if (telegramNotifier) {
+            try {
+                await telegramNotifier.notifyOrdering(orderData, anomalies);
+            } catch (telegramError) {
+                console.error('Telegram通知失敗:', telegramError);
+            }
+        }
+
+        res.json({
+            success: true,
+            data: orderData,
+            message: '叫貨記錄提交成功'
+        });
+    } catch (error) {
+        console.error('叫貨提交失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '叫貨提交失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取叫貨記錄
+app.get('/api/orders/records', authenticateToken, async (req, res) => {
+    try {
+        const records = await db.readTable('orders');
+        const userRecords = records.filter(r => r.employee_id === req.user.employee_id);
+        
+        res.json({
+            success: true,
+            data: userRecords.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)),
+            message: '叫貨記錄獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取叫貨記錄失敗'
+        });
+    }
+});
+
+// 叫貨審核 (管理員)
+app.post('/api/admin/orders/:id/review', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { action, reason } = req.body;
+        
+        const records = await db.readTable('orders');
+        const recordIndex = records.findIndex(r => r.id == id);
+        
+        if (recordIndex === -1) {
+            return res.status(404).json({
+                success: false,
+                message: '叫貨記錄不存在'
+            });
+        }
+        
+        records[recordIndex].status = action === 'approve' ? 'approved' : 'rejected';
+        records[recordIndex].review_reason = reason || '';
+        records[recordIndex].reviewed_by = req.user.id;
+        records[recordIndex].reviewed_at = new Date().toISOString();
+        
+        await db.writeTable('orders', records);
+        
+        res.json({
+            success: true,
+            message: `叫貨記錄已${action === 'approve' ? '核准' : '拒絕'}`
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '叫貨審核失敗'
+        });
+    }
+});
+
+// 叫貨異常分析函數
+async function analyzeOrderingAnomalies(currentOrder, storeId) {
+    try {
+        const allOrders = await db.readTable('orders');
+        const storeOrders = allOrders.filter(o => o.store_id === storeId);
+        const anomalies = [];
+        
+        // 檢查每個商品的叫貨頻率
+        for (const item of currentOrder.items) {
+            const productName = item.product_name;
+            const productOrders = storeOrders.filter(order => 
+                order.items && order.items.some(i => i.product_name === productName)
+            ).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            
+            if (productOrders.length > 1) {
+                const lastOrder = productOrders[1]; // 上一次叫貨記錄
+                const daysSince = Math.floor((new Date(currentOrder.created_at) - new Date(lastOrder.created_at)) / (1000 * 60 * 60 * 24));
+                
+                const lastItem = lastOrder.items.find(i => i.product_name === productName);
+                
+                if (daysSince >= 3 || daysSince <= 1) {
+                    anomalies.push({
+                        product_name: productName,
+                        days_since_last_order: daysSince,
+                        last_order_date: lastOrder.created_at,
+                        last_quantity: lastItem ? lastItem.quantity : 0,
+                        unit: item.unit || '個'
+                    });
+                }
+            }
+        }
+        
+        return anomalies;
+    } catch (error) {
+        console.error('叫貨異常分析失敗:', error);
+        return [];
+    }
+}
+
 // ==================== 測試用API ====================
 
 // 測試端點 - 重新初始化資料庫
@@ -3307,4 +3586,4 @@ process.on('SIGINT', () => {
 });
 
 module.exports = app;
-// 觸發Render.com重新部署 西元2025年08月17日 (星期日) 04時59分16秒    
+// 觸發Render.com重新部署 - 緊急修復營業額和叫貨API - 西元2025年08月17日 (星期日) 14時06分00秒    
