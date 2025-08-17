@@ -64,7 +64,19 @@ app.use(helmet({
     }
 }));
 
-app.use(compression());
+// 修復：正確配置compression中間件
+app.use(compression({
+    filter: (req, res) => {
+        // 不壓縮已經壓縮的內容
+        if (req.headers['x-no-compression']) {
+            return false;
+        }
+        // 使用compression的預設過濾器
+        return compression.filter(req, res);
+    },
+    threshold: 1024, // 只壓縮大於1KB的回應
+    level: 6 // 壓縮等級 (1-9, 6是平衡點)
+}));
 
 // API 速率限制
 const limiter = rateLimit({
