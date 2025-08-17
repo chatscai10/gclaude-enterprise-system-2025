@@ -439,8 +439,8 @@ app.post('/api/admin/login', async (req, res) => {
     }
 });
 
-// Token驗證
-app.post('/api/auth/verify', authenticateToken, async (req, res) => {
+// Token驗證 - 支援GET請求
+app.get('/api/auth/verify', authenticateToken, async (req, res) => {
     try {
         const user = await db.getUserByUsername(req.user.username);
         
@@ -2960,6 +2960,310 @@ app.get('/admin-settings', (req, res) => {
         res.status(404).json({
             success: false,
             message: '管理員設定頁面不存在'
+        });
+    }
+});
+
+// ==================== 缺失的API端點 ====================
+
+// 出勤記錄API (模擬實現)
+app.get('/api/attendance/records', authenticateToken, async (req, res) => {
+    try {
+        const records = await db.readTable('attendance') || [];
+        
+        const userRecords = records
+            .filter(record => record.employee_id === req.user.employee_id)
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+            .slice(0, 50);
+            
+        res.json({
+            success: true,
+            data: userRecords,
+            message: '出勤記錄獲取成功'
+        });
+    } catch (error) {
+        console.error('出勤記錄錯誤:', error);
+        res.status(500).json({
+            success: false,
+            message: '獲取出勤記錄失敗'
+        });
+    }
+});
+
+// 排班資料API (模擬實現)
+app.get('/api/schedule/current', authenticateToken, async (req, res) => {
+    try {
+        const schedules = await db.readTable('schedules') || [];
+        
+        const userSchedule = schedules.find(schedule => 
+            schedule.employee_id === req.user.employee_id &&
+            new Date(schedule.date) >= new Date().setHours(0,0,0,0)
+        );
+        
+        res.json({
+            success: true,
+            data: userSchedule || null,
+            message: '排班資料獲取成功'
+        });
+    } catch (error) {
+        console.error('排班資料錯誤:', error);
+        res.status(500).json({
+            success: false,
+            message: '獲取排班資料失敗'
+        });
+    }
+});
+
+// 系統設定API (管理員專用)
+app.get('/api/settings', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        res.json({
+            success: true,
+            data: {
+                companyName: 'GClaude 企業管理系統',
+                version: '2.0.0',
+                timezone: 'Asia/Taipei',
+                features: {
+                    attendance: true,
+                    revenue: true,
+                    schedule: true,
+                    promotion: true
+                }
+            },
+            message: '系統設定獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取系統設定失敗'
+        });
+    }
+});
+
+// 報告匯出API (管理員專用)
+app.get('/api/reports/export', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { type, format } = req.query;
+        
+        // 模擬報告產生
+        const reportData = {
+            type: type || 'monthly',
+            format: format || 'json',
+            generated_at: new Date().toISOString(),
+            data: {
+                employees: await db.readTable('employees') || [],
+                attendance: await db.readTable('attendance') || [],
+                revenue: await db.readTable('revenue') || []
+            }
+        };
+        
+        res.json({
+            success: true,
+            data: reportData,
+            message: '報告匯出成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '報告匯出失敗'
+        });
+    }
+});
+
+// 員工排班管理API (店長專用)
+app.get('/api/schedule/manage', authenticateToken, async (req, res) => {
+    try {
+        if (req.user.role !== 'manager' && req.user.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: '權限不足，需要店長或管理員權限'
+            });
+        }
+        
+        const schedules = await db.readTable('schedules') || [];
+        const teamSchedules = schedules.filter(schedule => 
+            schedule.store_id === req.user.store_id
+        );
+        
+        res.json({
+            success: true,
+            data: teamSchedules,
+            message: '排班管理資料獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取排班管理資料失敗'
+        });
+    }
+});
+
+// 團隊出勤查看API (店長專用)
+app.get('/api/attendance/team', authenticateToken, async (req, res) => {
+    try {
+        if (req.user.role !== 'manager' && req.user.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: '權限不足，需要店長或管理員權限'
+            });
+        }
+        
+        const attendance = await db.readTable('attendance') || [];
+        const teamAttendance = attendance.filter(record => 
+            record.store_id === req.user.store_id
+        );
+        
+        res.json({
+            success: true,
+            data: teamAttendance,
+            message: '團隊出勤資料獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取團隊出勤資料失敗'
+        });
+    }
+});
+
+// 團隊業績統計API (店長專用)
+app.get('/api/revenue/team', authenticateToken, async (req, res) => {
+    try {
+        if (req.user.role !== 'manager' && req.user.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: '權限不足，需要店長或管理員權限'
+            });
+        }
+        
+        const revenue = await db.readTable('revenue') || [];
+        const teamRevenue = revenue.filter(record => 
+            record.store_id === req.user.store_id
+        );
+        
+        const totalRevenue = teamRevenue.reduce((sum, record) => sum + (record.amount || 0), 0);
+        
+        res.json({
+            success: true,
+            data: {
+                total: totalRevenue,
+                records: teamRevenue,
+                count: teamRevenue.length
+            },
+            message: '團隊業績統計獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取團隊業績統計失敗'
+        });
+    }
+});
+
+// 個人排班查看API
+app.get('/api/schedule/my', authenticateToken, async (req, res) => {
+    try {
+        const schedules = await db.readTable('schedules') || [];
+        const mySchedules = schedules.filter(schedule => 
+            schedule.employee_id === req.user.employee_id
+        );
+        
+        res.json({
+            success: true,
+            data: mySchedules,
+            message: '個人排班查看成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取個人排班失敗'
+        });
+    }
+});
+
+// 升遷投票API
+app.post('/api/promotion/vote', authenticateToken, async (req, res) => {
+    try {
+        const { promotion_id, vote_decision, comment } = req.body;
+        
+        const votes = await db.readTable('promotion_votes') || [];
+        const newVote = {
+            id: votes.length + 1,
+            promotion_id,
+            voter_id: req.user.employee_id,
+            voter_name: req.user.employee_name,
+            vote_decision,
+            comment: comment || '',
+            created_at: new Date().toISOString()
+        };
+        
+        votes.push(newVote);
+        await db.writeTable('promotion_votes', votes);
+        
+        res.json({
+            success: true,
+            data: newVote,
+            message: '升遷投票成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '升遷投票失敗'
+        });
+    }
+});
+
+// 學習進度API (實習生專用)
+app.get('/api/learning/progress', authenticateToken, async (req, res) => {
+    try {
+        if (req.user.role !== 'intern') {
+            return res.status(403).json({
+                success: false,
+                message: '權限不足，需要實習生權限'
+            });
+        }
+        
+        // 模擬學習進度資料
+        const progress = {
+            total_hours: 160,
+            completed_hours: 85,
+            completion_rate: 53.1,
+            courses: [
+                { name: '系統介紹', completed: true, hours: 8 },
+                { name: '出勤管理', completed: true, hours: 16 },
+                { name: '客戶服務', completed: true, hours: 24 },
+                { name: '業績管理', completed: false, hours: 32 },
+                { name: '團隊協作', completed: false, hours: 40 }
+            ]
+        };
+        
+        res.json({
+            success: true,
+            data: progress,
+            message: '學習進度獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取學習進度失敗'
+        });
+    }
+});
+
+// ==================== 測試用API ====================
+
+// 測試端點 - 重新初始化資料庫
+app.post('/api/test/reset-database', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        await db.initializeData();
+        res.json({
+            success: true,
+            message: '資料庫重新初始化成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '資料庫重新初始化失敗'
         });
     }
 });

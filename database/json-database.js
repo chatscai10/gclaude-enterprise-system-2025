@@ -51,8 +51,9 @@ class JsonDatabase {
         try {
             await this.ensureDataDir();
             
-            // 初始化用戶資料
+            // 初始化用戶資料 - 添加所有測試用戶
             await this.initializeTable('users', [
+                // 管理員用戶
                 {
                     id: 1,
                     username: 'admin',
@@ -60,18 +61,131 @@ class JsonDatabase {
                     role: 'admin',
                     employee_id: 1,
                     store_id: 1,
-                    employee_name: '系統管理員',
+                    employee_name: '系統管理員A',
                     store_name: '總公司',
                     created_at: new Date().toISOString()
                 },
                 {
                     id: 2,
-                    username: 'employee',
-                    password: 'emp123',
-                    role: 'employee',
+                    username: 'admin2',
+                    password: 'admin123',
+                    role: 'admin',
                     employee_id: 2,
                     store_id: 1,
-                    employee_name: '示範員工',
+                    employee_name: '系統管理員B',
+                    store_name: '總公司',
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 3,
+                    username: 'admin3',
+                    password: 'admin123',
+                    role: 'admin',
+                    employee_id: 3,
+                    store_id: 1,
+                    employee_name: '系統管理員C',
+                    store_name: '總公司',
+                    created_at: new Date().toISOString()
+                },
+                // 店長用戶
+                {
+                    id: 4,
+                    username: 'manager',
+                    password: 'manager123',
+                    role: 'manager',
+                    employee_id: 4,
+                    store_id: 1,
+                    employee_name: '店長A',
+                    store_name: '總公司',
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 5,
+                    username: 'manager2',
+                    password: 'manager123',
+                    role: 'manager',
+                    employee_id: 5,
+                    store_id: 1,
+                    employee_name: '店長B',
+                    store_name: '總公司',
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 6,
+                    username: 'manager3',
+                    password: 'manager123',
+                    role: 'manager',
+                    employee_id: 6,
+                    store_id: 1,
+                    employee_name: '店長C',
+                    store_name: '總公司',
+                    created_at: new Date().toISOString()
+                },
+                // 員工用戶
+                {
+                    id: 7,
+                    username: 'employee',
+                    password: 'employee123',
+                    role: 'employee',
+                    employee_id: 7,
+                    store_id: 1,
+                    employee_name: '員工A',
+                    store_name: '總公司',
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 8,
+                    username: 'employee2',
+                    password: 'employee123',
+                    role: 'employee',
+                    employee_id: 8,
+                    store_id: 1,
+                    employee_name: '員工B',
+                    store_name: '總公司',
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 9,
+                    username: 'employee3',
+                    password: 'employee123',
+                    role: 'employee',
+                    employee_id: 9,
+                    store_id: 1,
+                    employee_name: '員工C',
+                    store_name: '總公司',
+                    created_at: new Date().toISOString()
+                },
+                // 實習生用戶
+                {
+                    id: 10,
+                    username: 'intern',
+                    password: 'intern123',
+                    role: 'intern',
+                    employee_id: 10,
+                    store_id: 1,
+                    employee_name: '實習生A',
+                    store_name: '總公司',
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 11,
+                    username: 'intern2',
+                    password: 'intern123',
+                    role: 'intern',
+                    employee_id: 11,
+                    store_id: 1,
+                    employee_name: '實習生B',
+                    store_name: '總公司',
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 12,
+                    username: 'intern3',
+                    password: 'intern123',
+                    role: 'intern',
+                    employee_id: 12,
+                    store_id: 1,
+                    employee_name: '實習生C',
                     store_name: '總公司',
                     created_at: new Date().toISOString()
                 }
