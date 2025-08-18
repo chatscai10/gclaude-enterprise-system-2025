@@ -4246,9 +4246,9 @@ app.post('/api/admin/schedule/force-open', authenticateToken, requireAdmin, asyn
 app.use('*', (req, res) => {
     res.status(404).json({
         success: false,
-        error: "Route not found",
+        error: 'Route not found',
         path: req.originalUrl,
-        message: "請求的資源不存在"
+        message: '請求的資源不存在'
     });
 });
 
@@ -4259,6 +4259,192 @@ app.use((error, req, res, next) => {
         message: error.message || 'Internal server error',
         timestamp: new Date().toISOString()
     });
+});
+
+// ==================== 伺服器啟動 ====================
+
+app.listen(PORT, '0.0.0.0', () => {
+app.get('/api/schedule/status', authenticateToken, async (req, res) => {
+    try {
+        const status = await scheduleSystem.getSystemStatus();
+        
+        res.json({
+            success: true,
+            data: status,
+            message: '排班系統狀態獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取排班系統狀態失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取排班規則
+app.get('/api/schedule/rules', authenticateToken, async (req, res) => {
+    try {
+        const rules = await scheduleSystem.getScheduleRules();
+        
+        res.json({
+            success: true,
+            data: rules,
+            message: '排班規則獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取排班規則失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取下個月日曆
+app.get('/api/schedule/calendar', authenticateToken, async (req, res) => {
+    try {
+        const calendar = scheduleSystem.getNextMonthCalendar();
+        
+        res.json({
+            success: true,
+            data: {
+                calendar: calendar,
+                month: scheduleSystem.getNextMonthString()
+            },
+            message: '日曆資料獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取日曆資料失敗: ' + error.message
+        });
+    }
+});
+
+// 進入排班系統（開始會話）
+app.post('/api/schedule/enter', authenticateToken, async (req, res) => {
+    try {
+        const sessionInfo = await scheduleSystem.startScheduleSession(req.user);
+        
+        res.json({
+            success: true,
+            data: sessionInfo,
+            message: '成功進入排班系統'
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+// 提交排班申請
+app.post('/api/schedule/submit', authenticateToken, async (req, res) => {
+    try {
+        const { vacation_dates } = req.body;
+        
+        if (!vacation_dates || !Array.isArray(vacation_dates)) {
+            return res.status(400).json({
+                success: false,
+                message: '請提供有效的休假日期'
+            });
+        }
+        
+        const scheduleRecord = await scheduleSystem.submitSchedule(
+            req.user.employee_id,
+            vacation_dates,
+            req.user.store_id
+        );
+        
+        res.json({
+            success: true,
+            data: scheduleRecord,
+            message: '排班申請提交成功'
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+// 獲取用戶排班記錄
+app.get('/api/schedule/my-schedule', authenticateToken, async (req, res) => {
+    try {
+        const userSchedule = await scheduleSystem.getUserScheduleForNextMonth(req.user.employee_id);
+        
+        res.json({
+            success: true,
+            data: userSchedule,
+            message: '用戶排班記錄獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取用戶排班記錄失敗: ' + error.message
+        });
+    }
+});
+
+// 退出排班系統（結束會話）
+app.post('/api/schedule/exit', authenticateToken, async (req, res) => {
+    try {
+        await scheduleSystem.endScheduleSession();
+        
+        res.json({
+            success: true,
+            message: '已退出排班系統'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '退出排班系統失敗: ' + error.message
+        });
+    }
+});
+
+// 管理員：強制開啟排班系統
+app.post('/api/admin/schedule/force-open', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { duration_minutes } = req.body;
+        const duration = duration_minutes || 30; // 預設30分鐘
+        
+        // 創建強制開啟記錄
+        const forceOpenRecord = {
+            id: Date.now(),
+            opened_by: req.user.id,
+            opened_by_name: req.user.name,
+            duration_minutes: duration,
+            start_time: new Date().toISOString(),
+            end_time: new Date(Date.now() + duration * 60 * 1000).toISOString(),
+            status: 'active'
+        };
+        
+        const forceOpenRecords = await db.readTable('schedule_force_open') || [];
+        forceOpenRecords.push(forceOpenRecord);
+        await db.writeTable('schedule_force_open', forceOpenRecords);
+        
+        // 發送Telegram通知
+        await telegramNotifier.sendBossNotification(
+            `🚨 強制排班系統已開啟\n⏰ 開放時間: ${duration}分鐘\n👤 開啟者: ${req.user.name}\n📅 開啟時間: ${new Date().toLocaleString('zh-TW')}\n📅 結束時間: ${new Date(Date.now() + duration * 60 * 1000).toLocaleString('zh-TW')}`
+        );
+        
+        await telegramNotifier.sendEmployeeNotification(
+            `🚨 強制排班系統已開啟，請盡快完成排班！`
+        );
+        
+        res.json({
+            success: true,
+            data: forceOpenRecord,
+            message: `強制排班系統已開啟 ${duration} 分鐘`
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '強制開啟排班系統失敗: ' + error.message
+        });
+    }
 });
 
 // ==================== 伺服器啟動 ====================
@@ -4282,26 +4468,15 @@ app.listen(PORT, '0.0.0.0', () => {
 });
 
 // 優雅關閉
-process.on('SIGTERM', async () => {
-    console.log('SIGTERM received, shutting down gracefully...');
-    try {
-        await anomalyDetector.stop();
-        console.log('Anomaly detector stopped');
-    } catch (error) {
-        console.error('Error stopping anomaly detector:', error);
-    }
+process.on('SIGINT', () => {
+    console.log('\n🔄 正在關閉伺服器...');
     
-    db.close();
-    process.exit(0);
-});
-
-process.on('SIGINT', async () => {
-    console.log('SIGINT received, shutting down gracefully...');
+    // 停止異常檢測服務
     try {
-        await anomalyDetector.stop();
-        console.log('Anomaly detector stopped');  
+        anomalyDetector.stop();
+        console.log('📍 定時異常檢測服務已停止');
     } catch (error) {
-        console.error('Error stopping anomaly detector:', error);
+        console.error('❌ 停止異常檢測服務失敗:', error.message);
     }
     
     db.close();
@@ -4309,4 +4484,4 @@ process.on('SIGINT', async () => {
 });
 
 module.exports = app;
-// 觸發Render.com重新部署 - 緊急修復營業額和叫貨API - 西元2025年08月17日 (星期日) 14時06分00秒
+// 觸發Render.com重新部署 - 緊急修復營業額和叫貨API - 西元2025年08月17日 (星期日) 14時06分00秒    
