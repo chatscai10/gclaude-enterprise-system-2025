@@ -698,6 +698,81 @@ ${promotionData.is_approved ?
 
         return await this.sendToBoth(testMessage, testMessage);
     }
+
+    // ==================== 數據作廢通知 ====================
+    async notifyDataVoid(type, voidedData) {
+        try {
+            const typeName = type === 'revenue' ? '營業額' : '叫貨';
+            const date = new Date().toLocaleDateString('zh-TW');
+            const storeName = this.safeGet(voidedData, 'store_name', '未知分店');
+            const employeeName = this.safeGet(voidedData, 'employee_name', '未知員工');
+            const voidReason = this.safeGet(voidedData, 'void_reason', '無原因');
+            const voidedByName = this.safeGet(voidedData, 'voided_by_name', '未知操作者');
+            
+            // 老闆詳細通知
+            let bossMessage = `
+🗑️ <b>${typeName}記錄作廢通知</b>
+
+📅 <b>作廢日期:</b> ${date}
+🏪 <b>分店:</b> ${storeName}
+👤 <b>原提交人:</b> ${employeeName}
+🔧 <b>作廢操作者:</b> ${voidedByName}
+📝 <b>作廢原因:</b> ${voidReason}
+🆔 <b>記錄ID:</b> ${voidedData.id}
+            `.trim();
+
+            if (type === 'revenue') {
+                const totalRevenue = Number(voidedData.total_revenue || 0);
+                const totalExpense = Number(voidedData.total_expense || 0);
+                const bonusAmount = Number(voidedData.bonus_amount || 0);
+                
+                bossMessage += `
+
+💰 <b>作廢的營業額詳情:</b>
+📊 總營收: $${totalRevenue.toLocaleString()}
+📉 總支出: $${totalExpense.toLocaleString()}
+💎 獎金: $${bonusAmount.toLocaleString()}
+📅 營業日期: ${voidedData.date || '未知'}
+                `.trim();
+            } else if (type === 'order') {
+                const itemCount = voidedData.items ? voidedData.items.length : 0;
+                const deliveryDate = voidedData.delivery_date || '未知';
+                
+                bossMessage += `
+
+🛒 <b>作廢的叫貨詳情:</b>
+📦 商品種類: ${itemCount}項
+📅 送貨日期: ${deliveryDate}
+                `.trim();
+                
+                if (voidedData.items && voidedData.items.length > 0) {
+                    bossMessage += '\n\n📋 <b>商品清單:</b>';
+                    voidedData.items.forEach(item => {
+                        const brand = this.safeGet(item, 'brand', '');
+                        const productName = this.safeGet(item, 'product_name', '未知商品');
+                        const quantity = Number(item.quantity || 0);
+                        const unit = this.safeGet(item, 'unit', '個');
+                        bossMessage += `\n  •${brand} ${productName} ${quantity} ${unit}`;
+                    });
+                }
+            }
+
+            // 員工簡化通知
+            const employeeMessage = `
+🗑️ <b>${typeName}記錄已作廢</b>
+
+📅 <b>日期:</b> ${date}
+🏪 <b>分店:</b> ${storeName}
+🆔 <b>記錄ID:</b> ${voidedData.id}
+📝 <b>原因:</b> ${voidReason}
+            `.trim();
+
+            return await this.sendToBoth(bossMessage.trim(), employeeMessage);
+        } catch (error) {
+            console.error('數據作廢通知發送失敗:', error);
+            throw error;
+        }
+    }
 }
 
 module.exports = TelegramNotifier;

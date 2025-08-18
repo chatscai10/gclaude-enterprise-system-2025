@@ -3604,6 +3604,240 @@ app.delete('/api/item-anomaly-settings/:productName', authenticateToken, async (
     }
 });
 
+// ==================== 數據作廢管理API ====================
+
+// 作廢營業額記錄
+app.delete('/api/revenue/:id/void', authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { reason } = req.body;
+        
+        if (!reason || reason.trim() === '') {
+            return res.status(400).json({
+                success: false,
+                message: '請提供作廢原因'
+            });
+        }
+        
+        const records = await db.readTable('revenue');
+        const recordIndex = records.findIndex(r => r.id == id);
+        
+        if (recordIndex === -1) {
+            return res.status(404).json({
+                success: false,
+                message: '營業額記錄不存在'
+            });
+        }
+        
+        const record = records[recordIndex];
+        
+        // 檢查權限：只有記錄提交者或管理員可以作廢
+        if (record.employee_id !== req.user.employee_id && req.user.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: '您沒有權限作廢此記錄'
+            });
+        }
+        
+        // 標記為作廢
+        records[recordIndex] = {
+            ...record,
+            status: 'voided',
+            void_reason: reason.trim(),
+            voided_by: req.user.employee_id,
+            voided_by_name: req.user.name,
+            voided_at: new Date().toISOString()
+        };
+        
+        await db.writeTable('revenue', records);
+        
+        // 發送Telegram通知
+        if (telegramNotifier) {
+            try {
+                await telegramNotifier.notifyDataVoid('revenue', records[recordIndex]);
+            } catch (telegramError) {
+                console.error('Telegram通知失敗:', telegramError);
+            }
+        }
+        
+        res.json({
+            success: true,
+            data: records[recordIndex],
+            message: '營業額記錄已作廢'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '作廢營業額記錄失敗'
+        });
+    }
+});
+
+// 作廢叫貨記錄
+app.delete('/api/orders/:id/void', authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { reason } = req.body;
+        
+        if (!reason || reason.trim() === '') {
+            return res.status(400).json({
+                success: false,
+                message: '請提供作廢原因'
+            });
+        }
+        
+        const records = await db.readTable('orders');
+        const recordIndex = records.findIndex(r => r.id == id);
+        
+        if (recordIndex === -1) {
+            return res.status(404).json({
+                success: false,
+                message: '叫貨記錄不存在'
+            });
+        }
+        
+        const record = records[recordIndex];
+        
+        // 檢查權限：只有記錄提交者或管理員可以作廢
+        if (record.employee_id !== req.user.employee_id && req.user.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: '您沒有權限作廢此記錄'
+            });
+        }
+        
+        // 標記為作廢
+        records[recordIndex] = {
+            ...record,
+            status: 'voided',
+            void_reason: reason.trim(),
+            voided_by: req.user.employee_id,
+            voided_by_name: req.user.name,
+            voided_at: new Date().toISOString()
+        };
+        
+        await db.writeTable('orders', records);
+        
+        // 發送Telegram通知
+        if (telegramNotifier) {
+            try {
+                await telegramNotifier.notifyDataVoid('order', records[recordIndex]);
+            } catch (telegramError) {
+                console.error('Telegram通知失敗:', telegramError);
+            }
+        }
+        
+        res.json({
+            success: true,
+            data: records[recordIndex],
+            message: '叫貨記錄已作廢'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '作廢叫貨記錄失敗'
+        });
+    }
+});
+
+// 恢復作廢記錄
+app.put('/api/revenue/:id/restore', authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // 只有管理員可以恢復記錄
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: '只有管理員可以恢復作廢記錄'
+            });
+        }
+        
+        const records = await db.readTable('revenue');
+        const recordIndex = records.findIndex(r => r.id == id);
+        
+        if (recordIndex === -1) {
+            return res.status(404).json({
+                success: false,
+                message: '營業額記錄不存在'
+            });
+        }
+        
+        const record = records[recordIndex];
+        
+        if (record.status !== 'voided') {
+            return res.status(400).json({
+                success: false,
+                message: '此記錄未被作廢，無需恢復'
+            });
+        }
+        
+        // 恢復記錄
+        records[recordIndex] = {
+            ...record,
+            status: 'pending',
+            restored_by: req.user.employee_id,
+            restored_by_name: req.user.name,
+            restored_at: new Date().toISOString()
+        };
+        
+        // 清除作廢相關欄位
+        delete records[recordIndex].void_reason;
+        delete records[recordIndex].voided_by;
+        delete records[recordIndex].voided_by_name;
+        delete records[recordIndex].voided_at;
+        
+        await db.writeTable('revenue', records);
+        
+        res.json({
+            success: true,
+            data: records[recordIndex],
+            message: '營業額記錄已恢復'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '恢復營業額記錄失敗'
+        });
+    }
+});
+
+// 獲取作廢記錄列表
+app.get('/api/admin/voided-records', authenticateToken, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: '只有管理員可以查看作廢記錄'
+            });
+        }
+        
+        const [revenueRecords, orderRecords] = await Promise.all([
+            db.readTable('revenue'),
+            db.readTable('orders')
+        ]);
+        
+        const voidedRevenue = revenueRecords.filter(r => r.status === 'voided');
+        const voidedOrders = orderRecords.filter(r => r.status === 'voided');
+        
+        const voidedData = [
+            ...voidedRevenue.map(r => ({ ...r, type: 'revenue' })),
+            ...voidedOrders.map(r => ({ ...r, type: 'order' }))
+        ].sort((a, b) => new Date(b.voided_at) - new Date(a.voided_at));
+        
+        res.json({
+            success: true,
+            data: voidedData,
+            message: '作廢記錄獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取作廢記錄失敗'
+        });
+    }
+});
+
 // ==================== 測試用API ====================
 
 // 測試端點 - 重新初始化資料庫
