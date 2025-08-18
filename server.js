@@ -1255,6 +1255,35 @@ app.get('/api/admin/inventory/stats', authenticateToken, requireAdmin, async (re
     }
 });
 
+// 基本庫存查詢API（員工可用）
+app.get('/api/inventory', authenticateToken, async (req, res) => {
+    try {
+        const inventory = await db.readTable('inventory') || [];
+        
+        // 對於一般員工，只顯示必要資訊
+        const filteredInventory = inventory.map(item => ({
+            id: item.id,
+            product_name: item.product_name || item.name,
+            quantity: item.quantity || 0,
+            unit: item.unit || '個',
+            category: item.category || '一般',
+            updated_at: item.updated_at || new Date().toISOString()
+        }));
+        
+        res.json({
+            success: true,
+            data: filteredInventory,
+            message: '庫存資料獲取成功'
+        });
+    } catch (error) {
+        console.error('獲取庫存資料失敗:', error);
+        res.status(500).json({
+            success: false,
+            message: '獲取庫存資料失敗: ' + error.message
+        });
+    }
+});
+
 // 分店列表API (公共端點)
 app.get('/api/stores', async (req, res) => {
     try {
