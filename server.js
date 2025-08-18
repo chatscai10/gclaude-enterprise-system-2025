@@ -2333,9 +2333,19 @@ app.get('/admin', (req, res) => {
     }
 });
 
-// 統一工作台路由
+// 統一工作台路由 - 需要認證的頁面
 app.get('/dashboard', (req, res) => {
-    const unifiedDashboardPath = path.join(__dirname, 'public', 'unified-employee-dashboard.html');
+    // 檢查是否有登入令牌
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
+    
+    if (!token) {
+        // 沒有令牌，重定向到登入頁面
+        return res.redirect('/login.html');
+    }
+    
+    // 有令牌，提供dashboard頁面
+    const unifiedDashboardPath = path.join(__dirname, 'public', 'unified-employee-dashboard-clean.html');
     if (fs.existsSync(unifiedDashboardPath)) {
         res.sendFile(unifiedDashboardPath);
     } else {

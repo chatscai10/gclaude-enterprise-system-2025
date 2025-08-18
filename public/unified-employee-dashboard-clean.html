@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GClaude 企業管理系統 - 員工工作台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            padding: 20px;
+            margin-bottom: 20px;
+            position: sticky;
+            top: 20px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+        
+        .main-content {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin-bottom: 20px;
+            min-height: calc(100vh - 120px);
+        }
+        
+        .nav-item {
+            margin-bottom: 8px;
+        }
+        
+        .nav-link {
+            border-radius: 10px;
+            color: #495057;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+            border: none;
+            text-align: left;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-link:hover {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+        
+        .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+        
+        .section-content {
+            display: none;
+        }
+        
+        .section-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 1px solid #f0f0f0;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .status-online {
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+        }
+        
+        .btn-gradient {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            color: white;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        @media (max-width: 768px) {
+            .container-fluid {
+                padding: 10px;
+            }
+            
+            .sidebar {
+                margin-bottom: 15px;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 頂部導航欄 -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="fas fa-building me-2"></i>
+                GClaude 企業管理系統
+            </a>
+            
+            <!-- 手機版選單切換 -->
+            <select class="form-select d-lg-none" style="max-width: 200px;" onchange="switchSection(this.value)">
+                <option value="dashboard">🏠 工作台首頁</option>
+                <option value="attendance">🕐 打卡系統</option>
+                <option value="schedule">📅 排班系統</option>
+                <option value="revenue">💰 營收登記</option>
+                <option value="ordering">📦 叫貨系統</option>
+                <option value="promotion">🏆 升遷投票</option>
+                <option value="profile">👤 個人檔案</option>
+            </select>
+            
+            <div class="navbar-nav ms-auto d-none d-lg-flex">
+                <span class="navbar-text me-3">
+                    <span class="status-indicator status-online"></span>
+                    歡迎，<span id="employeeName">載入中...</span>
+                </span>
+                <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                    <i class="fas fa-sign-out-alt me-1"></i>登出
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- 桌面版側邊欄 -->
+            <div class="col-lg-3 col-md-4">
+                <div class="sidebar">
+                    <h5 class="mb-3">
+                        <i class="fas fa-user-tie me-2"></i>
+                        員工功能選單
+                    </h5>
+                    <nav class="nav flex-column">
+                        <button class="nav-link active" data-section="dashboard">
+                            <i class="fas fa-home"></i>工作台首頁
+                        </button>
+                        <button class="nav-link" data-section="attendance">
+                            <i class="fas fa-clock"></i>打卡系統
+                        </button>
+                        <button class="nav-link" data-section="schedule">
+                            <i class="fas fa-calendar-alt"></i>排班系統
+                        </button>
+                        <button class="nav-link" data-section="revenue">
+                            <i class="fas fa-chart-line"></i>營收登記
+                        </button>
+                        <button class="nav-link" data-section="ordering">
+                            <i class="fas fa-shopping-cart"></i>叫貨系統
+                        </button>
+                        <button class="nav-link" data-section="promotion">
+                            <i class="fas fa-trophy"></i>升遷投票
+                        </button>
+                        <button class="nav-link" data-section="profile">
+                            <i class="fas fa-user"></i>個人檔案
+                        </button>
+                    </nav>
+                    
+                    <!-- 登出按鈕 (手機版) -->
+                    <div class="d-lg-none mt-3">
+                        <button class="btn btn-outline-danger w-100" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-1"></i>登出
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 主要內容區域 -->
+            <div class="col-lg-9 col-md-8">
+                <div class="main-content">
+                    <!-- 工作台首頁 -->
+                    <div id="dashboard-section" class="section-content active">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2><i class="fas fa-home me-2"></i>工作台首頁</h2>
+                            <span class="badge bg-success">系統正常運行</span>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6 col-lg-3 mb-3">
+                                <div class="stat-card text-center">
+                                    <i class="fas fa-clock fa-2x mb-2"></i>
+                                    <h5 class="mb-1" id="todayWorkHours">0小時0分</h5>
+                                    <small>今日工作時數</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3 mb-3">
+                                <div class="stat-card text-center">
+                                    <i class="fas fa-calendar-check fa-2x mb-2"></i>
+                                    <h5 class="mb-1" id="attendanceStatus">未打卡</h5>
+                                    <small>出勤狀態</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3 mb-3">
+                                <div class="stat-card text-center">
+                                    <i class="fas fa-tasks fa-2x mb-2"></i>
+                                    <h5 class="mb-1" id="pendingTasks">0</h5>
+                                    <small>待處理任務</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3 mb-3">
+                                <div class="stat-card text-center">
+                                    <i class="fas fa-bell fa-2x mb-2"></i>
+                                    <h5 class="mb-1" id="notifications">0</h5>
+                                    <small>系統通知</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6 mb-4">
+                                <div class="feature-card">
+                                    <h5><i class="fas fa-clock me-2"></i>快速打卡</h5>
+                                    <p class="text-muted">點擊下方按鈕進行上下班打卡</p>
+                                    <button class="btn btn-gradient" onclick="switchSection('attendance')">
+                                        <i class="fas fa-play me-1"></i>前往打卡
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 mb-4">
+                                <div class="feature-card">
+                                    <h5><i class="fas fa-chart-line me-2"></i>營收登記</h5>
+                                    <p class="text-muted">記錄今日營業收入和支出</p>
+                                    <button class="btn btn-gradient" onclick="switchSection('revenue')">
+                                        <i class="fas fa-plus me-1"></i>新增記錄
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 mb-4">
+                                <div class="feature-card">
+                                    <h5><i class="fas fa-shopping-cart me-2"></i>叫貨申請</h5>
+                                    <p class="text-muted">提交進貨需求和庫存補充</p>
+                                    <button class="btn btn-gradient" onclick="switchSection('ordering')">
+                                        <i class="fas fa-box me-1"></i>叫貨申請
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 mb-4">
+                                <div class="feature-card">
+                                    <h5><i class="fas fa-calendar-alt me-2"></i>排班管理</h5>
+                                    <p class="text-muted">查看班表和申請休假</p>
+                                    <button class="btn btn-gradient" onclick="switchSection('schedule')">
+                                        <i class="fas fa-calendar me-1"></i>查看班表
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 打卡系統 -->
+                    <div id="attendance-section" class="section-content">
+                        <h2><i class="fas fa-clock me-2"></i>打卡系統</h2>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            請確保您的GPS定位已開啟，以便系統記錄您的打卡位置
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="feature-card text-center">
+                                    <h4>當前時間</h4>
+                                    <h2 id="currentTime" class="text-primary">載入中...</h2>
+                                    <p id="currentDate" class="text-muted">載入中...</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="feature-card text-center">
+                                    <h4>工作狀態</h4>
+                                    <h3 id="workStatus" class="text-warning">未打卡</h3>
+                                    <p id="workingHours">工作時間: 0小時0分</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mb-4">
+                            <button id="clockButton" class="btn btn-gradient btn-lg px-5 py-3" onclick="toggleClock()">
+                                <i class="fas fa-play me-2"></i>上班打卡
+                            </button>
+                        </div>
+
+                        <div class="feature-card">
+                            <h5>今日出勤記錄</h5>
+                            <div id="todayAttendance">
+                                <p class="text-muted">載入中...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 排班系統 -->
+                    <div id="schedule-section" class="section-content">
+                        <h2><i class="fas fa-calendar-alt me-2"></i>排班系統</h2>
+                        <div class="feature-card">
+                            <h5>我的班表</h5>
+                            <div id="mySchedule">
+                                <p class="text-muted">載入中...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 營收登記 -->
+                    <div id="revenue-section" class="section-content">
+                        <h2><i class="fas fa-chart-line me-2"></i>營收登記</h2>
+                        
+                        <div class="feature-card">
+                            <h5>新增營收記錄</h5>
+                            <form id="revenueForm">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">日期</label>
+                                        <input type="date" class="form-control" id="revenueDate" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">日期類型</label>
+                                        <select class="form-select" id="dayType" required>
+                                            <option value="">請選擇</option>
+                                            <option value="weekday">平日</option>
+                                            <option value="weekend">假日</option>
+                                            <option value="holiday">特殊節日</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">訂單數量</label>
+                                        <input type="number" class="form-control" id="orderCount" min="0" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">總營收</label>
+                                        <input type="number" class="form-control" id="totalRevenue" min="0" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">總支出</label>
+                                        <input type="number" class="form-control" id="totalExpense" min="0" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">獎金金額</label>
+                                        <input type="number" class="form-control" id="bonusAmount" min="0" value="0">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">備註</label>
+                                        <textarea class="form-control" id="revenueNotes" rows="2"></textarea>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-gradient">
+                                            <i class="fas fa-save me-1"></i>提交記錄
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="feature-card">
+                            <h5>我的營收記錄</h5>
+                            <div id="revenueHistory">
+                                <p class="text-muted">載入中...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 叫貨系統 -->
+                    <div id="ordering-section" class="section-content">
+                        <h2><i class="fas fa-shopping-cart me-2"></i>叫貨系統</h2>
+                        
+                        <div class="feature-card">
+                            <h5>新增叫貨申請</h5>
+                            <form id="orderForm">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">預計送達日期</label>
+                                        <input type="date" class="form-control" id="deliveryDate" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">備註</label>
+                                        <textarea class="form-control" id="orderNotes" rows="2"></textarea>
+                                    </div>
+                                </div>
+                                
+                                <h6>叫貨項目</h6>
+                                <div id="orderItems">
+                                    <div class="row mb-2 order-item">
+                                        <div class="col-md-2">
+                                            <input type="text" class="form-control" placeholder="品項名稱" required>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="text" class="form-control" placeholder="品牌">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="number" class="form-control" placeholder="數量" min="1" required>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="text" class="form-control" placeholder="單位">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="number" class="form-control" placeholder="單價" min="0">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="text" class="form-control" placeholder="供應商">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="addOrderItem()">
+                                        <i class="fas fa-plus me-1"></i>新增項目
+                                    </button>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-gradient">
+                                    <i class="fas fa-paper-plane me-1"></i>提交申請
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="feature-card">
+                            <h5>我的叫貨記錄</h5>
+                            <div id="orderHistory">
+                                <p class="text-muted">載入中...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 升遷投票 -->
+                    <div id="promotion-section" class="section-content">
+                        <h2><i class="fas fa-trophy me-2"></i>升遷投票</h2>
+                        
+                        <div class="feature-card">
+                            <h5>升遷資格檢查</h5>
+                            <div id="promotionEligibility">
+                                <p class="text-muted">載入中...</p>
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <h5>進行中的投票</h5>
+                            <div id="activePromotions">
+                                <p class="text-muted">載入中...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 個人檔案 -->
+                    <div id="profile-section" class="section-content">
+                        <h2><i class="fas fa-user me-2"></i>個人檔案</h2>
+                        
+                        <div class="feature-card">
+                            <h5>基本資訊</h5>
+                            <div id="userProfile">
+                                <p class="text-muted">載入中...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示訊息容器 -->
+    <div id="alertContainer" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 全域變數
+        let currentUser = null;
+        let clockInTime = null;
+        let workingTimer = null;
+
+        // 頁面載入時檢查認證
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthentication();
+            setupNavigation();
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+        });
+
+        // 檢查用戶認證
+        async function checkAuthentication() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                const response = await fetch('/api/auth/verify', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    currentUser = result.user;
+                    document.getElementById('employeeName').textContent = currentUser.name;
+                    loadDashboardData();
+                } else {
+                    localStorage.removeItem('token');
+                    window.location.href = '/login.html';
+                }
+            } catch (error) {
+                console.error('認證檢查失敗:', error);
+                window.location.href = '/login.html';
+            }
+        }
+
+        // 設置導航功能
+        function setupNavigation() {
+            document.querySelectorAll('.nav-link[data-section]').forEach(link => {
+                link.addEventListener('click', function() {
+                    const section = this.dataset.section;
+                    switchSection(section);
+                });
+            });
+        }
+
+        // 切換功能區段
+        function switchSection(section) {
+            // 更新導航狀態
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.section === section) {
+                    link.classList.add('active');
+                }
+            });
+
+            // 更新內容顯示
+            document.querySelectorAll('.section-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            const targetSection = document.getElementById(section + '-section');
+            if (targetSection) {
+                targetSection.classList.add('active');
+                
+                // 載入對應區段的數據
+                switch(section) {
+                    case 'attendance':
+                        loadAttendanceData();
+                        break;
+                    case 'schedule':
+                        loadScheduleData();
+                        break;
+                    case 'revenue':
+                        loadRevenueData();
+                        break;
+                    case 'ordering':
+                        loadOrderingData();
+                        break;
+                    case 'promotion':
+                        loadPromotionData();
+                        break;
+                    case 'profile':
+                        loadProfileData();
+                        break;
+                }
+            }
+        }
+
+        // 載入儀表板數據
+        function loadDashboardData() {
+            // 載入基本統計
+            loadTodayStats();
+        }
+
+        // 載入今日統計
+        async function loadTodayStats() {
+            try {
+                // 載入今日出勤狀態
+                const attendanceResponse = await safeFetch('/api/attendance/today');
+                if (attendanceResponse.ok) {
+                    const attendanceData = await attendanceResponse.json();
+                    updateAttendanceDisplay(attendanceData.data);
+                }
+            } catch (error) {
+                console.error('載入統計數據失敗:', error);
+            }
+        }
+
+        // 更新出勤顯示
+        function updateAttendanceDisplay(attendance) {
+            const statusElement = document.getElementById('attendanceStatus');
+            const hoursElement = document.getElementById('todayWorkHours');
+            
+            if (attendance && attendance.clock_in) {
+                statusElement.textContent = attendance.clock_out ? '已下班' : '工作中';
+                clockInTime = new Date(attendance.clock_in);
+                
+                if (attendance.clock_out) {
+                    const clockOut = new Date(attendance.clock_out);
+                    const diff = clockOut - clockInTime;
+                    const hours = Math.floor(diff / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    hoursElement.textContent = `${hours}小時${minutes}分`;
+                } else {
+                    startWorkingTimer();
+                }
+            } else {
+                statusElement.textContent = '未打卡';
+                hoursElement.textContent = '0小時0分';
+            }
+        }
+
+        // 啟動工作時數計時器
+        function startWorkingTimer() {
+            if (workingTimer) clearInterval(workingTimer);
+            
+            workingTimer = setInterval(() => {
+                if (clockInTime) {
+                    const now = new Date();
+                    const diff = now - clockInTime;
+                    const hours = Math.floor(diff / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    
+                    const hoursElement = document.getElementById('todayWorkHours');
+                    if (hoursElement) {
+                        hoursElement.textContent = `${hours}小時${minutes}分`;
+                    }
+                    
+                    const workingHoursElement = document.getElementById('workingHours');
+                    if (workingHoursElement) {
+                        workingHoursElement.textContent = `工作時間: ${hours}小時${minutes}分`;
+                    }
+                }
+            }, 1000);
+        }
+
+        // 更新當前時間
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeElement = document.getElementById('currentTime');
+            const dateElement = document.getElementById('currentDate');
+            
+            if (timeElement) {
+                timeElement.textContent = now.toLocaleTimeString('zh-TW');
+            }
+            if (dateElement) {
+                dateElement.textContent = now.toLocaleDateString('zh-TW', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    weekday: 'long'
+                });
+            }
+        }
+
+        // 載入出勤數據
+        function loadAttendanceData() {
+            loadTodayAttendance();
+        }
+
+        // 載入今日出勤
+        async function loadTodayAttendance() {
+            try {
+                const response = await safeFetch('/api/attendance/today');
+                if (response.ok) {
+                    const result = await response.json();
+                    displayTodayAttendance(result.data);
+                }
+            } catch (error) {
+                console.error('載入出勤數據失敗:', error);
+            }
+        }
+
+        // 顯示今日出勤
+        function displayTodayAttendance(attendance) {
+            const container = document.getElementById('todayAttendance');
+            const clockButton = document.getElementById('clockButton');
+            const workStatus = document.getElementById('workStatus');
+            
+            if (attendance && attendance.clock_in) {
+                clockInTime = new Date(attendance.clock_in);
+                
+                if (attendance.clock_out) {
+                    // 已下班
+                    workStatus.textContent = '已下班';
+                    workStatus.className = 'text-secondary';
+                    clockButton.innerHTML = '<i class="fas fa-check me-2"></i>今日已完成';
+                    clockButton.disabled = true;
+                    clockButton.className = 'btn btn-secondary btn-lg px-5 py-3';
+                } else {
+                    // 工作中
+                    workStatus.textContent = '工作中';
+                    workStatus.className = 'text-success';
+                    clockButton.innerHTML = '<i class="fas fa-stop me-2"></i>下班打卡';
+                    clockButton.disabled = false;
+                    clockButton.className = 'btn btn-danger btn-lg px-5 py-3';
+                    startWorkingTimer();
+                }
+                
+                container.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>上班時間:</strong> ${new Date(attendance.clock_in).toLocaleTimeString('zh-TW')}
+                        </div>
+                        <div>
+                            <strong>下班時間:</strong> ${attendance.clock_out ? new Date(attendance.clock_out).toLocaleTimeString('zh-TW') : '進行中'}
+                        </div>
+                    </div>
+                `;
+            } else {
+                // 未打卡
+                workStatus.textContent = '未打卡';
+                workStatus.className = 'text-warning';
+                clockButton.innerHTML = '<i class="fas fa-play me-2"></i>上班打卡';
+                clockButton.disabled = false;
+                clockButton.className = 'btn btn-gradient btn-lg px-5 py-3';
+                
+                container.innerHTML = '<p class="text-muted">今日尚未打卡</p>';
+            }
+        }
+
+        // 打卡功能
+        async function toggleClock() {
+            try {
+                const button = document.getElementById('clockButton');
+                button.disabled = true;
+                
+                // 獲取位置
+                const position = await getCurrentPosition();
+                
+                const response = await safeFetch('/api/attendance/clock', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        location: `${position.coords.latitude},${position.coords.longitude}`
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showAlert(result.message, 'success');
+                    loadTodayAttendance();
+                    loadDashboardData();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('打卡失敗: ' + error.message, 'danger');
+            } finally {
+                const button = document.getElementById('clockButton');
+                button.disabled = false;
+            }
+        }
+
+        // 獲取當前位置
+        function getCurrentPosition() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error('瀏覽器不支援定位功能'));
+                    return;
+                }
+                
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 60000
+                });
+            });
+        }
+
+        // 載入排班數據
+        function loadScheduleData() {
+            document.getElementById('mySchedule').innerHTML = '<p class="text-muted">排班功能開發中...</p>';
+        }
+
+        // 載入營收數據
+        function loadRevenueData() {
+            // 設置今日日期
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('revenueDate').value = today;
+            
+            // 設置表單提交事件
+            const form = document.getElementById('revenueForm');
+            form.addEventListener('submit', submitRevenue);
+            
+            // 載入歷史記錄
+            loadRevenueHistory();
+        }
+
+        // 提交營收記錄
+        async function submitRevenue(event) {
+            event.preventDefault();
+            
+            try {
+                const formData = {
+                    date: document.getElementById('revenueDate').value,
+                    day_type: document.getElementById('dayType').value,
+                    order_count: parseInt(document.getElementById('orderCount').value),
+                    total_revenue: parseFloat(document.getElementById('totalRevenue').value),
+                    total_expense: parseFloat(document.getElementById('totalExpense').value),
+                    bonus_amount: parseFloat(document.getElementById('bonusAmount').value) || 0,
+                    notes: document.getElementById('revenueNotes').value
+                };
+                
+                const response = await safeFetch('/api/revenue/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showAlert('營收記錄提交成功！', 'success');
+                    document.getElementById('revenueForm').reset();
+                    const today = new Date().toISOString().split('T')[0];
+                    document.getElementById('revenueDate').value = today;
+                    loadRevenueHistory();
+                } else {
+                    const error = await response.json();
+                    showAlert('提交失敗: ' + error.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('提交失敗: ' + error.message, 'danger');
+            }
+        }
+
+        // 載入營收歷史
+        async function loadRevenueHistory() {
+            try {
+                const response = await safeFetch('/api/revenue/my-records');
+                if (response.ok) {
+                    const result = await response.json();
+                    displayRevenueHistory(result.data);
+                }
+            } catch (error) {
+                console.error('載入營收歷史失敗:', error);
+            }
+        }
+
+        // 顯示營收歷史
+        function displayRevenueHistory(records) {
+            const container = document.getElementById('revenueHistory');
+            
+            if (!records || records.length === 0) {
+                container.innerHTML = '<p class="text-muted">暫無營收記錄</p>';
+                return;
+            }
+            
+            const html = records.map(record => `
+                <div class="border rounded p-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6>${record.date} (${record.day_type})</h6>
+                            <p class="mb-1">
+                                訂單: ${record.order_count}筆 | 
+                                營收: $${record.total_revenue.toLocaleString()} | 
+                                支出: $${record.total_expense.toLocaleString()} | 
+                                淨利: $${(record.total_revenue - record.total_expense).toLocaleString()}
+                            </p>
+                            ${record.notes ? `<p class="text-muted mb-1">${record.notes}</p>` : ''}
+                            <small class="text-muted">${new Date(record.created_at).toLocaleString('zh-TW')}</small>
+                        </div>
+                        <span class="badge ${record.status === 'pending' ? 'bg-warning' : 'bg-success'}">
+                            ${record.status === 'pending' ? '待審核' : '已確認'}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
+        }
+
+        // 載入叫貨數據
+        function loadOrderingData() {
+            // 設置明日日期
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('deliveryDate').value = tomorrow.toISOString().split('T')[0];
+            
+            // 設置表單提交事件
+            const form = document.getElementById('orderForm');
+            form.addEventListener('submit', submitOrder);
+            
+            // 載入歷史記錄
+            loadOrderHistory();
+        }
+
+        // 新增叫貨項目
+        function addOrderItem() {
+            const container = document.getElementById('orderItems');
+            const newItem = document.createElement('div');
+            newItem.className = 'row mb-2 order-item';
+            newItem.innerHTML = `
+                <div class="col-md-2">
+                    <input type="text" class="form-control" placeholder="品項名稱" required>
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" placeholder="品牌">
+                </div>
+                <div class="col-md-2">
+                    <input type="number" class="form-control" placeholder="數量" min="1" required>
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" placeholder="單位">
+                </div>
+                <div class="col-md-2">
+                    <input type="number" class="form-control" placeholder="單價" min="0">
+                </div>
+                <div class="col-md-1">
+                    <input type="text" class="form-control" placeholder="供應商">
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeOrderItem(this)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(newItem);
+        }
+
+        // 移除叫貨項目
+        function removeOrderItem(button) {
+            button.closest('.order-item').remove();
+        }
+
+        // 提交叫貨申請
+        async function submitOrder(event) {
+            event.preventDefault();
+            
+            try {
+                // 收集項目數據
+                const items = [];
+                document.querySelectorAll('.order-item').forEach(item => {
+                    const inputs = item.querySelectorAll('input');
+                    if (inputs[0].value.trim()) {
+                        items.push({
+                            product_name: inputs[0].value.trim(),
+                            brand: inputs[1].value.trim(),
+                            quantity: parseInt(inputs[2].value) || 0,
+                            unit: inputs[3].value.trim(),
+                            unit_price: parseFloat(inputs[4].value) || 0,
+                            supplier: inputs[5].value.trim()
+                        });
+                    }
+                });
+                
+                if (items.length === 0) {
+                    showAlert('請至少添加一個叫貨項目', 'warning');
+                    return;
+                }
+                
+                const orderData = {
+                    delivery_date: document.getElementById('deliveryDate').value,
+                    notes: document.getElementById('orderNotes').value,
+                    items: items
+                };
+                
+                const response = await safeFetch('/api/orders/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+                
+                if (response.ok) {
+                    showAlert('叫貨申請提交成功！', 'success');
+                    document.getElementById('orderForm').reset();
+                    // 重置為明日日期
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    document.getElementById('deliveryDate').value = tomorrow.toISOString().split('T')[0];
+                    loadOrderHistory();
+                } else {
+                    const error = await response.json();
+                    showAlert('提交失敗: ' + error.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('提交失敗: ' + error.message, 'danger');
+            }
+        }
+
+        // 載入叫貨歷史
+        async function loadOrderHistory() {
+            try {
+                const response = await safeFetch('/api/orders/my-records');
+                if (response.ok) {
+                    const result = await response.json();
+                    displayOrderHistory(result.data);
+                }
+            } catch (error) {
+                console.error('載入叫貨歷史失敗:', error);
+            }
+        }
+
+        // 顯示叫貨歷史
+        function displayOrderHistory(records) {
+            const container = document.getElementById('orderHistory');
+            
+            if (!records || records.length === 0) {
+                container.innerHTML = '<p class="text-muted">暫無叫貨記錄</p>';
+                return;
+            }
+            
+            const html = records.map(record => `
+                <div class="border rounded p-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6>預計送達: ${record.delivery_date}</h6>
+                            <p class="mb-1">項目數: ${record.items ? record.items.length : 0}項</p>
+                            ${record.notes ? `<p class="text-muted mb-1">${record.notes}</p>` : ''}
+                            <small class="text-muted">${new Date(record.created_at).toLocaleString('zh-TW')}</small>
+                        </div>
+                        <span class="badge ${record.status === 'pending' ? 'bg-warning' : 'bg-success'}">
+                            ${record.status === 'pending' ? '待處理' : '已處理'}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
+        }
+
+        // 載入升遷數據
+        function loadPromotionData() {
+            document.getElementById('promotionEligibility').innerHTML = '<p class="text-muted">升遷功能開發中...</p>';
+            document.getElementById('activePromotions').innerHTML = '<p class="text-muted">暫無進行中的投票</p>';
+        }
+
+        // 載入個人檔案
+        function loadProfileData() {
+            if (currentUser) {
+                document.getElementById('userProfile').innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>姓名:</strong> ${currentUser.name}</p>
+                            <p><strong>用戶名:</strong> ${currentUser.username}</p>
+                            <p><strong>角色:</strong> ${currentUser.role}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>員工編號:</strong> ${currentUser.employee_id}</p>
+                            <p><strong>分店:</strong> ${currentUser.store_name}</p>
+                            <p><strong>狀態:</strong> <span class="badge bg-success">在職</span></p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // 安全的fetch包裝
+        async function safeFetch(url, options = {}) {
+            const token = localStorage.getItem('token');
+            if (token) {
+                options.headers = {
+                    'Authorization': 'Bearer ' + token,
+                    ...options.headers
+                };
+            }
+            
+            const response = await fetch(url, options);
+            
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            return response;
+        }
+
+        // 顯示提示訊息
+        function showAlert(message, type = 'info') {
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            const container = document.getElementById('alertContainer');
+            container.insertAdjacentHTML('beforeend', alertHtml);
+            
+            // 3秒後自動關閉
+            setTimeout(() => {
+                const alerts = container.querySelectorAll('.alert');
+                if (alerts.length > 0) {
+                    const oldestAlert = alerts[0];
+                    const bsAlert = bootstrap.Alert.getOrCreateInstance(oldestAlert);
+                    bsAlert.close();
+                }
+            }, 3000);
+        }
+
+        // 登出功能
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

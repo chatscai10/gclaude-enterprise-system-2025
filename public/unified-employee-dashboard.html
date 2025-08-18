@@ -2618,57 +2618,7 @@
         }
     </script>
 </body>
-</html> + totalRevenue.toLocaleString()}<br>
-                                                            <strong>總支出:</strong> $${totalExpense.toLocaleString()}<br>
-                                                            <strong>淨利:</strong> $${(totalRevenue - totalExpense).toLocaleString()}
-                                                        </p>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        ${record.notes ? `<p class="card-text"><strong>備註:</strong> ${record.notes}</p>` : ''}
-                                                        <small class="text-muted">提交時間: ${new Date(record.created_at).toLocaleString('zh-TW')}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="ms-3">
-                                                ${record.status === 'pending' ? `
-                                                    <button class="btn btn-sm btn-outline-danger" onclick="voidRevenueRecord(${record.id})">
-                                                        <i class="fas fa-trash me-1"></i>作廢
-                                                    </button>
-                                                ` : ''}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                    }
-                    
-                    // 找到營收記錄容器並顯示
-                    const container = document.getElementById('revenueHistory') || 
-                                    document.querySelector('[data-section="revenue"] .revenue-records');
-                    if (container) {
-                        container.innerHTML = html;
-                    }
-                } else {
-                    throw new Error(result.message);
-                }
-            } catch (error) {
-                console.error('載入營收記錄失敗:', error);
-                const container = document.getElementById('revenueHistory') || 
-                                document.querySelector('[data-section="revenue"] .revenue-records');
-                if (container) {
-                    container.innerHTML = `
-                        <div class="alert alert-danger">
-                            <i class="fas fa-exclamation-triangle me-2"></i>載入營收記錄失敗: ${error.message}
-                        </div>
-                    `;
-                }
-            }
-        }
-
-        // 作廢營收記錄
-        async function voidRevenueRecord(recordId) {
-            if (!confirm('確定要作廢此營收記錄嗎？')) {
+</html>
                 return;
             }
             
