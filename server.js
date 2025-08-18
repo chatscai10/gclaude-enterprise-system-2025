@@ -23,6 +23,9 @@ const TelegramNotifier = require('./modules/telegram-notifier');
 // 定時異常檢測服務
 const ScheduledAnomalyDetector = require('./services/scheduled-anomaly-detector');
 
+// 排班系統服務
+const ScheduleSystem = require('./services/schedule-system');
+
 const app = express();
 const PORT = process.env.PORT || 4006;
 const JWT_SECRET = process.env.JWT_SECRET || 'gclaude-enterprise-secret-key';
@@ -33,6 +36,9 @@ const telegramNotifier = new TelegramNotifier();
 
 // 初始化定時異常檢測服務
 const anomalyDetector = new ScheduledAnomalyDetector();
+
+// 初始化排班系統服務
+const scheduleSystem = new ScheduleSystem();
 
 // 配置multer用於檔案上傳
 const storage = multer.memoryStorage(); // 使用記憶體存儲，雲端環境友好
@@ -3273,7 +3279,7 @@ app.post('/api/revenue/submit', authenticateToken, async (req, res) => {
         }
 
         // 使用資料庫的獎金計算邏輯
-        const bonusCalculation = db.calculateBonus({
+        const bonusCalculation = db.calculateBonusAmount({
             revenue_items: revenue_items || [],
             expense_items: expense_items || [],
             bonus_type: bonus_type || '平日獎金',
@@ -4038,6 +4044,192 @@ app.use((error, req, res, next) => {
         message: error.message || 'Internal server error',
         timestamp: new Date().toISOString()
     });
+});
+
+// ==================== 排班系統API ====================
+
+// 獲取排班系統狀態
+app.get('/api/schedule/status', authenticateToken, async (req, res) => {
+    try {
+        const status = await scheduleSystem.getSystemStatus();
+        
+        res.json({
+            success: true,
+            data: status,
+            message: '排班系統狀態獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取排班系統狀態失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取排班規則
+app.get('/api/schedule/rules', authenticateToken, async (req, res) => {
+    try {
+        const rules = await scheduleSystem.getScheduleRules();
+        
+        res.json({
+            success: true,
+            data: rules,
+            message: '排班規則獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取排班規則失敗: ' + error.message
+        });
+    }
+});
+
+// 獲取下個月日曆
+app.get('/api/schedule/calendar', authenticateToken, async (req, res) => {
+    try {
+        const calendar = scheduleSystem.getNextMonthCalendar();
+        
+        res.json({
+            success: true,
+            data: {
+                calendar: calendar,
+                month: scheduleSystem.getNextMonthString()
+            },
+            message: '日曆資料獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取日曆資料失敗: ' + error.message
+        });
+    }
+});
+
+// 進入排班系統（開始會話）
+app.post('/api/schedule/enter', authenticateToken, async (req, res) => {
+    try {
+        const sessionInfo = await scheduleSystem.startScheduleSession(req.user);
+        
+        res.json({
+            success: true,
+            data: sessionInfo,
+            message: '成功進入排班系統'
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+// 提交排班申請
+app.post('/api/schedule/submit', authenticateToken, async (req, res) => {
+    try {
+        const { vacation_dates } = req.body;
+        
+        if (!vacation_dates || !Array.isArray(vacation_dates)) {
+            return res.status(400).json({
+                success: false,
+                message: '請提供有效的休假日期'
+            });
+        }
+        
+        const scheduleRecord = await scheduleSystem.submitSchedule(
+            req.user.employee_id,
+            vacation_dates,
+            req.user.store_id
+        );
+        
+        res.json({
+            success: true,
+            data: scheduleRecord,
+            message: '排班申請提交成功'
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+// 獲取用戶排班記錄
+app.get('/api/schedule/my-schedule', authenticateToken, async (req, res) => {
+    try {
+        const userSchedule = await scheduleSystem.getUserScheduleForNextMonth(req.user.employee_id);
+        
+        res.json({
+            success: true,
+            data: userSchedule,
+            message: '用戶排班記錄獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取用戶排班記錄失敗: ' + error.message
+        });
+    }
+});
+
+// 退出排班系統（結束會話）
+app.post('/api/schedule/exit', authenticateToken, async (req, res) => {
+    try {
+        await scheduleSystem.endScheduleSession();
+        
+        res.json({
+            success: true,
+            message: '已退出排班系統'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '退出排班系統失敗: ' + error.message
+        });
+    }
+});
+
+// 管理員：強制開啟排班系統
+app.post('/api/admin/schedule/force-open', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { duration_minutes } = req.body;
+        const duration = duration_minutes || 30; // 預設30分鐘
+        
+        // 創建強制開啟記錄
+        const forceOpenRecord = {
+            id: Date.now(),
+            opened_by: req.user.id,
+            opened_by_name: req.user.name,
+            duration_minutes: duration,
+            start_time: new Date().toISOString(),
+            end_time: new Date(Date.now() + duration * 60 * 1000).toISOString(),
+            status: 'active'
+        };
+        
+        const forceOpenRecords = await db.readTable('schedule_force_open') || [];
+        forceOpenRecords.push(forceOpenRecord);
+        await db.writeTable('schedule_force_open', forceOpenRecords);
+        
+        // 發送Telegram通知
+        await telegramNotifier.sendBossNotification(
+            `🚨 強制排班系統已開啟\n⏰ 開放時間: ${duration}分鐘\n👤 開啟者: ${req.user.name}\n📅 開啟時間: ${new Date().toLocaleString('zh-TW')}\n📅 結束時間: ${new Date(Date.now() + duration * 60 * 1000).toLocaleString('zh-TW')}`
+        );
+        
+        await telegramNotifier.sendEmployeeNotification(
+            `🚨 強制排班系統已開啟，請盡快完成排班！`
+        );
+        
+        res.json({
+            success: true,
+            data: forceOpenRecord,
+            message: `強制排班系統已開啟 ${duration} 分鐘`
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '強制開啟排班系統失敗: ' + error.message
+        });
+    }
 });
 
 // ==================== 伺服器啟動 ====================
