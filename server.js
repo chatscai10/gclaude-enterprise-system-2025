@@ -20,6 +20,9 @@ const DatabaseOperations = require('./database/json-database');
 // Telegram通知系統
 const TelegramNotifier = require('./modules/telegram-notifier');
 
+// 定時異常檢測服務
+const ScheduledAnomalyDetector = require('./services/scheduled-anomaly-detector');
+
 const app = express();
 const PORT = process.env.PORT || 4006;
 const JWT_SECRET = process.env.JWT_SECRET || 'gclaude-enterprise-secret-key';
@@ -27,6 +30,9 @@ const JWT_SECRET = process.env.JWT_SECRET || 'gclaude-enterprise-secret-key';
 // 初始化資料庫和通知系統
 const db = new DatabaseOperations();
 const telegramNotifier = new TelegramNotifier();
+
+// 初始化定時異常檢測服務
+const anomalyDetector = new ScheduledAnomalyDetector();
 
 // 配置multer用於檔案上傳
 const storage = multer.memoryStorage(); // 使用記憶體存儲，雲端環境友好
@@ -3248,12 +3254,31 @@ app.post('/api/revenue/submit', authenticateToken, async (req, res) => {
             store_id,
             date,
             order_count,
-            total_revenue,
-            total_expense,
-            bonus_amount,
-            day_type,
+            revenue_items,
+            expense_items,
+            bonus_type,
             notes
         } = req.body;
+
+        // 計算總收入和總支出
+        let total_revenue = 0;
+        let total_expense = 0;
+
+        if (revenue_items && Array.isArray(revenue_items)) {
+            total_revenue = revenue_items.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+        }
+
+        if (expense_items && Array.isArray(expense_items)) {
+            total_expense = expense_items.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+        }
+
+        // 使用資料庫的獎金計算邏輯
+        const bonusCalculation = db.calculateBonus({
+            revenue_items: revenue_items || [],
+            expense_items: expense_items || [],
+            bonus_type: bonus_type || '平日獎金',
+            date: new Date(date)
+        });
 
         // 創建營業額記錄
         const revenueData = {
@@ -3264,10 +3289,14 @@ app.post('/api/revenue/submit', authenticateToken, async (req, res) => {
             store_name: req.user.store_name,
             date,
             order_count: order_count || 0,
-            total_revenue: total_revenue || 0,
-            total_expense: total_expense || 0,
-            bonus_amount: bonus_amount || 0,
-            day_type: day_type || 'weekday',
+            revenue_items: revenue_items || [],
+            expense_items: expense_items || [],
+            total_revenue,
+            total_expense,
+            bonus_type: bonus_type || '平日獎金',
+            bonus_amount: bonusCalculation.amount,
+            bonus_reason: bonusCalculation.reason,
+            adjusted_income: bonusCalculation.adjustedIncome,
             notes: notes || '',
             status: 'pending',
             created_at: new Date().toISOString(),
@@ -3291,7 +3320,8 @@ app.post('/api/revenue/submit', authenticateToken, async (req, res) => {
         res.json({
             success: true,
             data: revenueData,
-            message: '營業額提交成功'
+            message: '營業額提交成功',
+            bonus_calculation: bonusCalculation
         });
     } catch (error) {
         console.error('營業額提交失敗:', error);
@@ -3304,6 +3334,25 @@ app.post('/api/revenue/submit', authenticateToken, async (req, res) => {
 
 // 獲取營業額記錄
 app.get('/api/revenue/records', authenticateToken, async (req, res) => {
+    try {
+        const records = await db.readTable('revenue');
+        const userRecords = records.filter(r => r.employee_id === req.user.employee_id);
+        
+        res.json({
+            success: true,
+            data: userRecords.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)),
+            message: '營業額記錄獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取營業額記錄失敗'
+        });
+    }
+});
+
+// 獲取我的營業額記錄 (修復API路由)
+app.get('/api/revenue/my-records', authenticateToken, async (req, res) => {
     try {
         const records = await db.readTable('revenue');
         const userRecords = records.filter(r => r.employee_id === req.user.employee_id);
@@ -3383,6 +3432,84 @@ app.post('/api/orders/submit', authenticateToken, async (req, res) => {
             notes
         } = req.body;
 
+        // 開始資料庫事務處理
+        console.log('開始叫貨提交事務處理...');
+        
+        // 檢查庫存充足性
+        const inventoryCheckResults = [];
+        const inventory = await db.readTable('inventory') || [];
+        
+        for (const item of items || []) {
+            const productName = item.product_name;
+            const requestedQuantity = parseInt(item.quantity) || 0;
+            
+            // 找到對應的庫存記錄
+            const inventoryItem = inventory.find(inv => 
+                inv.product_name === productName || 
+                inv.name === productName
+            );
+            
+            if (!inventoryItem) {
+                return res.status(400).json({
+                    success: false,
+                    message: `商品 "${productName}" 不存在於庫存中`
+                });
+            }
+            
+            const availableQuantity = parseInt(inventoryItem.quantity) || 0;
+            
+            if (requestedQuantity > availableQuantity) {
+                return res.status(400).json({
+                    success: false,
+                    message: `商品 "${productName}" 庫存不足：需要 ${requestedQuantity}，可用 ${availableQuantity}`
+                });
+            }
+            
+            inventoryCheckResults.push({
+                item: inventoryItem,
+                requestedQuantity,
+                availableQuantity
+            });
+        }
+
+        // 庫存檢查通過，執行庫存扣減
+        for (const result of inventoryCheckResults) {
+            const { item, requestedQuantity } = result;
+            const newQuantity = item.quantity - requestedQuantity;
+            
+            // 更新庫存數量
+            const inventoryIndex = inventory.findIndex(inv => inv.id === item.id);
+            if (inventoryIndex !== -1) {
+                inventory[inventoryIndex] = {
+                    ...inventory[inventoryIndex],
+                    quantity: newQuantity,
+                    updated_at: new Date().toISOString()
+                };
+            }
+            
+            // 記錄庫存異動
+            const inventoryTransactions = await db.readTable('inventory_transactions') || [];
+            inventoryTransactions.push({
+                id: Date.now() + Math.random(),
+                product_id: item.id,
+                product_name: item.product_name || item.name,
+                transaction_type: 'order_deduction',
+                quantity: -requestedQuantity,
+                before_quantity: item.quantity,
+                after_quantity: newQuantity,
+                reason: `員工叫貨扣減 (訂單ID: ${Date.now()})`,
+                performed_by: req.user.employee_id,
+                performed_by_name: req.user.name,
+                reference_no: `ORDER-${Date.now()}`,
+                created_at: new Date().toISOString()
+            });
+            
+            await db.writeTable('inventory_transactions', inventoryTransactions);
+        }
+
+        // 更新庫存表
+        await db.writeTable('inventory', inventory);
+
         // 創建叫貨記錄
         const orderData = {
             id: Date.now(),
@@ -3393,15 +3520,18 @@ app.post('/api/orders/submit', authenticateToken, async (req, res) => {
             delivery_date,
             items: items || [],
             notes: notes || '',
-            status: 'pending',
+            status: 'approved', // 自動核准已扣減庫存的訂單
+            inventory_deducted: true,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
         };
 
-        // 保存到資料庫
+        // 保存叫貨記錄
         const existingOrders = await db.readTable('orders');
         existingOrders.push(orderData);
         await db.writeTable('orders', existingOrders);
+
+        console.log('庫存扣減完成，叫貨記錄已保存');
 
         // 分析叫貨異常
         const anomalies = await analyzeOrderingAnomalies(orderData, req.user.store_id);
@@ -3418,7 +3548,12 @@ app.post('/api/orders/submit', authenticateToken, async (req, res) => {
         res.json({
             success: true,
             data: orderData,
-            message: '叫貨記錄提交成功'
+            message: '叫貨記錄提交成功，庫存已自動扣減',
+            inventory_deducted: inventoryCheckResults.map(r => ({
+                product: r.item.product_name || r.item.name,
+                deducted: r.requestedQuantity,
+                remaining: r.availableQuantity - r.requestedQuantity
+            }))
         });
     } catch (error) {
         console.error('叫貨提交失敗:', error);
@@ -3431,6 +3566,25 @@ app.post('/api/orders/submit', authenticateToken, async (req, res) => {
 
 // 獲取叫貨記錄
 app.get('/api/orders/records', authenticateToken, async (req, res) => {
+    try {
+        const records = await db.readTable('orders');
+        const userRecords = records.filter(r => r.employee_id === req.user.employee_id);
+        
+        res.json({
+            success: true,
+            data: userRecords.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)),
+            message: '叫貨記錄獲取成功'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '獲取叫貨記錄失敗'
+        });
+    }
+});
+
+// 獲取我的叫貨記錄 (修復API路由)
+app.get('/api/orders/my-records', authenticateToken, async (req, res) => {
     try {
         const records = await db.readTable('orders');
         const userRecords = records.filter(r => r.employee_id === req.user.employee_id);
@@ -3894,12 +4048,30 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`📊 Environment: ${process.env.NODE_ENV || 'production'}`);
     console.log(`🗄️ Database: JSON File Database (Cloud Compatible)`);
     console.log(`🔧 Telegram Bot: ${process.env.TELEGRAM_BOT_TOKEN ? '已設定' : '未設定'}`);
+    
+    // 啟動定時異常檢測服務
+    try {
+        anomalyDetector.start();
+        console.log(`📍 定時異常檢測服務已啟動`);
+    } catch (error) {
+        console.error(`❌ 定時異常檢測服務啟動失敗:`, error.message);
+    }
+    
     console.log(`✅ All systems operational - Cloud deployment ready!`);
 });
 
 // 優雅關閉
 process.on('SIGINT', () => {
     console.log('\n🔄 正在關閉伺服器...');
+    
+    // 停止異常檢測服務
+    try {
+        anomalyDetector.stop();
+        console.log('📍 定時異常檢測服務已停止');
+    } catch (error) {
+        console.error('❌ 停止異常檢測服務失敗:', error.message);
+    }
+    
     db.close();
     process.exit(0);
 });
