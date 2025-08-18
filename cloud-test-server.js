@@ -6,7 +6,7 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const PORT = 3008; // 使用不同端口避免衝突
+const PORT = 3009; // 使用不同端口避免衝突
 
 // 中間件
 app.use(cors());

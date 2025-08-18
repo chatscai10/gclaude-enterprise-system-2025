@@ -1,47 +1,42 @@
 {
-  "deploymentUrl": "http://localhost:3008",
-  "timestamp": "2025-08-16T12:49:45.266Z",
+  "deploymentUrl": "http://localhost:3009",
+  "timestamp": "2025-08-18T14:18:29.120Z",
   "tests": [
     {
       "endpoint": "/api/health",
-      "status": "success",
-      "statusCode": 200,
-      "responseTime": 1755348585305,
-      "contentLength": 0
+      "status": "failed",
+      "error": "",
+      "statusCode": 0
     },
     {
       "endpoint": "/api/deployment/status",
       "status": "failed",
-      "error": "Request failed with status code 404",
-      "statusCode": 404
+      "error": "",
+      "statusCode": 0
     },
     {
       "endpoint": "/",
-      "status": "success",
-      "statusCode": 200,
-      "responseTime": 1755348586353,
-      "contentLength": 16575
+      "status": "failed",
+      "error": "",
+      "statusCode": 0
     },
     {
       "endpoint": "/login.html",
-      "status": "success",
-      "statusCode": 200,
-      "responseTime": 1755348586871,
-      "contentLength": 16898
+      "status": "failed",
+      "error": "",
+      "statusCode": 0
     },
     {
       "endpoint": "/admin-dashboard.html",
-      "status": "success",
-      "statusCode": 200,
-      "responseTime": 1755348587380,
-      "contentLength": 90267
+      "status": "failed",
+      "error": "",
+      "statusCode": 0
     },
     {
       "endpoint": "/employee-dashboard.html",
-      "status": "success",
-      "statusCode": 200,
-      "responseTime": 1755348587899,
-      "contentLength": 76238
+      "status": "failed",
+      "error": "",
+      "statusCode": 0
     }
   ]
 }

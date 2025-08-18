@@ -1,20 +1,19 @@
 {
   "version": 2,
+  "name": "gclaude-enterprise-system",
   "builds": [
     {
-      "src": "server.js",
+      "src": "enterprise-server.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/server.js"
+      "dest": "/enterprise-server.js"
     }
   ],
   "env": {
-    "NODE_ENV": "production",
-    "TELEGRAM_BOT_TOKEN": "7659930552:AAF_jF1rAXFnjFO176-9X5fKfBwbrko8BNc",
-    "TELEGRAM_CHAT_ID": "-1002658082392"
+    "NODE_ENV": "production"
   }
 }

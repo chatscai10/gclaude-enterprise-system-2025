@@ -1,31 +1,11 @@
-{
-  "version": 2,
-  "services": [
-    {
-      "type": "web",
-      "name": "gclaude-enterprise-system",
-      "env": "node",
-      "plan": "free",
-      "buildCommand": "npm install",
-      "startCommand": "npm start",
-      "envVars": [
-        {
-          "key": "NODE_ENV",
-          "value": "production"
-        },
-        {
-          "key": "JWT_SECRET",
-          "generateValue": true
-        },
-        {
-          "key": "TELEGRAM_BOT_TOKEN",
-          "value": "7659930552:AAF_jF1rAXFnjFO176-9X5fKfBwbrko8BNc"
-        },
-        {
-          "key": "TELEGRAM_CHAT_ID",
-          "value": "-1002658082392"
-        }
-      ]
-    }
-  ]
-}
+
+services:
+  - type: web
+    name: gclaude-enterprise-system
+    env: node
+    buildCommand: npm install
+    startCommand: node enterprise-server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
