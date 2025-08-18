@@ -12,13 +12,57 @@
   },
   {
     "id": 2,
-    "username": "employee",
-    "password": "emp123",
-    "role": "employee",
-    "employee_id": 2,
+    "username": "manager",
+    "password": "manager123",
+    "role": "manager",
+    "employee_id": 4,
     "store_id": 1,
-    "employee_name": "示範員工",
-    "store_name": "總公司",
+    "employee_name": "店長A",
+    "store_name": "分店A",
+    "created_at": "2025-08-15T17:34:45.121Z"
+  },
+  {
+    "id": 3,
+    "username": "manager2",
+    "password": "manager123",
+    "role": "manager",
+    "employee_id": 5,
+    "store_id": 2,
+    "employee_name": "店長B",
+    "store_name": "分店B",
+    "created_at": "2025-08-15T17:34:45.121Z"
+  },
+  {
+    "id": 4,
+    "username": "employee",
+    "password": "employee123",
+    "role": "employee",
+    "employee_id": 7,
+    "store_id": 1,
+    "employee_name": "員工A",
+    "store_name": "分店A",
+    "created_at": "2025-08-15T17:34:45.121Z"
+  },
+  {
+    "id": 5,
+    "username": "employee2",
+    "password": "employee123",
+    "role": "employee",
+    "employee_id": 8,
+    "store_id": 2,
+    "employee_name": "員工B",
+    "store_name": "分店B",
+    "created_at": "2025-08-15T17:34:45.121Z"
+  },
+  {
+    "id": 6,
+    "username": "intern",
+    "password": "intern123",
+    "role": "intern",
+    "employee_id": 10,
+    "store_id": 1,
+    "employee_name": "實習生A",
+    "store_name": "分店A",
     "created_at": "2025-08-15T17:34:45.121Z"
   }
 ]
